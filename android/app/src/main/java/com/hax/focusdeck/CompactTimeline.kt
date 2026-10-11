@@ -7,8 +7,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -55,7 +57,15 @@ internal fun startDeltaDescription(delta: Long?): String = when {
             fun choose(s: CalendarSegment) { selected=if(selected==s.activityId) null else s.activityId;anchor=Offset(with(density){(width*(s.left+s.right)/2).toPx()},0f) }
             val actions=segments.distinctBy { it.activityId }.map { s -> CustomAccessibilityAction("Inspect ${data.activities[s.activityId]?.title ?: "activity"}") { choose(s);true } }
             Box(Modifier.fillMaxWidth().height(56.dp)) {
-                Canvas(Modifier.fillMaxWidth().height(48.dp).testTag("home-timeline-tracks")
+                Canvas(Modifier.fillMaxWidth().height(48.dp).testTag("home-timeline-tracks").drawWithCache {
+                    val path=android.graphics.Path()
+                    repeat(2) { i ->
+                        val y=10.dp.toPx()+i*13.dp.toPx()
+                        path.addRoundRect(0f,y,size.width,y+5.dp.toPx(),2.dp.toPx(),2.dp.toPx(),android.graphics.Path.Direction.CW)
+                    }
+                    val shadow=OmssShadow(path,size.width,size.height,1.dp.toPx(),2.dp.toPx(),3.dp.toPx(),.4f)
+                    onDrawWithContent { drawIntoCanvas { shadow.draw(it.nativeCanvas) };drawContent() }
+                }
                     .semantics { contentDescription="Daily timeline, planned upper track and actual lower track, ${zone.id}";customActions=actions
                         onClick("Inspect first activity") { segments.firstOrNull()?.let(::choose);segments.isNotEmpty() } }
                     .pointerInput(segments) { detectTapGestures { at ->
@@ -78,6 +88,7 @@ internal fun startDeltaDescription(delta: Long?): String = when {
                     if(now!=null && now in start until end) {
                         val x=size.width*(now-start).toFloat()/(end-start)
                         drawLine(Color.White,Offset(x,6.dp.toPx()),Offset(x,31.dp.toPx()),1.dp.toPx())
+                        drawCircle(Color.White,3.dp.toPx(),Offset(x,6.dp.toPx()))
                     }
                     for(h in 0..24) {
                         val tick=if(h==24) 1f else (date.atTime(h,0).atZone(zone).toInstant().toEpochMilli()-start).toFloat()/(end-start)
@@ -89,8 +100,7 @@ internal fun startDeltaDescription(delta: Long?): String = when {
                 }
                 selected?.let { id -> data.activities[id]?.let { a ->
                     DashboardPopup(dismiss={selected=null},anchorPoint=anchor) {
-                        Surface(Modifier.widthIn(max=280.dp).testTag("home-task-popup"),shape=RoundedCornerShape(10.dp),color=DashboardRaised,
-                            border=BorderStroke(1.dp,DeckColors.accent),shadowElevation=10.dp) {
+                        OmssSurface(Modifier.widthIn(max=280.dp).testTag("home-task-popup"),nested=true) {
                             Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
                                 Text(a.title,fontSize=13.sp,fontWeight=FontWeight.Bold)
                                 fun clock(t: Long?,z: ZoneId)=t?.let { Instant.ofEpochMilli(it).atZone(z).format(DateTimeFormatter.ofPattern("HH:mm")) } ?: "N/A"

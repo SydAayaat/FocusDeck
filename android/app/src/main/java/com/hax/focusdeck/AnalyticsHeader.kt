@@ -48,7 +48,7 @@ internal fun analyticsPeriodLabel(period: HistoryPeriod,date: LocalDate): String
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val stacked=maxWidth<340.dp || androidx.compose.ui.platform.LocalDensity.current.fontScale>1.25f
             val navigator: @Composable ()->Unit = {
-                Surface(Modifier.testTag("analytics-date"),shape=RoundedCornerShape(12.dp),color=DashboardRaised) {
+                OmssSurface(Modifier.testTag("analytics-date"),nested=true) {
                     Row(Modifier.heightIn(min=42.dp),verticalAlignment=Alignment.CenterVertically) {
                         IconButton({setAnchor(StudyHistory.shift(period,anchor,-1))},enabled=period!=HistoryPeriod.ALL,modifier=Modifier.size(36.dp).semantics { contentDescription="Previous ${period.label}" }) { BundledCardIcon("chevron-left",Modifier.size(16.dp),DeckColors.muted) }
                         Text(analyticsPeriodLabel(period,anchor),Modifier.weight(1f),fontSize=11.sp,maxLines=1,overflow=TextOverflow.Ellipsis)
@@ -62,14 +62,10 @@ internal fun analyticsPeriodLabel(period: HistoryPeriod,date: LocalDate): String
                 Box(Modifier.weight(1f)) { navigator() }
             }
         }
-        Surface(shape=RoundedCornerShape(12.dp),color=DashboardInset) {
-            Row(Modifier.fillMaxWidth().padding(3.dp),horizontalArrangement=Arrangement.spacedBy(3.dp)) {
-                HistoryPeriod.entries.forEach { value ->
-                    Box(Modifier.weight(1f).heightIn(min=40.dp).background(if(period==value) DashboardRaised else androidx.compose.ui.graphics.Color.Transparent,RoundedCornerShape(10.dp))
-                        .semantics { selected=period==value;role=Role.Tab }.testTag("period-${value.name}").clickable { setPeriod(value) }.padding(9.dp),contentAlignment=Alignment.Center) {
-                        Text(value.label,fontSize=11.sp,color=if(period==value) androidx.compose.ui.graphics.Color.White else DeckColors.muted)
-                    }
-                }
+        Row(Modifier.fillMaxWidth()) {
+            // All remains available through the existing menu and when already selected.
+            (if(period==HistoryPeriod.ALL) HistoryPeriod.entries else HistoryPeriod.entries.filter { it!=HistoryPeriod.ALL }).forEach { value ->
+                OmssFlatTab(value.label,period==value,Modifier.weight(1f).testTag("period-${value.name}")) { setPeriod(value) }
             }
         }
     }

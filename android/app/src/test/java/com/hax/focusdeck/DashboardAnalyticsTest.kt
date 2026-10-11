@@ -90,4 +90,32 @@ class DashboardAnalyticsTest {
         assertNull(completionContribution(s.copy(progressHistory=s.progressHistory+intervening.copy(unit=h.unit,targetValueAtThatTime=200.0)),"project",date,date,zone))
     }
 
+    @Test fun focusReferencesExcludePartialLiveAndUnlocatedDaysWithoutInventingMissingZeroes() {
+        fun day(offset: Long, minutes: Long, incomplete: Boolean=false, unlocated: Long=0) =
+            CalendarDay(date.plusDays(offset),hasRecord=true,focusMs=minutes*60000,hourCoverage=true,
+                incomplete=incomplete,unlocatedMs=unlocated).apply { hours[9]=minutes*60000-unlocated }
+        val recorded=day(0,120)
+        val partial=day(1,600,incomplete=true)
+        val unlocated=day(2,600,unlocated=60000)
+        val days=listOf(recorded,partial,unlocated,CalendarDay(date.plusDays(3)))
+        assertEquals(120*60000.0,dailyFocusReference(days)!!,0.0)
+        assertEquals(5*60000.0,hourlyFocusReference(days)!!,0.0)
+        assertNull(hourlyFocusReference(listOf(partial,unlocated)))
+        assertNull(dailyFocusReference(emptyList()))
+    }
+
+    @Test fun eligibleObservedZeroParticipatesInReferenceDenominator() {
+        val active=CalendarDay(date,hasRecord=true,hourCoverage=true,focusMs=48*60000).apply { hours[8]=48*60000 }
+        val zero=CalendarDay(date.plusDays(1),hasRecord=true,hourCoverage=true)
+        assertEquals(24*60000.0,dailyFocusReference(listOf(active,zero))!!,0.0)
+        assertEquals(60000.0,hourlyFocusReference(listOf(active,zero))!!,0.0)
+        assertEquals(0.0,hourlyFocusReference(listOf(zero))!!,0.0)
+    }
+
+    @Test fun referenceLabelsAlwaysRetainHoursAndMinutes() {
+        assertEquals("0h 30m",referenceDuration(30*60000.0))
+        assertEquals("2h 15m",referenceDuration(135*60000.0))
+        assertEquals("0h 0m",referenceDuration(0.0))
+    }
+
 }

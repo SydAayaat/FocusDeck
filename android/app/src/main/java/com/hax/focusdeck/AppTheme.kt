@@ -5,16 +5,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 
 internal data class DeckPalette(val id: String, val title: String, val accent: Color, val secondary: Color,
-    val muted: Color = Color(0xFFA4AAB5), val success: Color = Color(0xFF17C99C), val error: Color = Color(0xFFF04453)) {
+    val muted: Color = OmssColors.secondaryText, val success: Color = Color(0xFF00DFA6), val error: Color = Color(0xFFFF5252)) {
     val border get() = accent.copy(alpha = .22f)
-    val track get() = Color(0xFF30343B)
-    val surface get() = if (id == "monochrome") Color(0xFF080808) else Color(0xFF1C1D20)
+    val track get() = OmssColors.track
+    val surface get() = if (id == "monochrome") Color(0xFF181818) else OmssColors.card
 }
 internal object DeckPalettes {
     val all = listOf(
         DeckPalette("cyan", "Cyan", Color(0xFF00C8EF), Color(0xFFFFD166)),
         DeckPalette("monochrome", "Monochrome / grayscale", Color(0xFFE8E8E8), Color(0xFFAAAAAA), Color(0xFFAAAAAA), Color.White, Color(0xFFBBBBBB)),
-        DeckPalette("gold", "Gold / yellow", Color(0xFFF7A915), Color(0xFF18C8E5)),
+        DeckPalette("gold", "Gold / yellow", OmssColors.amber, OmssColors.cyan),
         DeckPalette("blue", "Ocean blue", Color(0xFF62A7FF), Color(0xFF9BD8FF)),
         DeckPalette("purple", "Amethyst", Color(0xFFBB9BFF), Color(0xFFF2BCFF)),
         DeckPalette("green", "Emerald", Color(0xFF55E6AF), Color(0xFFA8F0C2)),
@@ -39,7 +39,7 @@ internal object DeckColors {
     SideEffect { DeckColors.palette = palette }
     MaterialTheme(colorScheme = darkColorScheme(primary = palette.accent, secondary = palette.secondary,
         background = Color.Black, surface = palette.surface, onBackground = if (id == "monochrome") Color(0xFFF4F4F4) else Color(0xFFF1F4F6),
-        onSurface = if (id == "monochrome") Color(0xFFF4F4F4) else Color(0xFFF1F4F6), error = palette.error, outline = palette.border,
+        onSurface = if (id == "monochrome") Color(0xFFF4F4F4) else OmssColors.text, error = palette.error, outline = palette.border,
         onPrimary = Color.Black, onSecondary = Color.Black)) {
         CompositionLocalProvider(LocalDeckImmersive provides immersive, LocalContentColor provides MaterialTheme.colorScheme.onSurface) { MotionProvider(motion, content) }
     }

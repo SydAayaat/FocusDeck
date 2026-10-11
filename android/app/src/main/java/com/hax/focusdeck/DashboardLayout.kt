@@ -107,12 +107,12 @@ internal val LocalDashboardCardHeight = staticCompositionLocalOf<Dp?> { null }
                         CustomAccessibilityAction("Increase $label") { val s=state.dimensions(id,default.copy(height=measuredHeight.coerceAtLeast(minimumHeight),heightSized=false));state.preview(id,s.copy(span=if('x' in axis) (s.span+1).coerceAtMost(12) else s.span,height=if('y' in axis) (s.height+24).coerceAtMost(2400) else s.height,heightSized=s.heightSized || 'y' in axis));state.persist();true },
                         CustomAccessibilityAction("Decrease $label") { val s=state.dimensions(id,default.copy(height=measuredHeight.coerceAtLeast(minimumHeight),heightSized=false));state.preview(id,s.copy(span=if('x' in axis) (s.span-1).coerceAtLeast(1) else s.span,height=if('y' in axis) (s.height-24).coerceAtLeast(minimumHeight) else s.height,heightSized=s.heightSized || 'y' in axis));state.persist();true }) }
                     .pointerInput(id,axis,state,state.editing) {
-                        detectDragGestures(onDragStart={original=state.value.cards[id];before=latestSize.copy(span=((measuredWidth.value+12)/(latestWidth.value+12)*12).roundToInt().coerceIn(1,12),height=measuredHeight.coerceAtLeast(minimumHeight),heightSized=state.value.cards[id]?.heightSized ?: false);delta=Offset.Zero},onDragCancel={state.value=state.value.copy(cards=original?.let { state.value.cards+(id to it) } ?: (state.value.cards-id))},onDragEnd={state.persist()},onDrag={change,amount->
+                        detectDragGestures(onDragStart={original=state.value.cards[id];before=latestSize.copy(span=((measuredWidth.value+8)/(latestWidth.value+8)*12).roundToInt().coerceIn(1,12),height=measuredHeight.coerceAtLeast(minimumHeight),heightSized=state.value.cards[id]?.heightSized ?: false);delta=Offset.Zero},onDragCancel={state.value=state.value.copy(cards=original?.let { state.value.cards+(id to it) } ?: (state.value.cards-id))},onDragEnd={state.persist()},onDrag={change,amount->
                             change.consume();delta+=amount
                             val dx=with(density){delta.x.toDp().value};val dy=with(density){delta.y.toDp().value}
                             val step=1
                             val minSpan=1
-                            val span=if('x' in axis) (((before.span+dx/(latestWidth.value+12)*12)/step).roundToInt()*step).coerceIn(minSpan,12) else before.span
+                            val span=if('x' in axis) (((before.span+dx/(latestWidth.value+8)*12)/step).roundToInt()*step).coerceIn(minSpan,12) else before.span
                             val height=if('y' in axis) (((before.height+dy)/24).roundToInt()*24).coerceIn(minimumHeight,2400) else before.height
                             state.preview(id,CardDimensions(span,height,before.heightSized || 'y' in axis))
                         })
@@ -141,10 +141,10 @@ internal data class DashboardCard(val id: String, val span: Int = 12, val height
     BoxWithConstraints(modifier) {
         val totalWidth=maxWidth;val columns=12
         fun effectiveSpan(card: DashboardCard): Int {
-            val minimum=kotlin.math.ceil((card.minimumWidth+12f)/(totalWidth.value+12f)*12).toInt().coerceIn(1,12)
+            val minimum=kotlin.math.ceil((card.minimumWidth+8f)/(totalWidth.value+8f)*12).toInt().coerceIn(1,12)
             return state.dimensions(card.id,CardDimensions(card.span,card.height)).span.coerceIn(minimum,12)
         }
-        LazyVerticalGrid(GridCells.Fixed(columns),state=grid,modifier=Modifier.fillMaxSize().then(if(scrollTag!=null) Modifier.testTag(scrollTag) else Modifier),horizontalArrangement=Arrangement.spacedBy(12.dp),verticalArrangement=Arrangement.spacedBy(12.dp),contentPadding=PaddingValues(bottom=24.dp)) {
+        LazyVerticalGrid(GridCells.Fixed(columns),state=grid,modifier=Modifier.fillMaxSize().then(if(scrollTag!=null) Modifier.testTag(scrollTag) else Modifier),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(bottom=24.dp)) {
             if(header!=null) item(key="layout-header",span={GridItemSpan(maxLineSpan)}) { header() }
             items(ordered,key={it.id},span={card->GridItemSpan(effectiveSpan(card))}) { card ->
                 val reorder=Modifier.semantics {
@@ -189,21 +189,21 @@ internal data class DashboardMetric(val id: String, val label: String, val value
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val width=maxWidth
         Column(verticalArrangement=Arrangement.spacedBy(12.dp)) {
-            metrics.chunked(4).forEachIndexed { row, group ->
-                if(row>0) HorizontalDivider(color=DeckColors.track)
+            metrics.chunked(4).forEach { group ->
                 FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                     group.forEach { metric ->
                         val default=CardDimensions(12/group.size,140)
                         val span=state?.dimensions(metric.id,default)?.span ?: default.span
                         val w=((width+8.dp)*span/12f-8.dp).coerceIn(minOf(width,72.dp),width)
                         val body: @Composable () -> Unit = {
-                            Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(7.dp)) {
+                            OmssMiniCard(Modifier.fillMaxWidth().fillMaxHeight()) {
                                 metric.icon?.let { BundledCardIcon(it,Modifier.size(24.dp),DeckColors.accent) }
-                                Text(metric.value,fontSize=18.sp,fontWeight=androidx.compose.ui.text.font.FontWeight.Medium,color=metric.color ?: androidx.compose.ui.graphics.Color.White)
+                                Text(metric.value,fontSize=18.sp,fontWeight=androidx.compose.ui.text.font.FontWeight.Medium,color=metric.color ?: OmssColors.text)
                                 Text(metric.label,color=DeckColors.muted,fontSize=10.sp)
                             }
                         }
-                        if(state!=null) ResizableCardFrame(metric.id,state,default,width,Modifier.width(w),content=body) else Box(Modifier.width(w)) { body() }
+                        val frame=Modifier.width(w).then(if(state?.value?.cards?.get(metric.id)?.heightSized!=true) Modifier.fillMaxRowHeight() else Modifier)
+                        if(state!=null) ResizableCardFrame(metric.id,state,default,width,frame,content=body) else Box(frame) { body() }
                     }
                 }
             }

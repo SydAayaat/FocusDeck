@@ -5,6 +5,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.IconButton
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.*
@@ -37,13 +39,20 @@ internal fun monthCalendarSlots(anchor: LocalDate): List<LocalDate?> {
     val count=((lead+first.lengthOfMonth()+6)/7)*7
     return List(count) { i->(i-lead).takeIf { it in 0 until first.lengthOfMonth() }?.let { first.plusDays(it.toLong()) } }
 }
-@Composable internal fun NativeMonthCalendar(data: CalendarDataset,anchor: LocalDate,openDay: (LocalDate)->Unit,openWeek: (LocalDate)->Unit,scores: Map<LocalDate,ExecutionScore> = emptyMap(),metric: CalendarMetric=CalendarMetric.FOCUS_HOURS,setMetric: ((CalendarMetric)->Unit)?=null) {
+@OptIn(ExperimentalLayoutApi::class)
+@Composable internal fun NativeMonthCalendar(data: CalendarDataset,anchor: LocalDate,openDay: (LocalDate)->Unit,openWeek: (LocalDate)->Unit,scores: Map<LocalDate,ExecutionScore> = emptyMap(),metric: CalendarMetric=CalendarMetric.FOCUS_HOURS,setMetric: ((CalendarMetric)->Unit)?=null,shiftMonth: ((Long)->Unit)?=null) {
     val cells=remember(anchor) { monthCalendarSlots(anchor) };val density=LocalDensity.current
     val peak=if(metric==CalendarMetric.FOCUS_HOURS) cells.mapNotNull { calendarMetricValue(data.days[it],scores[it],metric) }.maxOrNull()?.coerceAtLeast(1.0) ?: 1.0 else 100.0
     var menu by remember { mutableStateOf(false) }
     var selected by remember(anchor) { mutableStateOf<LocalDate?>(null) };var point by remember { mutableStateOf(Offset.Zero) }
-    Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
-        Text(anchor.format(DateTimeFormatter.ofPattern("MMM yyyy")),fontSize=11.sp,color=DeckColors.muted)
+    FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+        OmssSurface(nested=true) {
+            Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically) {
+                if(shiftMonth!=null) IconButton({shiftMonth(-1)},Modifier.size(32.dp).semantics { contentDescription="Previous calendar month" }) { Text("‹") }
+                Text(anchor.format(DateTimeFormatter.ofPattern("MMM yyyy")),fontSize=11.sp,color=DeckColors.muted)
+                if(shiftMonth!=null) IconButton({shiftMonth(1)},Modifier.size(32.dp).semantics { contentDescription="Next calendar month" }) { Text("›") }
+            }
+        }
         if(setMetric!=null) Box { TextButton({menu=true},contentPadding=PaddingValues(2.dp)) { Text(metric.label+" ▾",fontSize=10.sp) };DropdownMenu(menu,{menu=false}) { CalendarMetric.entries.forEach { v->DropdownMenuItem(text={Text(v.label)},onClick={menu=false;setMetric(v)}) } } }
         Text("● Higher",fontSize=10.sp,color=DeckColors.accent);Text("● Lower",fontSize=10.sp,color=DeckColors.secondary)
     }
@@ -61,7 +70,11 @@ internal fun monthCalendarSlots(anchor: LocalDate): List<LocalDate?> {
             listOf("Mon","Tue","Wed","Thu","Fri","Sat","Sun").forEachIndexed { i,label->drawIntoCanvas { it.nativeCanvas.drawText(label,slot*(i+.5f),12.dp.toPx(),paint) } }
             cells.forEachIndexed { i,date->if(date!=null) {
                 val d=data.days[date];val value=calendarMetricValue(d,scores[date],metric);val state=calendarEvidenceState(date,d,scores[date],metric)
-                val color=when { value==null || value==0.0->DeckColors.track.copy(alpha=.6f);value.toDouble()/peak>=.65->DeckColors.accent;else->DeckColors.secondary }
+                val color=when {
+                    value==null || value==0.0->OmssColors.material(OmssColors.track)
+                    value.toDouble()/peak<.25->OmssColors.analytical
+                    else->lerp(OmssColors.material(OmssColors.track),DeckColors.accent,(value.toDouble()/peak).toFloat().coerceIn(.3f,1f))
+                }
                 val x=slot*(i%7+.5f)-cell/2;val y=top+i/7*rowHeight
                 drawRoundRect(color,Offset(x,y),Size(cell,cell),CornerRadius(3.dp.toPx()))
                 if(state=="future") drawRect(Color.Black.copy(alpha=.65f),Offset(x,y),Size(cell,cell))

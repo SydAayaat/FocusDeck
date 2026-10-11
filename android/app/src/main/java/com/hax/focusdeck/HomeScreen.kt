@@ -78,7 +78,7 @@ fun HomeScreen(repo: DeckRepository, paired: Boolean, connection: String,
                         Text(upcoming?.schedule?.let { s -> val z=s.timezone?.let(ZoneId::of) ?: sourceZone;"${Instant.ofEpochMilli(s.start).atZone(z).format(DateTimeFormatter.ofPattern("HH:mm"))} – ${s.end?.let { Instant.ofEpochMilli(it).atZone(z).format(DateTimeFormatter.ofPattern("HH:mm")) } ?: "N/A"}" }
                             ?: if(upcoming!=null) "No absolute schedule" else "Send your next plan from the desktop.",fontSize=11.sp,color=DeckColors.muted)
                     }
-                    if(upcoming!=null && !viewer) Button(openSession,contentPadding=PaddingValues(horizontal=14.dp,vertical=8.dp)) { Text("▶  Start",fontSize=12.sp) }
+                    if(upcoming!=null && !viewer) OmssPrimaryButton(openSession) { Text("▶  Start",fontSize=12.sp) }
                 }
             }
         }
@@ -91,15 +91,14 @@ fun HomeScreen(repo: DeckRepository, paired: Boolean, connection: String,
                 }
                 Column(verticalArrangement=Arrangement.spacedBy(3.dp)) {
                     RefLabel("TODAY’S FOCUS")
-                    Text(if(calendar==null) "—" else dashboardDuration(day?.focusMs ?: 0),fontSize=42.sp,fontWeight=FontWeight.Bold)
+                    Text(if(calendar==null) "—" else dashboardDuration(day?.focusMs ?: 0),fontSize=42.sp,style=OmssTypography.metric)
                     Text(day?.let { "${it.sessions.size} recorded sessions · ${it.done} blocks done" } ?: "No recorded activity today",fontSize=12.sp,color=DeckColors.muted)
                 }
-                HorizontalDivider(color=DeckColors.track)
                 LayoutPanel("weekly-statistics",100) { Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp)) {
                     FDCard(Modifier.weight(1f)) { RefLabel("THIS WEEK");Text(dashboardDuration(week),fontSize=21.sp,fontWeight=FontWeight.Bold) }
                     FDCard(Modifier.weight(1f)) { RefLabel("ALL-TIME FOCUS");Text(dashboardDuration(total),fontSize=21.sp,fontWeight=FontWeight.Bold) }
                 } }
-                OutlinedButton(history,Modifier.fillMaxWidth().height(44.dp),shape=RoundedCornerShape(14.dp),
+                OutlinedButton(history,Modifier.fillMaxWidth().height(44.dp).omssDirectionalShadow(RoundedCornerShape(14.dp),OmssElevations.component),shape=RoundedCornerShape(14.dp),
                     colors=ButtonDefaults.outlinedButtonColors(containerColor=DeckColors.surface),border=BorderStroke(1.dp,DeckColors.accent)) {
                     Spacer(Modifier.weight(1f));BundledCardIcon("chart-no-axes-column",Modifier.size(21.dp),DeckColors.accent)
                     Spacer(Modifier.width(12.dp));Text("Analytics",fontWeight=FontWeight.Bold,fontSize=16.sp)
@@ -112,7 +111,7 @@ fun HomeScreen(repo: DeckRepository, paired: Boolean, connection: String,
     }
 }
 @Composable private fun SessionBadge() {
-    Surface(shape=RoundedCornerShape(50),color=DashboardRaised,border=BorderStroke(1.dp,DeckColors.accent)) {
-        BundledCardIcon("book-open",Modifier.padding(10.dp).size(24.dp),DeckColors.accent)
+    OmssCircularGauge(1f,Modifier.size(56.dp)) {
+        BundledCardIcon("book-open",Modifier.size(25.dp),DeckColors.accent)
     }
 }

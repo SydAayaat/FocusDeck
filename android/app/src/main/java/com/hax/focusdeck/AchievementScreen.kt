@@ -136,7 +136,7 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
                     Column(Modifier.selectable(chosen,role=Role.Tab,onClick={scope.launch {
                         if(mode==AchievementMotion.OFF) pager.scrollToPage(index) else pager.animateScrollToPage(index,animationSpec=tween(mode.duration))
                     }}).semantics { contentDescription="Category $name" },horizontalAlignment=Alignment.CenterHorizontally) {
-                        Text(name,Modifier.background(if(chosen) DashboardRaised else DashboardInset,RoundedCornerShape(20.dp)).padding(horizontal=14.dp,vertical=8.dp),fontSize=12.sp,color=if(chosen) ACyan else AGrey)
+                        Text(name,Modifier.padding(horizontal=14.dp,vertical=8.dp),fontSize=12.sp,color=if(chosen) ACyan else AGrey)
                         Spacer(Modifier.height(4.dp))
                         Box(Modifier.width((name.length*6+28).dp).height(2.dp).background(if(chosen) ACyan else DeckColors.track))
                     }
@@ -203,9 +203,9 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     FDCard(Modifier.fillMaxWidth()) {
         Text("Overview",fontSize=18.sp,fontWeight=FontWeight.Bold)
         DashboardMetricStrip(listOf(
-            DashboardMetric("overview-active","Active streaks",all.count { it.current>0 }.toString(),"flame"),
+            DashboardMetric("overview-active","Active streaks","${all.count { it.current>0 }} / ${all.size}","flame"),
             DashboardMetric("overview-records","Personal bests",records.toString(),"trophy"),
-            DashboardMetric("overview-daily","Daily objectives",if(daily.isEmpty()) "Not set" else "${daily.count { it.met }} / ${daily.size}","target"),
+            DashboardMetric("overview-daily","Daily target",if(daily.isEmpty()) "Not set" else "${daily.count { it.met }} / ${daily.size}","target"),
             DashboardMetric("overview-progress","Progress cards","${progressCards.count { it.progress?.targetValue!=null }} / ${progressCards.size}","chart-no-axes-column")
         ))
     }
@@ -220,21 +220,21 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     val touch=Modifier.combinedClickable(interactionSource=interaction,indication=null,onClick=open,onLongClick=longPress)
     FDCard(modifier.graphicsLayer { scaleX=scale;scaleY=scale }.then(touch).semantics { contentDescription="Open ${def.title} achievement" },padding=10.dp) {
         if(size=="compact") {
-            Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top) {
-                AchievementRing(stats,store,onRecordViewed,Modifier.size(56.dp))
-                Spacer(Modifier.weight(1f))
-                if(options!=null) IconButton(options,Modifier.size(24.dp).semantics { contentDescription="Options for ${def.title}" }) { Text("⋮",fontSize=22.sp,color=AGrey) }
+            Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                AchievementRing(stats,store,onRecordViewed,Modifier.size(44.dp))
+                Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                    Text(def.title,fontSize=12.sp,fontWeight=FontWeight.SemiBold)
+                    Text(def.category.replaceFirstChar { it.uppercase() },fontSize=10.sp,color=AGrey)
+                }
             }
-            Text(def.title,fontSize=13.sp,fontWeight=FontWeight.SemiBold,maxLines=3,overflow=TextOverflow.Ellipsis)
-            Text(def.category.replaceFirstChar { it.uppercase() },fontSize=10.sp,color=AGrey)
         } else Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalAlignment=Alignment.CenterVertically) {
             AchievementRing(stats,store,onRecordViewed,Modifier.size(if(size=="full") 84.dp else 62.dp))
             Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(5.dp)) {
-                Text(def.title,fontSize=13.sp,fontWeight=FontWeight.SemiBold,maxLines=4,overflow=TextOverflow.Ellipsis)
+                Text(def.title,fontSize=13.sp,fontWeight=FontWeight.SemiBold)
                 Text(def.category.replaceFirstChar { it.uppercase() },fontSize=10.sp,color=AGrey)
             }
-            if(options!=null) IconButton(options,Modifier.size(24.dp).semantics { contentDescription="Options for ${def.title}" }) { Text("⋮",fontSize=22.sp,color=AGrey) }
         }
+        if(LocalDashboardLayout.current?.editing==true && options!=null) TextButton(options,contentPadding=PaddingValues(0.dp)) { Text("Card options",fontSize=10.sp,color=AGrey) }
         if(def.progressEnabled) {
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(3.dp)) {
                 Text("${AchievementEngine.progressValue(p?.currentValue ?: 0.0)} / ${p?.targetValue?.let(AchievementEngine::progressValue) ?: "—"}",Modifier.weight(1f),fontSize=11.sp)
@@ -330,6 +330,15 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     val target = if(detail && !stats.definition.progressEnabled) 1f else achievementRingFraction(stats)
     val fraction = remember(stats.definition.id) { Animatable(target) }
     LaunchedEffect(target, mode) { fraction.animateTo(target, tween(if (detail && mode == AchievementMotion.FULL) 650 else mode.duration)) }
+    // Keep the previously approved detail hero/glow; dashboard cards use the matte assembly.
+    if(!detail) {
+        OmssCircularGauge(fraction.value,modifier.semantics {
+            contentDescription = if(stats.definition.progressEnabled) "Progress ${p?.percent?.toInt()?.let { "$it%" } ?: "N/A"}" else if(stats.newRecord) "New record ring" else "Current streak ring"
+        },color=accent.value,radiusFraction=.36f) {
+            CardIconView(stats.definition,store,Modifier.size(22.dp),ACyan)
+        }
+        return
+    }
     Box(modifier.semantics { contentDescription = if (stats.definition.progressEnabled) "Progress ${p?.percent?.toInt()?.let { "$it%" } ?: "N/A"}" else if (stats.newRecord) "New record ring" else "Current streak ring" }) {
         Canvas(Modifier.fillMaxSize()) {
             val r = size.minDimension * if (detail) .33f else .36f

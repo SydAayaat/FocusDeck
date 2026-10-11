@@ -14,28 +14,26 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.*
 
 /** Shared matte dashboard primitives. Timer and reward structures remain independent. */
-internal val DashboardBackground get() = if (DeckColors.palette.id == "monochrome") Color.Black else Color(0xFF111214)
-internal val DashboardRaised get() = if (DeckColors.palette.id == "monochrome") Color(0xFF242424) else Color(0xFF242529)
-internal val DashboardInset get() = if (DeckColors.palette.id == "monochrome") Color(0xFF141414) else Color(0xFF141518)
+internal val DashboardBackground get() = if (DeckColors.palette.id == "monochrome") Color.Black else OmssColors.canvas
+internal val DashboardRaised get() = OmssColors.material(OmssColors.nested)
+internal val DashboardInset get() = OmssColors.material(OmssColors.hub)
 @Composable internal fun FDCard(modifier: Modifier = Modifier, onClick: (() -> Unit)? = null,
     padding: Dp = 12.dp, content: @Composable ColumnScope.() -> Unit) {
-    Surface(modifier.then(if(onClick == null) Modifier else Modifier.clickable(onClick=onClick)),
-        shape=RoundedCornerShape(16.dp), color=DeckColors.surface, shadowElevation=5.dp) {
-        CompositionLocalProvider(LocalTextStyle provides androidx.compose.ui.text.TextStyle(fontSize=14.sp)) {
+    OmssSurface(modifier.then(if(onClick == null) Modifier else Modifier.clickable(onClick=onClick))) {
+        CompositionLocalProvider(LocalTextStyle provides androidx.compose.ui.text.TextStyle(fontSize=14.sp,fontFeatureSettings="tnum")) {
             Column(Modifier.padding(padding), verticalArrangement=Arrangement.spacedBy(8.dp), content=content)
         }
     }
 }
-@Composable internal fun FDTitle(title: String, trailing: String? = null,trailingAction: (() -> Unit)? = null) {
+@Composable internal fun FDTitle(title: String, trailing: String? = null,trailingAction: (() -> Unit)? = null,badge: String? = null) {
     Row(Modifier.fillMaxWidth(), verticalAlignment=Alignment.CenterVertically) {
         Text(title,Modifier.weight(1f),fontSize=15.sp,fontWeight=FontWeight.Bold)
         trailing?.let { Text(it,Modifier.then(if(trailingAction!=null) Modifier.clickable(onClick=trailingAction) else Modifier),color=DeckColors.muted,fontSize=11.sp) }
+        badge?.let { OmssStatusPill(it) }
     }
 }
 @Composable internal fun FDTrack(fraction: Float?, modifier: Modifier = Modifier, color: Color = DeckColors.accent) {
-    Box(modifier.fillMaxWidth().height(5.dp).background(DeckColors.track,RoundedCornerShape(4.dp))) {
-        if(fraction != null && fraction > 0) Box(Modifier.fillMaxWidth(fraction.coerceIn(0f,1f)).fillMaxHeight().background(color,RoundedCornerShape(4.dp)))
-    }
+    OmssProgressTrack(fraction,modifier,color)
 }
 internal fun dashboardDuration(ms: Long?): String = ms?.let {
     val minutes=it.coerceAtLeast(0)/60000
@@ -43,7 +41,7 @@ internal fun dashboardDuration(ms: Long?): String = ms?.let {
 } ?: "N/A"
 @Composable internal fun DashboardNavigation(selected: String, home: () -> Unit, achievements: () -> Unit,
     analytics: () -> Unit, focus: (() -> Unit)? = null) {
-    Surface(Modifier.fillMaxWidth().testTag("dashboard-navigation"),color=DashboardInset,shape=RoundedCornerShape(16.dp),shadowElevation=5.dp) {
+    OmssSurface(Modifier.fillMaxWidth().testTag("dashboard-navigation")) {
         Row(Modifier.fillMaxWidth().heightIn(min=62.dp),verticalAlignment=Alignment.CenterVertically) {
             val items=listOf(Triple("home","Home","house"),Triple("achievements","Achievements","trophy")) +
                 (if(focus!=null) listOf(Triple("focus","Focus","timer")) else emptyList()) + Triple("analytics","Analytics","chart-no-axes-column")

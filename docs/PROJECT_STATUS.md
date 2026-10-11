@@ -1,4 +1,8 @@
-# Current development status · Phase 2 Analytics (source only)
+# Current development status · OMSS native UI (source only)
+
+The latest six dashboard references and pasted OMSS specification now drive the native Home, timeline popup, Achievements and shared Day/Week/Month/Year Analytics materials and composition. Reusable opaque matte cards, directional cached GPU shadows, raised hubs/tracks, flat tabs and cyan references behind bars are implemented on local branch `codex/omss-native-ui`. Versions remain Android 1.21.0 / desktop 1.20.0. Main/instrumented Kotlin compilation, 38 focused JVM tests and lint passed (0 errors, 15 warnings). See [OMSS_UI.md](OMSS_UI.md) for changed files, evidence and remaining visual limits. No APK assembly, device execution, installation, reset, push or remote CI was performed. Previous entries describe earlier deliveries.
+
+# Phase 2 Analytics (source only)
 
 Android and desktop Analytics now share factual Plan Execution Score, estimation/calibration, consistency and historical comparison definitions. Day, Week and shared Month/Year/All templates retain local shared-grid editing; report copy rechecks canonical history and deletion state. Versions remain Android 1.21.0 / desktop 1.20.0. Work is on `codex/phase-2-analytics`. See [PHASE_2_ANALYTICS.md](PHASE_2_ANALYTICS.md) for policy, changed files, executed checks and limitations. The Phase 2 delivery contains complete source and no APK; no assembly, installation, service setup, data reset, push or remote CI was performed.
 

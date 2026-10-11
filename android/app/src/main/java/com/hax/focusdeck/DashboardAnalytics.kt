@@ -93,3 +93,13 @@ internal fun dashboardAnalytics(data: CalendarDataset,reports: List<Report>,peri
 internal fun achievementRingFraction(stats: AchievementStats): Float = if(stats.definition.progressEnabled)
     ((stats.definition.progress?.percent ?: 0.0)/100).toFloat().coerceIn(0f,1f)
     else if(stats.initialized && stats.current>0) 1f else 0f
+
+/** Reference projections use the same complete, located-day denominator as hour evidence. */
+internal fun hourlyFocusReference(days: List<CalendarDay>): Double? = days.filter { it.hourComplete }
+    .takeIf { it.isNotEmpty() }?.let { eligible -> eligible.sumOf { it.hours.sum() }.toDouble() / eligible.size / 24 }
+internal fun dailyFocusReference(days: List<CalendarDay>): Double? = days.filter { it.hourComplete }
+    .takeIf { it.isNotEmpty() }?.map { it.focusMs.toDouble() }?.average()
+internal fun referenceDuration(ms: Double): String {
+    val minutes = (ms.coerceAtLeast(0.0) / 60000).toLong()
+    return "${minutes / 60}h ${minutes % 60}m"
+}

@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.*
@@ -190,6 +191,42 @@ class LockedDashboardUiTest {
         ui.runOnIdle { assertSame(report,copied);reports=emptyList() }
         ui.waitUntil(5000) { ui.onAllNodesWithText("Native copy test").fetchSemanticsNodes().isEmpty() }
         ui.onNodeWithText("Archive source actions").assertExists()
+    }
+
+    @Test fun referenceLineIsCyanInGapsAndOccludedByOpaqueBars() {
+        scene {
+            Box(Modifier.width(400.dp).padding(12.dp)) {
+                NativeFocusBars(listOf("Mon" to 4*3600000.0,"Tue" to 3600000.0,"Wed" to null),
+                    benchmark=2*3600000.0,key="omss-layering",onInspect={_,_->})
+            }
+        }
+        val pixels=ui.onNodeWithTag("focus-bars-omss-layering").captureToImage().toPixelMap()
+        val dp=pixels.height/122f;val left=28*dp;val slot=(pixels.width-left-52*dp)/3
+        val cyanRows=(0 until pixels.height).filter { y->
+            ((left+slot*.84f).toInt()..(left+slot*1.15f).toInt()).any { x->
+                val c=pixels[x,y];c.red<.15f && c.green>.65f && c.blue>.65f
+            }
+        }
+        assertTrue("Reference remains visible between bars",cyanRows.isNotEmpty())
+        val barX=(left+slot*.5f).toInt()
+        cyanRows.forEach { y->val c=pixels[barX,y];assertTrue("Opaque amber bar covers cyan reference",c.red>.8f && c.blue<.25f) }
+    }
+
+    @Test fun matteCardShadowFallsDownAndRight() {
+        scene {
+            Box(Modifier.size(200.dp,160.dp).testTag("omss-shadow-scene")) {
+                FDCard(Modifier.offset(40.dp,30.dp).size(100.dp,60.dp)) {}
+            }
+        }
+        val pixels=ui.onNodeWithTag("omss-shadow-scene").captureToImage().toPixelMap()
+        val dp=pixels.width/200f
+        fun luminance(x: Float,y: Float): Float {
+            val c=pixels[(x*dp).toInt(),(y*dp).toInt()]
+            return c.red*.2126f+c.green*.7152f+c.blue*.0722f
+        }
+        assertTrue("Down-right shadow is darker than corresponding up-left canvas",
+            luminance(144f,95f)<luminance(36f,25f)-.004f)
+        assertTrue("Opaque matte body contrasts with canvas",luminance(90f,55f)>luminance(20f,20f))
     }
 
 }

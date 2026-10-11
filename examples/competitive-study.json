@@ -1,0 +1,186 @@
+{
+  "protocol_version": 1,
+  "session_id": "3eeaac8b-44d9-4dfa-9470-2c04a62ebfa1",
+  "title": "Competitive study \u00b7 algebra",
+  "created_at": "2026-10-07T00:00:00Z",
+  "comparison_key": "algebra-practice-medium-v1",
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "focus",
+      "title": "Solve and check five algebra exercises",
+      "duration_seconds": 1500,
+      "quality_criteria": [
+        "Solve all five exercises",
+        "Check each answer and explain any corrected error"
+      ],
+      "comparison": {
+        "category": "algebra-exercises",
+        "complexity": "medium",
+        "method": "closed-book-then-check",
+        "work_units": 5,
+        "target_revision": "v1"
+      },
+      "session_weight": 1.5,
+      "reward_policy": {
+        "enabled": true,
+        "tiers": [
+          {
+            "min_beat_score": 100,
+            "min_focus_ratio": 85,
+            "reward": {
+              "type": "squats",
+              "amount": 10
+            }
+          },
+          {
+            "min_beat_score": 108,
+            "min_focus_ratio": 90,
+            "reward": {
+              "type": "pushups",
+              "amount": 12
+            },
+            "alternatives": [
+              {
+                "type": "walk",
+                "duration_seconds": 60
+              }
+            ]
+          },
+          {
+            "condition": "personal_best",
+            "reward": {
+              "type": "combined",
+              "actions": [
+                {
+                  "type": "pushups",
+                  "amount": 15
+                },
+                {
+                  "type": "walk",
+                  "duration_seconds": 60
+                }
+              ]
+            },
+            "alternatives": [
+              {
+                "type": "mobility",
+                "duration_seconds": 90
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "break1",
+      "type": "break",
+      "title": "Quiet break",
+      "duration_seconds": 300
+    },
+    {
+      "id": "b2",
+      "type": "focus",
+      "title": "Explain two solution methods from memory",
+      "duration_seconds": 1200,
+      "quality_criteria": [
+        "Explain both methods without looking",
+        "Check the explanation against notes"
+      ],
+      "comparison": {
+        "category": "algebra-recall",
+        "complexity": "medium",
+        "method": "closed-book-then-check",
+        "work_units": 2,
+        "target_revision": "v1"
+      },
+      "session_weight": 1.0,
+      "reward_policy": {
+        "enabled": false
+      }
+    }
+  ],
+  "reward_strategy": {
+    "style": "physical_competitive",
+    "allowed_rewards": [
+      "pushups",
+      "squats",
+      "plank",
+      "mobility",
+      "walk",
+      "stretching",
+      "guitar",
+      "coffee"
+    ],
+    "daily_rep_limits": {
+      "pushups": 40,
+      "squats": 60
+    },
+    "daily_physical_seconds": 600,
+    "max_consecutive_same_activity": 2,
+    "coffee_reward": {
+      "enabled": false,
+      "minimum_productive_session_seconds": 10800,
+      "minimum_hours_between_coffee_rewards": 3,
+      "latest_allowed_local_time": "16:00"
+    }
+  },
+  "classification": {
+    "strong_max_actual_ratio": 0.9,
+    "on_target_max_actual_ratio": 1.05,
+    "slightly_over_max_actual_ratio": 1.25,
+    "strong_min_focus_ratio": 80
+  },
+  "session_scoring": {
+    "coefficients": {
+      "strong": 1.0,
+      "on_target": 0.75,
+      "slightly_over": 0.2,
+      "over_target": -0.4
+    }
+  },
+  "session_reward_policy": {
+    "enabled": true,
+    "eligibility": {
+      "minimum_on_or_above_target_blocks": 2,
+      "minimum_focus_ratio": 90
+    },
+    "tiers": [
+      {
+        "min_session_score": 70,
+        "reward": {
+          "type": "guitar",
+          "duration_minutes": 10
+        }
+      },
+      {
+        "min_session_score": 85,
+        "reward": {
+          "type": "guitar",
+          "duration_minutes": 15
+        }
+      },
+      {
+        "min_session_score": 95,
+        "reward": {
+          "type": "combined",
+          "actions": [
+            {
+              "type": "coffee"
+            },
+            {
+              "type": "guitar",
+              "duration_minutes": 15
+            }
+          ]
+        },
+        "alternatives": [
+          {
+            "type": "guitar",
+            "duration_minutes": 15
+          }
+        ]
+      }
+    ]
+  }
+}

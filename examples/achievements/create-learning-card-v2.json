@@ -1,0 +1,14 @@
+{
+  "achievement_version": 2,
+  "id": "create-learning-20261007",
+  "timestamp": "2026-10-07T12:00:00Z",
+  "source": "GPT",
+  "operation": "upsert",
+  "definition": {
+    "id": "robotics_practice",
+    "title": "Robotics practice",
+    "category": "learning",
+    "kind": "scheduled",
+    "description": "Work on explicitly scheduled robotics deliverables"
+  }
+}

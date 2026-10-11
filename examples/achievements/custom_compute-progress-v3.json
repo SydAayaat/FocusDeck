@@ -1,0 +1,11 @@
+{
+  "achievement_version": 3,
+  "operation": "progress_set",
+  "id": "custom_compute-total-example",
+  "timestamp": "2026-10-07T12:00:00Z",
+  "source": "GPT",
+  "achievement_id": "custom_compute",
+  "current_value": 20,
+  "target_value": 100,
+  "unit": "index topics"
+}

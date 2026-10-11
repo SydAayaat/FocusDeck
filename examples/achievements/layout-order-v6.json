@@ -1,0 +1,12 @@
+{
+  "achievement_version": 6,
+  "operation": "layout_order",
+  "id": "example-order",
+  "timestamp": "2026-10-09T10:00:00Z",
+  "source": "Example only",
+  "expected_store_revision": 12,
+  "order": [
+    "german",
+    "gym"
+  ]
+}

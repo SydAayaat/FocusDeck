@@ -1,0 +1,9 @@
+{
+  "achievement_version": 2,
+  "id": "delete-mobility-20261007",
+  "timestamp": "2026-10-07T12:00:00Z",
+  "source": "GPT",
+  "operation": "delete",
+  "achievement_id": "mobility",
+  "confirm": true
+}

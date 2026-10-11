@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <application android:name="android.app.Application" android:label="FocusDeck UI QA" tools:replace="android:name,android:label">
+        <activity android:name="com.hax.focusdeck.UiQaActivity" android:exported="true" />
+        <activity android:name="com.hax.focusdeck.MainActivity" tools:node="remove" />
+        <service android:name="com.hax.focusdeck.FocusService" tools:node="remove" />
+    </application>
+</manifest>

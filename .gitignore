@@ -1,0 +1,30 @@
+*.pyc
+__pycache__/
+*.egg-info/
+.venv/
+.gradle/
+.kotlin/
+build/
+local.properties
+*.jks
+*.keystore
+*.apk
+*.aab
+dist/
+pairing.json
+settings.json
+key.pem
+cert.pem
+.idea/
+
+battery-runs/
+
+# Local Android capture evidence (may include device chrome/private baseline state).
+artifacts/uiqa/**/*.png
+artifacts/uiqa/**/*.xml
+
+# Generated native capture diagnostics stay local; keep portable review reports.
+artifacts/uiqa/*
+!artifacts/uiqa/STATUS.md
+!artifacts/uiqa/GALLERY.md
+!artifacts/uiqa/ACCEPTANCE.json

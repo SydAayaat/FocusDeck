@@ -1,0 +1,12 @@
+2026-10-08 source-only verification
+Full desktop suite: 167 collected, 166 passed, one AF_UNIX host restriction skip.
+Final seven viewer checks rerun after timestamp/schema and actual viewer_state/slow-viewer command-routing coverage: passed.
+Battery measurement-tool fixtures: seven passed (not physical battery evidence).
+Python compileall and install/setup/package shell syntax: passed.
+Kotlin syntax parsing: no new error files. DeckNetwork, DeckRepository and CommandProcessor have parser limitations also present in baseline.
+Five new TabletMirror JVM tests supplied; unexecuted.
+Android source compilation, APK assembly, native unit/lint/instrumented and physical two-device checks: unexecuted.
+The prior 1.14 offline AGP 8.9.2 dependency failure remains a known environment limitation; no APK build retried here.
+No target PC service update/device installation/pairing reset/user history deletion/GitHub push.
+
+APK follow-up: Android compile + assembleDebug passed; 11 focused JVM tests passed. SkipEnd fixture corrected. APK versionCode20/versionName1.15.0, application ID and v2 signature/integrity verified. Lint/device execution unexecuted. See UPDATE_1.15.0 APK follow-up for signing identity and SHA-256.

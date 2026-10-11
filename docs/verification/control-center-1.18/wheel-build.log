@@ -1,0 +1,9 @@
+Processing ./desktop
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: focusdeck
+  Building wheel for focusdeck (pyproject.toml): started
+  Building wheel for focusdeck (pyproject.toml): finished with status 'done'
+  Created wheel for focusdeck: filename=focusdeck-1.18.0-py3-none-any.whl size=709466 sha256=ada01f963e1fb009d4ddbaac316437ef9cd4a71a09862c52891cecb585ad1dc7
+  Stored in directory: /tmp/pip-ephem-wheel-cache-6fvvvsjm/wheels/db/a8/6d/5aa84b5cbbb324d3b477da5a7e040b12c8c3211591c83ebb90
+Successfully built focusdeck

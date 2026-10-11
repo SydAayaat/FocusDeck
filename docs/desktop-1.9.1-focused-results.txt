@@ -1,0 +1,42 @@
+test_contract_two_is_rejected_by_contract_one_phone (test_achievements.AchievementControlTests.test_contract_two_is_rejected_by_contract_one_phone) ... ok
+test_existing_pending_ack_replay_preserves_event_id (test_achievements.AchievementControlTests.test_existing_pending_ack_replay_preserves_event_id) ... ok
+test_log_deletion_never_erases_or_reimports_achievement_ledger (test_achievements.AchievementControlTests.test_log_deletion_never_erases_or_reimports_achievement_ledger) ... ok
+test_offline_commands_follow_existing_no_queue_policy (test_achievements.AchievementControlTests.test_offline_commands_follow_existing_no_queue_policy) ... ok
+test_old_phone_rejected_without_pending_command (test_achievements.AchievementControlTests.test_old_phone_rejected_without_pending_command) ... ok
+test_actual_cli_queries_with_daemon_offline (test_achievements.AchievementSnapshotTests.test_actual_cli_queries_with_daemon_offline) ... ok
+test_complete_chunks_persist_atomically_and_query_history_offline (test_achievements.AchievementSnapshotTests.test_complete_chunks_persist_atomically_and_query_history_offline) ... ok
+test_disconnect_and_out_of_order_preserve_previous_cache (test_achievements.AchievementSnapshotTests.test_disconnect_and_out_of_order_preserve_previous_cache) ... ok
+test_empty_cache_is_honest (test_achievements.AchievementSnapshotTests.test_empty_cache_is_honest) ... ok
+test_invalid_final_payload_does_not_replace_cache (test_achievements.AchievementSnapshotTests.test_invalid_final_payload_does_not_replace_cache) ... ok
+test_abstinence_initialize_and_break (test_achievements.AchievementValidationTests.test_abstinence_initialize_and_break) ... ok
+test_actual_cli_stdin_validation_and_rejection (test_achievements.AchievementValidationTests.test_actual_cli_stdin_validation_and_rejection) ... ok
+test_archive (test_achievements.AchievementValidationTests.test_archive) ... ok
+test_bad_target_objectives (test_achievements.AchievementValidationTests.test_bad_target_objectives) ... ok
+test_bad_timestamps_versions_types_and_combinations (test_achievements.AchievementValidationTests.test_bad_timestamps_versions_types_and_combinations) ... ok
+test_builtins_cannot_be_defined_as_dynamic (test_achievements.AchievementValidationTests.test_builtins_cannot_be_defined_as_dynamic) ... ok
+test_cli_management_generates_confirmed_contract_two_commands (test_achievements.AchievementValidationTests.test_cli_management_generates_confirmed_contract_two_commands) ... ok
+test_contract_two_custom_cards_across_categories_and_manual_kinds (test_achievements.AchievementValidationTests.test_contract_two_custom_cards_across_categories_and_manual_kinds) ... ok
+test_contract_two_management_requires_explicit_delete_confirmation (test_achievements.AchievementValidationTests.test_contract_two_management_requires_explicit_delete_confirmation) ... ok
+test_daily_target_variable_objectives (test_achievements.AchievementValidationTests.test_daily_target_variable_objectives) ... ok
+test_dynamic_projects_and_college (test_achievements.AchievementValidationTests.test_dynamic_projects_and_college) ... ok
+test_german_completion (test_achievements.AchievementValidationTests.test_german_completion) ... ok
+test_achievement_examples_and_capability_wire (test_schemas.SchemaTests.test_achievement_examples_and_capability_wire) ... ok
+test_achievement_schema_rejects_unsupported_combinations (test_schemas.SchemaTests.test_achievement_schema_rejects_unsupported_combinations) ... ok
+test_achievement_v2_deletion_requires_true_confirmation_and_old_contract_stays_restricted (test_schemas.SchemaTests.test_achievement_v2_deletion_requires_true_confirmation_and_old_contract_stays_restricted) ... ok
+test_all_legacy_stopwatch_and_mixed_example_plans (test_schemas.SchemaTests.test_all_legacy_stopwatch_and_mixed_example_plans) ... ok
+test_all_schemas_are_valid_draft_2020_12 (test_schemas.SchemaTests.test_all_schemas_are_valid_draft_2020_12) ... ok
+test_legacy_and_v2_shared_reports (test_schemas.SchemaTests.test_legacy_and_v2_shared_reports) ... ok
+test_v2_report_schema_rejects_nonpositive_and_fractional_countdown_targets (test_schemas.SchemaTests.test_v2_report_schema_rejects_nonpositive_and_fractional_countdown_targets) ... ok
+test_v2_schema_rejects_duration_time_reward_and_break_stopwatch (test_schemas.SchemaTests.test_v2_schema_rejects_duration_time_reward_and_break_stopwatch) ... ok
+test_wire_capability_and_nullable_stopwatch_state (test_schemas.SchemaTests.test_wire_capability_and_nullable_stopwatch_state) ... ok
+test_achievement_command_ack_snapshot_and_offline_cache_over_existing_tls (test_focusdeck.TransportTests.test_achievement_command_ack_snapshot_and_offline_cache_over_existing_tls) ... Executing <Task pending name='Task-35' coro=<TransportTests.asyncSetUp() running at /workspace/scratch/32085340b0d2/FocusDeck/desktop/tests/test_focusdeck.py:146> wait_for=<_GatheringFuture pending cb=[Task.task_wakeup()]> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.126 seconds
+ok
+test_achievement_pending_replay_is_gated_then_preserves_exact_payload (test_focusdeck.TransportTests.test_achievement_pending_replay_is_gated_then_preserves_exact_payload) ... Executing <Task pending name='Task-47' coro=<TransportTests.asyncSetUp() running at /workspace/scratch/32085340b0d2/FocusDeck/desktop/tests/test_focusdeck.py:146> wait_for=<_GatheringFuture pending cb=[Task.task_wakeup()]> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.242 seconds
+ok
+test_achievement_v2_pending_delete_is_gated_until_phone_upgrade (test_focusdeck.TransportTests.test_achievement_v2_pending_delete_is_gated_until_phone_upgrade) ... Executing <Task pending name='Task-62' coro=<TransportTests.asyncSetUp() running at /workspace/scratch/32085340b0d2/FocusDeck/desktop/tests/test_focusdeck.py:146> wait_for=<_GatheringFuture pending cb=[Task.task_wakeup()]> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.317 seconds
+ok
+
+----------------------------------------------------------------------
+Ran 34 tests in 1.608s
+
+OK

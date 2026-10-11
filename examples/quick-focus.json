@@ -1,0 +1,10 @@
+{
+  "protocol_version": 1,
+  "session_id": "quick-focus-demo",
+  "title": "ROB Index",
+  "created_at": "2026-10-06T19:00:00Z",
+  "auto_advance": true,
+  "blocks": [
+    {"id": "b1", "type": "focus", "title": "Topics 1.1 → 1.2", "duration_seconds": 2100}
+  ]
+}

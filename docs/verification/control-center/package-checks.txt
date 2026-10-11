@@ -1,0 +1,3 @@
+Native UI: 54 layouts and five interaction assertions passed; no JS errors or horizontal overflow.
+Wheel: ZIP integrity passed, 44 bundled UI assets, CLI/server/GUI entry points present. Installed-wheel offscreen startup/render passed.
+Python/JavaScript/shell syntax and Git whitespace passed. Android source unchanged; no APK/physical/KWin tests.

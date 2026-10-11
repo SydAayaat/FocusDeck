@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "achievement-command.schema.json",
+  "oneOf": [
+    {
+      "$ref": "achievement-command-v1.schema.json"
+    },
+    {
+      "$ref": "achievement-command-v2.schema.json"
+    },
+    {
+      "$ref": "achievement-command-v3.schema.json"
+    },
+    {
+      "$ref": "achievement-command-v4.schema.json"
+    },
+    {
+      "$ref": "achievement-command-v5.schema.json"
+    },
+    {
+      "$ref": "achievement-command-v6.schema.json"
+    }
+  ]
+}

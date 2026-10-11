@@ -1,0 +1,14 @@
+{
+  "achievement_version": 2,
+  "id": "create-discipline-20261007",
+  "timestamp": "2026-10-07T12:00:00Z",
+  "source": "GPT",
+  "operation": "upsert",
+  "definition": {
+    "id": "no_late_scrolling",
+    "title": "No late scrolling",
+    "category": "discipline",
+    "kind": "abstinence",
+    "description": "Time since the supplied start or last break"
+  }
+}

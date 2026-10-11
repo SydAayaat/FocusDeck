@@ -1,0 +1,9 @@
+{
+  "achievement_version": 1,
+  "id": "example-initialize-porn-free-20261007",
+  "timestamp": "2026-10-07T08:00:00+02:00",
+  "source": "GPT",
+  "operation": "event",
+  "achievement_id": "porn_free",
+  "event": "initialize"
+}

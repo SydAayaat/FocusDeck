@@ -1,0 +1,6 @@
+Executing <Task pending name='Task-1' coro=<TransportTests.asyncSetUp() running at /workspace/scratch/89f2a29bb0df/index-rebuild/work/FocusDeck/desktop/tests/test_focusdeck.py:146> wait_for=<_GatheringFuture pending cb=[Task.task_wakeup()]> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.151 seconds
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.195s
+
+OK

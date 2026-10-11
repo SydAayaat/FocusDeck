@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "achievement-command-v6.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "achievement_version",
+    "operation",
+    "id",
+    "timestamp",
+    "order",
+    "expected_store_revision"
+  ],
+  "properties": {
+    "achievement_version": {
+      "const": 6
+    },
+    "operation": {
+      "const": "layout_order"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "order": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 1000,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]{0,99}$"
+      }
+    },
+    "expected_store_revision": {
+      "type": "integer",
+      "minimum": 0
+    }
+  }
+}

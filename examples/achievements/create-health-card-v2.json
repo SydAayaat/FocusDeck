@@ -1,0 +1,14 @@
+{
+  "achievement_version": 2,
+  "id": "create-health-20261007",
+  "timestamp": "2026-10-07T12:00:00Z",
+  "source": "GPT",
+  "operation": "upsert",
+  "definition": {
+    "id": "mobility",
+    "title": "Mobility",
+    "category": "health",
+    "kind": "daily",
+    "description": "Complete the agreed mobility routine"
+  }
+}

@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "focusdeck"
+version = "1.20.0"
+description = "Local LAN companion for the native FocusDeck Android cockpit"
+requires-python = ">=3.10"
+dependencies = ["websockets>=14,<17", "Pillow>=11,<13", "PyYAML>=6,<7"]
+license = {text = "MIT"}
+
+[project.optional-dependencies]
+test = ["jsonschema>=4.17,<5"]
+gui = ["PySide6>=6.8,<7"]
+
+[project.scripts]
+focusdeck = "focusdeck.cli:main"
+focusdeck-server = "focusdeck.server:main"
+focusdeck-control-center = "focusdeck.desktop_app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+focusdeck = ["control_ui/*.html", "control_ui/*.css", "control_ui/*.js", "control_ui/assets/*.png", "control_ui/assets/*.svg", "control_ui/assets/icons/*"]

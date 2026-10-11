@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "achievement-command-v1.schema.json",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "definition"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "operation": {
+          "const": "upsert"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "definition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "title",
+            "category"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,99}$"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "category": {
+              "enum": [
+                "projects",
+                "college"
+              ]
+            },
+            "kind": {
+              "const": "scheduled"
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "daily_participation": {
+              "type": "boolean"
+            },
+            "archived": {
+              "type": "boolean"
+            },
+            "created_date": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "maxProperties": 30,
+              "propertyNames": {
+                "maxLength": 100
+              },
+              "additionalProperties": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "achievement_id"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "operation": {
+          "const": "archive"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "achievement_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,99}$"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "achievement_id",
+        "event"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "operation": {
+          "const": "event"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "achievement_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,99}$"
+        },
+        "event": {
+          "enum": [
+            "initialize",
+            "streak_break",
+            "completed",
+            "objective_completed"
+          ]
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "date",
+        "objectives"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "operation": {
+          "const": "daily_target"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "objectives": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "focus_blocks",
+                  "focus_time",
+                  "achievement"
+                ]
+              },
+              "minimum": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 604800000
+              },
+              "achievement_id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,99}$"
+              },
+              "text": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "achievement"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "achievement_id"
+                  ]
+                },
+                "else": {
+                  "not": {
+                    "required": [
+                      "achievement_id"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

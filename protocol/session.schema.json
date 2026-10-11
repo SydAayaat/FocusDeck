@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "session.schema.json",
+  "title": "FocusDeck session contract dispatcher (v1 and v2)",
+  "oneOf": [
+    {
+      "$ref": "session-v1.schema.json"
+    },
+    {
+      "$ref": "session-v2.schema.json"
+    }
+  ]
+}

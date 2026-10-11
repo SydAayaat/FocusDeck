@@ -1,0 +1,11 @@
+{
+  "achievement_version": 3,
+  "operation": "progress_set",
+  "id": "german-total-example",
+  "timestamp": "2026-10-07T12:00:00Z",
+  "source": "GPT",
+  "achievement_id": "german",
+  "current_value": 200,
+  "target_value": 1250,
+  "unit": "words"
+}

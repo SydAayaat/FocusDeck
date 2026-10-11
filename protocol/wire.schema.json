@@ -1,0 +1,883 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "wire.schema.json",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "device_id",
+        "name"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "hello"
+        },
+        "device_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "supported_session_versions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              1,
+              2
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "supported_achievement_versions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "type": "integer"
+          },
+          "uniqueItems": true,
+          "maxItems": 6
+        },
+        "role": {
+          "enum": [
+            "phone",
+            "viewer"
+          ]
+        },
+        "supported_viewer_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "supported_schedule_version": {
+          "const": 1,
+          "type": "integer"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "desktop_id"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "hello_ack"
+        },
+        "desktop_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "supported_session_versions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              1,
+              2
+            ]
+          },
+          "uniqueItems": true,
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "supported_achievement_versions": {
+          "type": "array",
+          "items": {
+            "enum": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "type": "integer"
+          },
+          "uniqueItems": true,
+          "maxItems": 6
+        },
+        "role": {
+          "enum": [
+            "phone",
+            "viewer"
+          ]
+        },
+        "supported_viewer_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "supported_schedule_version": {
+          "type": "integer",
+          "const": 1
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "command_id",
+        "action"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "command"
+        },
+        "command_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "action": {
+          "enum": [
+            "send",
+            "start",
+            "pause",
+            "resume",
+            "next",
+            "stop",
+            "extend",
+            "reward_done",
+            "reward_continue",
+            "achievements",
+            "skip_block",
+            "end_block"
+          ]
+        },
+        "session": {
+          "$ref": "session.schema.json"
+        },
+        "achievement": {
+          "$ref": "achievement-command.schema.json"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "enum": [
+                  "send",
+                  "start"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "session"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "action": {
+                "const": "achievements"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "achievement"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "command_id",
+        "ok"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "ack"
+        },
+        "command_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "ok": {
+          "type": "boolean"
+        },
+        "error": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "state"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "state"
+        },
+        "state": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "phase": {
+              "enum": [
+                "idle",
+                "ready",
+                "active",
+                "paused",
+                "between",
+                "complete",
+                "stopped",
+                "overtime",
+                "quality",
+                "reward",
+                "session_reward"
+              ]
+            },
+            "session_id": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "title": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "block_index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            "block_count": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            "remaining_ms": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            "observed_at_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            "completed_blocks": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000000000
+            },
+            "overtime_ms": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0,
+              "maximum": 1000000000000
+            },
+            "is_overtime": {
+              "type": "boolean"
+            },
+            "timer_mode": {
+              "enum": [
+                "countdown",
+                "stopwatch",
+                null
+              ]
+            },
+            "elapsed_active_ms": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "elapsed_paused_ms": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "phase",
+            "session_id",
+            "title",
+            "block_index",
+            "block_count",
+            "remaining_ms",
+            "revision",
+            "observed_at_ms",
+            "completed_blocks"
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "report_key",
+        "report"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "report"
+        },
+        "report_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 250
+        },
+        "report": {
+          "$ref": "report.schema.json"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "report_key",
+        "file_id"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "report_ack"
+        },
+        "report_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 250
+        },
+        "file_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 100
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "message"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "error"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "history_delete"
+        },
+        "sync_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "deletions": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "before_ms": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 253402300799999
+            },
+            "report_keys": {
+              "uniqueItems": true,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 250
+              },
+              "maxItems": 3000,
+              "minItems": 0
+            },
+            "revision": {
+              "type": "string",
+              "maxLength": 100
+            }
+          },
+          "required": [
+            "before_ms",
+            "report_keys",
+            "revision"
+          ]
+        }
+      },
+      "required": [
+        "protocol_version",
+        "type",
+        "sync_id",
+        "deletions"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "history_delete_ack"
+        },
+        "sync_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "protocol_version",
+        "type",
+        "sync_id"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "achievement_version",
+        "snapshot_id",
+        "index",
+        "count",
+        "data"
+      ],
+      "properties": {
+        "protocol_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "type": {
+          "const": "achievement_snapshot"
+        },
+        "achievement_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "snapshot_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "data": {
+          "type": "string",
+          "maxLength": 50000
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "snapshot_id",
+        "index"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "achievement_snapshot_ack"
+        },
+        "snapshot_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "enabled"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "viewer_interest"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "visible"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "viewer_presence"
+        },
+        "visible": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "desktop_id",
+        "authority_device_id",
+        "phone_connected",
+        "phone_supports_viewer"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "viewer_status"
+        },
+        "desktop_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "authority_device_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "phone_connected": {
+          "type": "boolean"
+        },
+        "phone_supports_viewer": {
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "data"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "viewer_state"
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "state",
+            "clock"
+          ],
+          "properties": {
+            "state": {
+              "type": "object",
+              "$comment": "Native serialized DeckState, read-only cache. Session and timer remain phone-authoritative."
+            },
+            "clock": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "wall",
+                "mono",
+                "boot"
+              ],
+              "properties": {
+                "wall": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "mono": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "boot": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "transfer_id",
+        "document",
+        "index",
+        "count",
+        "data"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "viewer_chunk"
+        },
+        "transfer_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "document": {
+          "enum": [
+            "state",
+            "ledger",
+            "report"
+          ]
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000
+        },
+        "data": {
+          "type": "string",
+          "maxLength": 32000
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "transfer_id",
+        "index"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "viewer_ack"
+        },
+        "transfer_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "index": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "sync_id",
+        "desktop_id",
+        "authority_device_id"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "viewer_reports_begin"
+        },
+        "sync_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "desktop_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "authority_device_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "protocol_version",
+        "type",
+        "sync_id",
+        "as_of_ms"
+      ],
+      "properties": {
+        "protocol_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "type": {
+          "const": "viewer_reports_end"
+        },
+        "sync_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "as_of_ms": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  ],
+  "$comment": "Transport/pairing protocol remains 1. Version 2 session payloads require an advertised supported_session_versions capability. Schema dispatchers version session and report payloads independently. Viewer version 1 uses a separate bearer token on /v1/viewer. Only viewer_presence and viewer_ack are accepted from viewers. Cached state/ledger includes desktop_id and authority_device_id; report batches publish atomically."
+}

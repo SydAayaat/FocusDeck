@@ -1,0 +1,1 @@
+Lucide icons 0.468.0, downloaded from https://github.com/lucide-icons/lucide/tree/0.468.0/icons . Original SVGs and complete ISC/Feather MIT license retained. Android vectors generated without modifying path geometry.

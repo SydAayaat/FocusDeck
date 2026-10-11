@@ -1,0 +1,253 @@
+{
+  "session_id": "competitive",
+  "title": "Practice",
+  "status": "complete",
+  "planned_ms": 100000,
+  "active_ms": 90000,
+  "focused_ms": 90000,
+  "break_ms": 0,
+  "paused_ms": 5000,
+  "wall_ms": 100000,
+  "started_at_ms": 1000000,
+  "finished_at_ms": 1100000,
+  "overtime_ms": 0,
+  "timeline_coverage": "complete",
+  "planned_block_count": 1,
+  "recorded_timezone": "UTC",
+  "blocks": [
+    {
+      "id": "a",
+      "type": "focus",
+      "title": "Five exercises",
+      "planned_ms": 100000,
+      "budget_ms": 100000,
+      "active_ms": 90000,
+      "paused_ms": 5000,
+      "started_at_ms": 1000000,
+      "finished_at_ms": 1095000,
+      "outcome": "done",
+      "overtime_ms": 0,
+      "performance": {
+        "quality": "confirmed",
+        "quality_criteria": [
+          "Check five answers"
+        ],
+        "comparison": {
+          "category": "algebra",
+          "complexity": "medium",
+          "method": "closed-book",
+          "work_units": 5,
+          "target_revision": "v1"
+        },
+        "wall_ms": 95000,
+        "pace_index": 111.11,
+        "focus_ratio": 94.74,
+        "beat_score": 104.8,
+        "rank": "A",
+        "recalibration_needed": false,
+        "previous_benchmark": null,
+        "new_personal_best": false,
+        "pb_delta": null,
+        "scoring": {
+          "rank_thresholds": [
+            85.0,
+            95.0,
+            105.0,
+            110.0
+          ],
+          "target_pace": 95.0,
+          "strong_pace": 110.0,
+          "target_focus": 80.0,
+          "strong_focus": 90.0,
+          "recalibration_pace": 150.0
+        },
+        "reward": {
+          "tier": "strong",
+          "actions": [
+            {
+              "kind": "walk",
+              "reps": 0,
+              "seconds": 60
+            }
+          ],
+          "reason": "Configured reward eligible",
+          "acknowledged": true,
+          "skipped": false,
+          "acknowledged_at_ms": 1100000,
+          "local_day": "1970-01-01",
+          "daily_reps_before": {
+            "pushups": 0,
+            "squats": 0
+          },
+          "daily_physical_seconds_before": 0
+        },
+        "reward_contract": {
+          "completion": {
+            "actions": [
+              {
+                "kind": "mobility",
+                "seconds": 60
+              }
+            ]
+          },
+          "strong": {
+            "actions": [
+              {
+                "kind": "walk",
+                "seconds": 60
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "events": [
+    {
+      "seq": 1,
+      "kind": "block_started",
+      "at_ms": 1000000,
+      "mono_ms": 0,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "active",
+      "active_ms": 0,
+      "paused_ms": 0,
+      "budget_ms": 100000
+    },
+    {
+      "seq": 2,
+      "kind": "paused",
+      "at_ms": 1045000,
+      "mono_ms": 45000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "paused",
+      "active_ms": 45000,
+      "paused_ms": 0,
+      "budget_ms": 100000
+    },
+    {
+      "seq": 3,
+      "kind": "resumed",
+      "at_ms": 1050000,
+      "mono_ms": 50000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "active",
+      "active_ms": 45000,
+      "paused_ms": 5000,
+      "budget_ms": 100000
+    },
+    {
+      "seq": 4,
+      "kind": "block_done",
+      "at_ms": 1095000,
+      "mono_ms": 95000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "active",
+      "active_ms": 90000,
+      "paused_ms": 5000,
+      "budget_ms": 100000
+    },
+    {
+      "seq": 5,
+      "kind": "review_started",
+      "at_ms": 1095000,
+      "mono_ms": 95000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "quality",
+      "active_ms": 90000,
+      "paused_ms": 5000,
+      "budget_ms": 100000
+    },
+    {
+      "seq": 6,
+      "kind": "quality_confirmed",
+      "at_ms": 1096000,
+      "mono_ms": 96000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "quality",
+      "active_ms": 90000,
+      "paused_ms": 5000,
+      "budget_ms": 100000
+    },
+    {
+      "seq": 7,
+      "kind": "reward_offered",
+      "at_ms": 1096000,
+      "mono_ms": 96000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "reward",
+      "active_ms": 90000,
+      "paused_ms": 5000,
+      "budget_ms": 100000
+    },
+    {
+      "seq": 8,
+      "kind": "reward_acknowledged",
+      "at_ms": 1100000,
+      "mono_ms": 100000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "reward",
+      "active_ms": 90000,
+      "paused_ms": 5000,
+      "budget_ms": 100000
+    },
+    {
+      "seq": 9,
+      "kind": "session_complete",
+      "at_ms": 1100000,
+      "mono_ms": 100000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "complete",
+      "active_ms": 90000,
+      "paused_ms": 5000,
+      "budget_ms": 100000
+    }
+  ],
+  "competition": {
+    "comparison_key": "practice",
+    "planned_focus_blocks": 1,
+    "completed_focus_blocks": 1,
+    "on_or_ahead_count": 1,
+    "completion_fraction": 1.0,
+    "average_pace": 111.11,
+    "focus_ratio": 94.74,
+    "beat_score": 104.8,
+    "rank": "A",
+    "previous_benchmark": null,
+    "new_personal_best": false,
+    "pb_delta": null,
+    "reward_strategy": {
+      "style": "physical_competitive",
+      "scoring": {
+        "rank_thresholds": [
+          85.0,
+          95.0,
+          105.0,
+          110.0
+        ],
+        "target_pace": 95.0,
+        "strong_pace": 110.0,
+        "target_focus": 80.0,
+        "strong_focus": 90.0,
+        "recalibration_pace": 150.0
+      }
+    },
+    "session_reward": null,
+    "reward": {
+      "tier": "none",
+      "actions": [],
+      "reason": "No reward contract",
+      "acknowledged": false,
+      "skipped": false
+    }
+  }
+}

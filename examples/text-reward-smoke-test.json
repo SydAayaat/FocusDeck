@@ -1,0 +1,47 @@
+{
+  "protocol_version": 1,
+  "session_id": "b3f7ac79-8da4-44d0-b6a3-a4cd87920443",
+  "title": "GPT text rewards smoke test",
+  "created_at": "2026-10-07T00:00:00Z",
+  "session_reward_policy": {
+    "enabled": false
+  },
+  "blocks": [
+    {
+      "id": "b1",
+      "type": "focus",
+      "title": "Wait past 30 seconds, then DONE",
+      "duration_seconds": 30,
+      "session_weight": 0.5,
+      "reward_policy": {
+        "enabled": false
+      }
+    },
+    {
+      "id": "b2",
+      "type": "focus",
+      "title": "DONE around 30 seconds; CONTINUE through reward",
+      "duration_seconds": 30,
+      "session_weight": 1.5,
+      "reward_policy": {
+        "enabled": true,
+        "tiers": [
+          {
+            "min_beat_score": 95,
+            "max_beat_score": 104.99,
+            "reward": {
+              "text": "Move one physical FocusStack token."
+            }
+          },
+          {
+            "min_beat_score": 105,
+            "max_beat_score": 111,
+            "reward": {
+              "text": "5 pull-ups + move one token. For this smoke test, press CONTINUE without exercising."
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

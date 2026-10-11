@@ -1,0 +1,6 @@
+Wheel contains current CSS/JS, both mountain logo assets, icon pack backend and tray modules.
+Native layout checks: 102; overflow: zero; JavaScript errors: zero; workflows: seventeen passed.
+Icon library tests: eight passed. Desktop suite: 205 passed / one existing AF_UNIX host skip.
+Updated-event sorting and search filtering checked in Node VM.
+Android compile blocked before source compilation by offline Android Gradle plugin 8.9.2.
+No APK assembly, installation, pairing reset or remote push.

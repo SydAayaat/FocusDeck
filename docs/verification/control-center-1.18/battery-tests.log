@@ -1,0 +1,12 @@
+test_cli_endpoint_capture_and_comparison_with_fake_adb (__main__.MeasurementTests.test_cli_endpoint_capture_and_comparison_with_fake_adb) ... ok
+test_real_discharge_units_and_elapsed_time (__main__.MeasurementTests.test_real_discharge_units_and_elapsed_time) ... ok
+test_short_run_or_reboot_withholds_rates (__main__.MeasurementTests.test_short_run_or_reboot_withholds_rates) ... ok
+test_unknown_charging_state_withholds_rate (__main__.MeasurementTests.test_unknown_charging_state_withholds_rate) ... ok
+test_unsupported_counter_does_not_invent_mah (__main__.MeasurementTests.test_unsupported_counter_does_not_invent_mah) ... ok
+test_usb_charging_and_simulation_withhold_rates (__main__.MeasurementTests.test_usb_charging_and_simulation_withhold_rates) ... ok
+test_wrong_device_or_version_withholds_rate (__main__.MeasurementTests.test_wrong_device_or_version_withholds_rate) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.007s
+
+OK

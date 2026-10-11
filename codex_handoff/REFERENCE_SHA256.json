@@ -1,0 +1,30 @@
+{
+  "achivements.jpeg": {
+    "sha256": "efb4a115e3e6290f8e840a039e1a1f31ad684620cb5b80b24f1ac27cb5f9c33f",
+    "bytes": 272843
+  },
+  "day.jpeg": {
+    "sha256": "5c43e3bd030185a302f1cf1953f179a7fe6141300913105134533aab0727843a",
+    "bytes": 375422
+  },
+  "home.jpeg": {
+    "sha256": "48baead736b5cd6fe2f8e970122a5c6a61ba23a17010de0d747ca5c41e1fcb51",
+    "bytes": 239606
+  },
+  "home_!.jpeg": {
+    "sha256": "ce4b6a4d92e33b6d2ec4e4b400ef9a9498e25169a0bc1fb34e399961a0419254",
+    "bytes": 283384
+  },
+  "month.jpeg": {
+    "sha256": "38f6bd2f600c85d1eaa24932f04310430c68590695f7588630dd668b5389252d",
+    "bytes": 300213
+  },
+  "weekl.jpeg": {
+    "sha256": "7f4595631ca4300794b11255ef1b47f58e157b60c156249071033d01e4d2e52d",
+    "bytes": 288298
+  },
+  "year.jpeg": {
+    "sha256": "2f345238c92196b7f57c2c2c05d4f26e6da1189cdb763bbb5c7c5a7d7f96d7f0",
+    "bytes": 325903
+  }
+}

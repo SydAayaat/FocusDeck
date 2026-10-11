@@ -1,0 +1,65 @@
+{
+  "protocol_version": 2,
+  "session_id": "3c772a65-ceb3-4a83-9578-c2ec5b6e444b",
+  "title": "Robotics 1 — Stopwatch study",
+  "created_at": "2026-10-07T03:50:55.990042+00:00",
+  "auto_advance": true,
+  "blocks": [
+    {
+      "id": "ROB1-2.1",
+      "type": "focus",
+      "title": "Frames and rotation matrices",
+      "timer_mode": "stopwatch",
+      "quality_criteria": [
+        "Explain coordinate frames",
+        "Solve one rotation-matrix problem"
+      ],
+      "reward_policy": {
+        "enabled": false
+      }
+    },
+    {
+      "id": "ROB1-2.2",
+      "type": "focus",
+      "title": "Rotation composition",
+      "timer_mode": "stopwatch",
+      "quality_criteria": [
+        "Solve one rotation-composition example"
+      ],
+      "reward_policy": {
+        "enabled": true,
+        "selection": "highest_satisfied",
+        "tiers": [
+          {
+            "condition": "module_completed",
+            "min_focus_ratio": 80,
+            "reward": {
+              "text": "Move one physical token into your EARNED container."
+            },
+            "block_ids": [
+              "ROB1-2.1",
+              "ROB1-2.2"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "session_reward_policy": {
+    "enabled": true,
+    "selection": "highest_satisfied",
+    "tiers": [
+      {
+        "condition": "session_completed",
+        "min_focus_ratio": 80,
+        "reward": {
+          "text": "Play guitar for ten minutes."
+        }
+      }
+    ],
+    "eligibility": {
+      "require_all_focus_completed": true,
+      "minimum_completed_blocks": 2
+    }
+  }
+}

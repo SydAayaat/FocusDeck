@@ -1,0 +1,18 @@
+{
+  "achievement_version": 3,
+  "operation": "upsert",
+  "id": "course-create-example",
+  "timestamp": "2026-10-07T12:00:00Z",
+  "definition": {
+    "id": "course_index",
+    "title": "Course Index",
+    "category": "college",
+    "streak_enabled": false,
+    "progress_enabled": true,
+    "progress": {
+      "current_value": 18,
+      "target_value": 64,
+      "unit": "topics"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "achievement_version": 1,
+  "id": "example-project-completed-20261007",
+  "timestamp": "2026-10-07T12:00:00+02:00",
+  "source": "GPT",
+  "operation": "event",
+  "achievement_id": "custom_compute",
+  "event": "objective_completed",
+  "text": "Completed topics 2.3.1–2.3.4"
+}

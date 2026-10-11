@@ -1,0 +1,8 @@
+QRhiGles2: Failed to create temporary context
+QRhiGles2: Failed to create context
+Failed to create RHI for backend: OpenGL
+[41:48:1008/162657.956607:ERROR:../../../qtwebengine/src/3rdparty/chromium/dbus/bus.cc:408] Failed to connect to the bus: Failed to open socket: Operation not permitted
+[41:52:1008/162657.957558:ERROR:../../../qtwebengine/src/3rdparty/chromium/net/base/address_tracker_linux.cc:222] Could not create NETLINK socket: Operation not permitted (1)
+[41:50:1008/162657.958065:ERROR:../../../qtwebengine/src/3rdparty/chromium/device/udev_linux/udev_watcher.cc:51] Failed to initialize a udev monitor.
+[41:61:1008/162657.973719:ERROR:../../../qtwebengine/src/3rdparty/chromium/content/browser/zygote_host/zygote_host_impl_linux.cc:283] Failed to adjust OOM score of renderer with pid 62: No such file or directory (2)
+GPUInfo not initialized on GpuInfoUpdate

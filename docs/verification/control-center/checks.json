@@ -1,0 +1,553 @@
+{
+  "checks": [
+    {
+      "width": 1672,
+      "page": "overview",
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Focus with purpose",
+        "controls": 24
+      }
+    },
+    {
+      "width": 1672,
+      "page": "cards",
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Achievement Cards",
+        "controls": 39
+      }
+    },
+    {
+      "width": 1672,
+      "page": "sessions",
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Session Builder",
+        "controls": 24
+      }
+    },
+    {
+      "width": 1672,
+      "page": "history",
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1672,
+      "page": "devices",
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Your devices",
+        "controls": 12
+      }
+    },
+    {
+      "width": 1672,
+      "page": "settings",
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Customize your FocusDeck",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1440,
+      "page": "overview",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Focus with purpose",
+        "controls": 24
+      }
+    },
+    {
+      "width": 1440,
+      "page": "cards",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Achievement Cards",
+        "controls": 39
+      }
+    },
+    {
+      "width": 1440,
+      "page": "sessions",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Session Builder",
+        "controls": 24
+      }
+    },
+    {
+      "width": 1440,
+      "page": "history",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1440,
+      "page": "devices",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Your devices",
+        "controls": 12
+      }
+    },
+    {
+      "width": 1440,
+      "page": "settings",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Customize your FocusDeck",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1050,
+      "page": "overview",
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Focus with purpose",
+        "controls": 24
+      }
+    },
+    {
+      "width": 1050,
+      "page": "cards",
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Achievement Cards",
+        "controls": 39
+      }
+    },
+    {
+      "width": 1050,
+      "page": "sessions",
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Session Builder",
+        "controls": 24
+      }
+    },
+    {
+      "width": 1050,
+      "page": "history",
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1050,
+      "page": "devices",
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Your devices",
+        "controls": 12
+      }
+    },
+    {
+      "width": 1050,
+      "page": "settings",
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Customize your FocusDeck",
+        "controls": 20
+      }
+    },
+    {
+      "width": 800,
+      "page": "overview",
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Focus with purpose",
+        "controls": 24
+      }
+    },
+    {
+      "width": 800,
+      "page": "cards",
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Achievement Cards",
+        "controls": 39
+      }
+    },
+    {
+      "width": 800,
+      "page": "sessions",
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Session Builder",
+        "controls": 24
+      }
+    },
+    {
+      "width": 800,
+      "page": "history",
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 800,
+      "page": "devices",
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Your devices",
+        "controls": 12
+      }
+    },
+    {
+      "width": 800,
+      "page": "settings",
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Customize your FocusDeck",
+        "controls": 20
+      }
+    },
+    {
+      "width": 600,
+      "page": "overview",
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Focus with purpose",
+        "controls": 24
+      }
+    },
+    {
+      "width": 600,
+      "page": "cards",
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Achievement Cards",
+        "controls": 39
+      }
+    },
+    {
+      "width": 600,
+      "page": "sessions",
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Session Builder",
+        "controls": 24
+      }
+    },
+    {
+      "width": 600,
+      "page": "history",
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 600,
+      "page": "devices",
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Your devices",
+        "controls": 12
+      }
+    },
+    {
+      "width": 600,
+      "page": "settings",
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Customize your FocusDeck",
+        "controls": 20
+      }
+    },
+    {
+      "width": 420,
+      "page": "overview",
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Focus with purpose",
+        "controls": 24
+      }
+    },
+    {
+      "width": 420,
+      "page": "cards",
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Achievement Cards",
+        "controls": 39
+      }
+    },
+    {
+      "width": 420,
+      "page": "sessions",
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Session Builder",
+        "controls": 24
+      }
+    },
+    {
+      "width": 420,
+      "page": "history",
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 420,
+      "page": "devices",
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Your devices",
+        "controls": 12
+      }
+    },
+    {
+      "width": 420,
+      "page": "settings",
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Customize your FocusDeck",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1672,
+      "page": "history_month",
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1672,
+      "page": "history_year",
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1672,
+      "page": "history_all",
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1440,
+      "page": "history_month",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1440,
+      "page": "history_year",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1440,
+      "page": "history_all",
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1050,
+      "page": "history_month",
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1050,
+      "page": "history_year",
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 1050,
+      "page": "history_all",
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 800,
+      "page": "history_month",
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 800,
+      "page": "history_year",
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 800,
+      "page": "history_all",
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 600,
+      "page": "history_month",
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 600,
+      "page": "history_year",
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 600,
+      "page": "history_all",
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 420,
+      "page": "history_month",
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 420,
+      "page": "history_year",
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Study History",
+        "controls": 20
+      }
+    },
+    {
+      "width": 420,
+      "page": "history_all",
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Study History",
+        "controls": 20
+      }
+    }
+  ],
+  "workflow": {
+    "cardRedirect": true,
+    "previewEdit": true,
+    "sessionRedirect": true,
+    "duplicateUnique": true,
+    "savedTemplate": true,
+    "done": true
+  },
+  "errors": []
+}

@@ -1,0 +1,23 @@
+{
+  "achievement_version": 1,
+  "id": "example-daily-target-20261007",
+  "timestamp": "2026-10-07T12:00:00+02:00",
+  "source": "GPT",
+  "operation": "daily_target",
+  "date": "2026-10-07",
+  "objectives": [
+    {
+      "kind": "focus_blocks",
+      "minimum": 5
+    },
+    {
+      "kind": "achievement",
+      "achievement_id": "german"
+    },
+    {
+      "kind": "achievement",
+      "achievement_id": "custom_compute",
+      "text": "Complete topics 2.3.1–2.3.4"
+    }
+  ]
+}

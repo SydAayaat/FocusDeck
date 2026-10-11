@@ -1,0 +1,13 @@
+{
+  "achievement_version": 1,
+  "id": "example-create-college-subject-20261007",
+  "timestamp": "2026-10-07T12:00:00+02:00",
+  "source": "GPT",
+  "operation": "upsert",
+  "definition": {
+    "id": "robotics_1",
+    "title": "Robotics 1",
+    "category": "college",
+    "description": "Scheduled Robotics 1 objectives"
+  }
+}

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Small pinned bootstrap: avoids shipping an unverified wrapper JAR.
+# Once downloaded, Gradle and its caches can be used offline.
+set -euo pipefail
+VERSION=8.11.1
+ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+CACHE="${GRADLE_USER_HOME:-$HOME/.gradle}/focusdeck-dist"
+GRADLE="$CACHE/gradle-$VERSION/bin/gradle"
+if [[ ! -x "$GRADLE" ]]; then
+  mkdir -p "$CACHE"
+  temp_dir="$(mktemp -d "$CACHE/bootstrap.XXXXXX")"
+  trap 'rm -rf -- "$temp_dir"' EXIT
+  url="https://services.gradle.org/distributions/gradle-$VERSION-bin.zip"
+  curl --fail --location --connect-timeout 15 --max-time 300 "$url" --output "$temp_dir/gradle.zip"
+  curl --fail --location --connect-timeout 15 --max-time 30 "$url.sha256" --output "$temp_dir/gradle.sha256"
+  read -r hash < "$temp_dir/gradle.sha256" || true
+  [[ "$hash" =~ ^[a-fA-F0-9]{64}$ ]] || { echo "Invalid Gradle checksum" >&2; exit 1; }
+  printf '%s  %s\n' "$hash" "$temp_dir/gradle.zip" | sha256sum --check --status
+  unzip -q "$temp_dir/gradle.zip" -d "$CACHE"
+fi
+exec "$GRADLE" -p "$ROOT" "$@"

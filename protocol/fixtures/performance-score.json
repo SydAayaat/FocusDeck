@@ -1,0 +1,228 @@
+[
+  {
+    "name": "late and overtime",
+    "records": [
+      {
+        "id": "a",
+        "report_key": "attempt",
+        "title": "Focus",
+        "project": "Project",
+        "category": "learning",
+        "date": "2026-10-01",
+        "planned_ms": 60000,
+        "original_planned_ms": 60000,
+        "actual_ms": 66000,
+        "done": true,
+        "eligible": true,
+        "provisional": false,
+        "start_deviation_ms": 180000,
+        "estimation": {
+          "planned_ms": 60000,
+          "actual_ms": 66000,
+          "signed_error_ms": 6000,
+          "absolute_error_ms": 6000,
+          "percentage_error": 10.0,
+          "accuracy": 90.0,
+          "interpretation": "plan underestimated duration"
+        }
+      }
+    ],
+    "expected": {
+      "score": 93.5,
+      "completion": 1.0,
+      "punctuality": 0.8,
+      "efficiency": 0.9
+    }
+  },
+  {
+    "name": "untimed partial coverage",
+    "records": [
+      {
+        "id": "a",
+        "report_key": "attempt",
+        "title": "Focus",
+        "project": "Project",
+        "category": "learning",
+        "date": "2026-10-01",
+        "planned_ms": 60000,
+        "original_planned_ms": 60000,
+        "actual_ms": 66000,
+        "done": true,
+        "eligible": true,
+        "provisional": false,
+        "start_deviation_ms": null,
+        "estimation": {
+          "planned_ms": 60000,
+          "actual_ms": 66000,
+          "signed_error_ms": 6000,
+          "absolute_error_ms": 6000,
+          "percentage_error": 10.0,
+          "accuracy": 90.0,
+          "interpretation": "plan underestimated duration"
+        }
+      }
+    ],
+    "expected": {
+      "score": 98.0,
+      "completion": 1.0,
+      "punctuality": null,
+      "efficiency": 0.9
+    }
+  },
+  {
+    "name": "future excluded",
+    "records": [
+      {
+        "id": "a",
+        "report_key": "attempt",
+        "title": "Focus",
+        "project": "Project",
+        "category": "learning",
+        "date": "2026-10-01",
+        "planned_ms": 60000,
+        "original_planned_ms": 60000,
+        "actual_ms": 66000,
+        "done": true,
+        "eligible": true,
+        "provisional": false,
+        "start_deviation_ms": 180000,
+        "estimation": {
+          "planned_ms": 60000,
+          "actual_ms": 66000,
+          "signed_error_ms": 6000,
+          "absolute_error_ms": 6000,
+          "percentage_error": 10.0,
+          "accuracy": 90.0,
+          "interpretation": "plan underestimated duration"
+        }
+      },
+      {
+        "id": "future",
+        "report_key": "attempt",
+        "title": "Focus",
+        "project": "Project",
+        "category": "learning",
+        "date": "2026-10-01",
+        "planned_ms": 60000,
+        "original_planned_ms": 60000,
+        "actual_ms": 66000,
+        "done": false,
+        "eligible": false,
+        "provisional": false,
+        "start_deviation_ms": null,
+        "estimation": null
+      }
+    ],
+    "expected": {
+      "score": 93.5,
+      "completion": 1.0,
+      "punctuality": 0.8,
+      "efficiency": 0.9
+    }
+  },
+  {
+    "name": "weighted incomplete",
+    "records": [
+      {
+        "id": "a",
+        "report_key": "attempt",
+        "title": "Focus",
+        "project": "Project",
+        "category": "learning",
+        "date": "2026-10-01",
+        "planned_ms": 60000,
+        "original_planned_ms": 60000,
+        "actual_ms": 66000,
+        "done": true,
+        "eligible": true,
+        "provisional": false,
+        "start_deviation_ms": 180000,
+        "estimation": {
+          "planned_ms": 60000,
+          "actual_ms": 66000,
+          "signed_error_ms": 6000,
+          "absolute_error_ms": 6000,
+          "percentage_error": 10.0,
+          "accuracy": 90.0,
+          "interpretation": "plan underestimated duration"
+        }
+      },
+      {
+        "id": "pending",
+        "report_key": "attempt",
+        "title": "Focus",
+        "project": "Project",
+        "category": "learning",
+        "date": "2026-10-01",
+        "planned_ms": 180000,
+        "original_planned_ms": 180000,
+        "actual_ms": 0,
+        "done": false,
+        "eligible": true,
+        "provisional": false,
+        "start_deviation_ms": null,
+        "estimation": null
+      }
+    ],
+    "expected": {
+      "score": 23.375,
+      "completion": 0.25,
+      "punctuality": 0.8,
+      "efficiency": 0.9
+    }
+  },
+  {
+    "name": "missing plan",
+    "records": [
+      {
+        "id": "a",
+        "report_key": "attempt",
+        "title": "Focus",
+        "project": "Project",
+        "category": "learning",
+        "date": "2026-10-01",
+        "planned_ms": null,
+        "original_planned_ms": null,
+        "actual_ms": 66000,
+        "done": true,
+        "eligible": true,
+        "provisional": false,
+        "start_deviation_ms": 180000,
+        "estimation": null
+      }
+    ],
+    "expected": {
+      "score": null,
+      "completion": null,
+      "punctuality": null,
+      "efficiency": null
+    }
+  },
+  {
+    "name": "valid zero completion",
+    "records": [
+      {
+        "id": "a",
+        "report_key": "attempt",
+        "title": "Focus",
+        "project": "Project",
+        "category": "learning",
+        "date": "2026-10-01",
+        "planned_ms": 60000,
+        "original_planned_ms": 60000,
+        "actual_ms": 0,
+        "done": false,
+        "eligible": true,
+        "provisional": false,
+        "start_deviation_ms": null,
+        "estimation": null
+      }
+    ],
+    "expected": {
+      "score": 0.0,
+      "completion": 0.0,
+      "punctuality": null,
+      "efficiency": null
+    }
+  }
+]

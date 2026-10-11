@@ -1,0 +1,412 @@
+{
+  "session_id": "11111111-1111-4111-8111-111111111111",
+  "title": "Mixed-mode shared fixture",
+  "status": "complete",
+  "report_version": 2,
+  "planned_ms": null,
+  "timed_planned_ms": 120000,
+  "planned_countdown_focus_blocks": 1,
+  "planned_stopwatch_focus_blocks": 1,
+  "active_ms": 200000,
+  "focused_ms": 200000,
+  "break_ms": 0,
+  "paused_ms": 25000,
+  "wall_ms": 228000,
+  "started_at_ms": 1791310000000,
+  "finished_at_ms": 1791310228000,
+  "blocks": [
+    {
+      "id": "S1",
+      "type": "focus",
+      "title": "Untimed topic",
+      "timer_mode": "stopwatch",
+      "planned_ms": null,
+      "budget_ms": null,
+      "active_ms": 100000,
+      "paused_ms": 25000,
+      "wall_ms": 125000,
+      "focus_ratio": 80.0,
+      "started_at_ms": 1791310000000,
+      "finished_at_ms": 1791310125000,
+      "outcome": "done",
+      "overtime_ms": null,
+      "performance": {
+        "quality": "confirmed",
+        "quality_criteria": [],
+        "comparison": null,
+        "wall_ms": 125000,
+        "pace_index": null,
+        "focus_ratio": 80.0,
+        "beat_score": null,
+        "rank": null,
+        "recalibration_needed": false,
+        "previous_benchmark": null,
+        "new_personal_best": false,
+        "pb_delta": null,
+        "scoring": {
+          "rank_thresholds": [
+            85.0,
+            95.0,
+            105.0,
+            110.0
+          ],
+          "target_pace": 95.0,
+          "strong_pace": 110.0,
+          "target_focus": 80.0,
+          "strong_focus": 90.0,
+          "recalibration_pace": 150.0
+        },
+        "reward": {
+          "tier": "tier_1",
+          "actions": [
+            {
+              "kind": "text",
+              "text": "Earn one token.",
+              "reps": 0,
+              "seconds": 0
+            }
+          ],
+          "reason": "Configured reward eligible",
+          "acknowledged": true,
+          "skipped": false,
+          "acknowledged_at_ms": 1791310126000,
+          "local_day": "2026-10-06",
+          "daily_reps_before": {},
+          "daily_physical_seconds_before": 0
+        },
+        "reward_contract": null,
+        "reward_policy": {
+          "enabled": true,
+          "selection": "highest_satisfied",
+          "tiers": [
+            {
+              "condition": "completed",
+              "min_focus_ratio": 80,
+              "reward": {
+                "text": "Earn one token."
+              }
+            }
+          ]
+        },
+        "performance_class": null,
+        "session_weight": 10.0,
+        "classification": null
+      }
+    },
+    {
+      "id": "C1",
+      "type": "focus",
+      "title": "Timed topic",
+      "timer_mode": "countdown",
+      "planned_ms": 120000,
+      "budget_ms": 120000,
+      "active_ms": 100000,
+      "paused_ms": 0,
+      "wall_ms": 100000,
+      "focus_ratio": 100.0,
+      "started_at_ms": 1791310126000,
+      "finished_at_ms": 1791310226000,
+      "outcome": "done",
+      "overtime_ms": 0,
+      "performance": {
+        "quality": "confirmed",
+        "quality_criteria": [],
+        "comparison": null,
+        "wall_ms": 100000,
+        "pace_index": 120.0,
+        "focus_ratio": 100.0,
+        "beat_score": 111.0,
+        "rank": "S+",
+        "recalibration_needed": false,
+        "previous_benchmark": null,
+        "new_personal_best": false,
+        "pb_delta": null,
+        "scoring": {
+          "rank_thresholds": [
+            85.0,
+            95.0,
+            105.0,
+            110.0
+          ],
+          "target_pace": 95.0,
+          "strong_pace": 110.0,
+          "target_focus": 80.0,
+          "strong_focus": 90.0,
+          "recalibration_pace": 150.0
+        },
+        "reward": {
+          "tier": "none",
+          "actions": [],
+          "reason": "No reward assigned",
+          "acknowledged": false,
+          "skipped": false,
+          "acknowledged_at_ms": null,
+          "local_day": null,
+          "daily_reps_before": {},
+          "daily_physical_seconds_before": 0
+        },
+        "reward_contract": null,
+        "reward_policy": {
+          "enabled": false
+        },
+        "performance_class": "strong",
+        "session_weight": 2.0,
+        "classification": {
+          "strong_max_actual_ratio": 0.9,
+          "on_target_max_actual_ratio": 1.05,
+          "slightly_over_max_actual_ratio": 1.25,
+          "strong_min_focus_ratio": 80.0
+        }
+      }
+    }
+  ],
+  "overtime_ms": 0,
+  "timeline_coverage": "complete",
+  "planned_block_count": 2,
+  "recorded_timezone": "UTC",
+  "events": [
+    {
+      "seq": 1,
+      "kind": "block_started",
+      "at_ms": 1791310000000,
+      "mono_ms": 0,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "active",
+      "active_ms": 0,
+      "paused_ms": 0,
+      "budget_ms": null
+    },
+    {
+      "seq": 2,
+      "kind": "paused",
+      "at_ms": 1791310100000,
+      "mono_ms": 100000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "paused",
+      "active_ms": 100000,
+      "paused_ms": 0,
+      "budget_ms": null
+    },
+    {
+      "seq": 3,
+      "kind": "resumed",
+      "at_ms": 1791310125000,
+      "mono_ms": 125000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "active",
+      "active_ms": 100000,
+      "paused_ms": 25000,
+      "budget_ms": null
+    },
+    {
+      "seq": 4,
+      "kind": "block_done",
+      "at_ms": 1791310125000,
+      "mono_ms": 125000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "active",
+      "active_ms": 100000,
+      "paused_ms": 25000,
+      "budget_ms": null
+    },
+    {
+      "seq": 5,
+      "kind": "reward_offered",
+      "at_ms": 1791310125000,
+      "mono_ms": 125000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "reward",
+      "active_ms": 100000,
+      "paused_ms": 25000,
+      "budget_ms": null
+    },
+    {
+      "seq": 6,
+      "kind": "reward_acknowledged",
+      "at_ms": 1791310126000,
+      "mono_ms": 126000,
+      "boot": 1,
+      "block_index": 0,
+      "phase": "reward",
+      "active_ms": 100000,
+      "paused_ms": 25000,
+      "budget_ms": null
+    },
+    {
+      "seq": 7,
+      "kind": "block_started",
+      "at_ms": 1791310126000,
+      "mono_ms": 126000,
+      "boot": 1,
+      "block_index": 1,
+      "phase": "active",
+      "active_ms": 0,
+      "paused_ms": 0,
+      "budget_ms": 120000
+    },
+    {
+      "seq": 8,
+      "kind": "block_done",
+      "at_ms": 1791310226000,
+      "mono_ms": 226000,
+      "boot": 1,
+      "block_index": 1,
+      "phase": "active",
+      "active_ms": 100000,
+      "paused_ms": 0,
+      "budget_ms": 120000
+    },
+    {
+      "seq": 9,
+      "kind": "reward_offered",
+      "at_ms": 1791310226000,
+      "mono_ms": 226000,
+      "boot": 1,
+      "block_index": 1,
+      "phase": "reward",
+      "active_ms": 100000,
+      "paused_ms": 0,
+      "budget_ms": 120000
+    },
+    {
+      "seq": 10,
+      "kind": "reward_acknowledged",
+      "at_ms": 1791310227000,
+      "mono_ms": 227000,
+      "boot": 1,
+      "block_index": 1,
+      "phase": "reward",
+      "active_ms": 100000,
+      "paused_ms": 0,
+      "budget_ms": 120000
+    },
+    {
+      "seq": 11,
+      "kind": "session_reward_offered",
+      "at_ms": 1791310227000,
+      "mono_ms": 227000,
+      "boot": 1,
+      "block_index": 1,
+      "phase": "session_reward",
+      "active_ms": 100000,
+      "paused_ms": 0,
+      "budget_ms": 120000
+    },
+    {
+      "seq": 12,
+      "kind": "session_reward_acknowledged",
+      "at_ms": 1791310228000,
+      "mono_ms": 228000,
+      "boot": 1,
+      "block_index": 1,
+      "phase": "session_reward",
+      "active_ms": 100000,
+      "paused_ms": 0,
+      "budget_ms": 120000
+    },
+    {
+      "seq": 13,
+      "kind": "session_complete",
+      "at_ms": 1791310228000,
+      "mono_ms": 228000,
+      "boot": 1,
+      "block_index": 1,
+      "phase": "complete",
+      "active_ms": 100000,
+      "paused_ms": 0,
+      "budget_ms": 120000
+    }
+  ],
+  "competition": {
+    "comparison_key": null,
+    "planned_focus_blocks": 2,
+    "completed_focus_blocks": 2,
+    "on_or_ahead_count": 1,
+    "completion_fraction": 1.0,
+    "average_pace": 120.0,
+    "focus_ratio": 88.89,
+    "beat_score": 111.0,
+    "rank": "S+",
+    "previous_benchmark": null,
+    "new_personal_best": false,
+    "pb_delta": null,
+    "reward_strategy": {
+      "style": "physical_competitive",
+      "scoring": {
+        "rank_thresholds": [
+          85.0,
+          95.0,
+          105.0,
+          110.0
+        ],
+        "target_pace": 95.0,
+        "strong_pace": 110.0,
+        "target_focus": 80.0,
+        "strong_focus": 90.0,
+        "recalibration_pace": 150.0
+      }
+    },
+    "session_reward": null,
+    "reward": {
+      "tier": "tier_1",
+      "actions": [
+        {
+          "kind": "text",
+          "text": "Play guitar for ten minutes.",
+          "reps": 0,
+          "seconds": 0
+        }
+      ],
+      "reason": "Configured reward eligible",
+      "acknowledged": true,
+      "skipped": false,
+      "acknowledged_at_ms": 1791310228000,
+      "local_day": "2026-10-06",
+      "daily_reps_before": {},
+      "daily_physical_seconds_before": 0
+    },
+    "weighted": {
+      "raw_weighted_points": 2.0,
+      "total_weight": 2.0,
+      "normalized_session_score": 100.0,
+      "class_counts": {
+        "strong": 1,
+        "on_target": 0,
+        "slightly_over": 0,
+        "over_target": 0
+      },
+      "average_focus_ratio": 100.0,
+      "scoring": {
+        "coefficients": {
+          "strong": 1.0,
+          "on_target": 0.75,
+          "slightly_over": 0.2,
+          "over_target": -0.4
+        }
+      }
+    },
+    "session_reward_policy": {
+      "enabled": true,
+      "selection": "highest_satisfied",
+      "tiers": [
+        {
+          "condition": "session_completed",
+          "min_focus_ratio": 80,
+          "reward": {
+            "text": "Play guitar for ten minutes."
+          }
+        }
+      ],
+      "eligibility": {
+        "minimum_completed_blocks": 2,
+        "require_all_focus_completed": true
+      }
+    },
+    "score_scope": "countdown_only"
+  }
+}

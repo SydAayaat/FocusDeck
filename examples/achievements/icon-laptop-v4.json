@@ -1,0 +1,12 @@
+{
+  "achievement_version": 4,
+  "operation": "icon_set",
+  "id": "example-laptop-icon-20261007",
+  "timestamp": "2026-10-07T18:00:00Z",
+  "source": "GPT",
+  "achievement_id": "custom_compute",
+  "icon": {
+    "kind": "builtin",
+    "name": "laptop"
+  }
+}

@@ -1,0 +1,113 @@
+{
+  "protocol_version": 2,
+  "session_id": "518b77b2-a38f-4d14-95d1-7f239cf96103",
+  "title": "Robotics 1 — Mixed timer modes",
+  "created_at": "2026-10-07T03:50:55.990042+00:00",
+  "auto_advance": true,
+  "blocks": [
+    {
+      "id": "ROB1-2.1",
+      "type": "focus",
+      "title": "Frames and rotation matrices",
+      "timer_mode": "stopwatch",
+      "quality_criteria": [
+        "Explain coordinate frames",
+        "Solve one rotation-matrix problem"
+      ],
+      "reward_policy": {
+        "enabled": false
+      }
+    },
+    {
+      "id": "ROB1-2.2",
+      "type": "focus",
+      "title": "Rotation composition",
+      "timer_mode": "stopwatch",
+      "quality_criteria": [
+        "Solve one rotation-composition example"
+      ],
+      "reward_policy": {
+        "enabled": false
+      }
+    },
+    {
+      "id": "ROB1-2.3",
+      "type": "focus",
+      "title": "Module 2 worked example",
+      "timer_mode": "stopwatch",
+      "reward_policy": {
+        "enabled": true,
+        "selection": "highest_satisfied",
+        "tiers": [
+          {
+            "condition": "module_completed",
+            "min_focus_ratio": 80,
+            "reward": {
+              "text": "Module 2 complete: move one physical token."
+            },
+            "block_ids": [
+              "ROB1-2.1",
+              "ROB1-2.2",
+              "ROB1-2.3"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ROB1-break",
+      "type": "break",
+      "title": "Short break",
+      "duration_seconds": 300
+    },
+    {
+      "id": "ROB1-3.1",
+      "type": "focus",
+      "title": "Rigid-body transformations",
+      "timer_mode": "countdown",
+      "duration_seconds": 1800,
+      "session_weight": 1.5,
+      "quality_criteria": [
+        "Solve one transformation example"
+      ],
+      "reward_policy": {
+        "enabled": true,
+        "tiers": [
+          {
+            "min_beat_score": 95,
+            "reward": {
+              "text": "Take a two-minute walk."
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ROB1-3.2",
+      "type": "focus",
+      "title": "Homogeneous coordinate practice",
+      "timer_mode": "stopwatch",
+      "session_weight": 1.2,
+      "reward_policy": {
+        "enabled": false
+      }
+    }
+  ],
+  "session_reward_policy": {
+    "enabled": true,
+    "selection": "highest_satisfied",
+    "tiers": [
+      {
+        "condition": "session_completed",
+        "min_focus_ratio": 80,
+        "reward": {
+          "text": "Play guitar for ten minutes."
+        }
+      }
+    ],
+    "eligibility": {
+      "require_all_focus_completed": true,
+      "minimum_completed_blocks": 5
+    }
+  }
+}

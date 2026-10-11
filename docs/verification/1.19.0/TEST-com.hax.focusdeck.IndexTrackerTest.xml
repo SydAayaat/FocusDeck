@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hax.focusdeck.IndexTrackerTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-10-08T19:28:36" hostname="767ecd7052da" time="0.14">
+  <properties/>
+  <testcase name="completeReopenRecompleteKeepEvidenceAndExactReceipt" classname="com.hax.focusdeck.IndexTrackerTest" time="0.102"/>
+  <testcase name="missingParentAndCycleRejected" classname="com.hax.focusdeck.IndexTrackerTest" time="0.001"/>
+  <testcase name="importCountsOnlyUniqueLeaves" classname="com.hax.focusdeck.IndexTrackerTest" time="0.002"/>
+  <testcase name="topicDoesNotManufactureStudyDay" classname="com.hax.focusdeck.IndexTrackerTest" time="0.011"/>
+  <testcase name="progressOnlyHasNoStreak" classname="com.hax.focusdeck.IndexTrackerTest" time="0.002"/>
+  <testcase name="milestonesAreDerivedAndReplaySafe" classname="com.hax.focusdeck.IndexTrackerTest" time="0.009"/>
+  <testcase name="duplicateAndAmbiguousNumbersRejected" classname="com.hax.focusdeck.IndexTrackerTest" time="0.001"/>
+  <testcase name="renamingRemovingAndRestoringPreserveIdentityAndHistory" classname="com.hax.focusdeck.IndexTrackerTest" time="0.003"/>
+  <testcase name="lateDistinctTopicEvidenceUsesActualPhoneDate" classname="com.hax.focusdeck.IndexTrackerTest" time="0.002"/>
+  <testcase name="numericalProgressAndStaleRevisionRejected" classname="com.hax.focusdeck.IndexTrackerTest" time="0.003"/>
+  <testcase name="explicitMigrationRetainsLegacyNumericIdentity" classname="com.hax.focusdeck.IndexTrackerTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

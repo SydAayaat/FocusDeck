@@ -1,0 +1,19 @@
+[Unit]
+Description=FocusDeck encrypted local-network companion
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/share/focusdeck/venv/bin/focusdeck-server
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.config/focusdeck %h/.local/share/focusdeck %t
+
+[Install]
+WantedBy=default.target

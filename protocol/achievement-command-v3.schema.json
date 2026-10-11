@@ -1,0 +1,584 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "achievement-command-v3.schema.json",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "definition"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 3
+        },
+        "operation": {
+          "const": "upsert"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "definition": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "title",
+            "category"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{0,99}$"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "category": {
+              "enum": [
+                "discipline",
+                "health",
+                "learning",
+                "focus",
+                "projects",
+                "college"
+              ]
+            },
+            "kind": {
+              "enum": [
+                "daily",
+                "scheduled",
+                "abstinence"
+              ]
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 1000
+            },
+            "daily_participation": {
+              "type": "boolean"
+            },
+            "archived": {
+              "type": "boolean"
+            },
+            "created_date": {
+              "type": "string"
+            },
+            "metadata": {
+              "type": "object",
+              "maxProperties": 30,
+              "propertyNames": {
+                "maxLength": 100
+              },
+              "additionalProperties": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "streak_enabled": {
+              "type": "boolean"
+            },
+            "progress_enabled": {
+              "type": "boolean"
+            },
+            "progress": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "current_value": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000000000.0
+                },
+                "target_value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 1000000000000.0
+                },
+                "unit": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100
+                }
+              }
+            }
+          },
+          "allOf": [
+            {
+              "not": {
+                "required": [
+                  "streak_enabled"
+                ],
+                "properties": {
+                  "streak_enabled": {
+                    "const": false
+                  }
+                },
+                "not": {
+                  "required": [
+                    "progress_enabled"
+                  ],
+                  "properties": {
+                    "progress_enabled": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "progress"
+                ],
+                "properties": {}
+              },
+              "then": {
+                "required": [
+                  "progress_enabled"
+                ],
+                "properties": {
+                  "progress_enabled": {
+                    "const": true
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "required": [
+                  "progress_enabled"
+                ],
+                "properties": {
+                  "progress_enabled": {
+                    "const": true
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "kind": {
+                    "not": {
+                      "const": "abstinence"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "achievement_id"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 3
+        },
+        "operation": {
+          "const": "archive"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "achievement_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,99}$"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "achievement_id",
+        "event"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 3
+        },
+        "operation": {
+          "const": "event"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "achievement_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,99}$"
+        },
+        "event": {
+          "enum": [
+            "initialize",
+            "streak_break",
+            "completed",
+            "objective_completed"
+          ]
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "date",
+        "objectives"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 3
+        },
+        "operation": {
+          "const": "daily_target"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "objectives": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "kind"
+            ],
+            "properties": {
+              "kind": {
+                "enum": [
+                  "focus_blocks",
+                  "focus_time",
+                  "achievement"
+                ]
+              },
+              "minimum": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 604800000
+              },
+              "achievement_id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]{0,99}$"
+              },
+              "text": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "kind": {
+                      "const": "achievement"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "achievement_id"
+                  ]
+                },
+                "else": {
+                  "not": {
+                    "required": [
+                      "achievement_id"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "achievement_id"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 3
+        },
+        "operation": {
+          "const": "restore"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "achievement_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,99}$"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "achievement_id",
+        "confirm"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 3
+        },
+        "operation": {
+          "const": "delete"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "achievement_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,99}$"
+        },
+        "confirm": {
+          "const": true,
+          "type": "boolean"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "achievement_id"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 3
+        },
+        "operation": {
+          "const": "progress_set"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "achievement_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,99}$"
+        },
+        "current_value": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000000000000.0
+        },
+        "target_value": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1000000000000.0
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "current_value"
+          ]
+        },
+        {
+          "required": [
+            "target_value"
+          ]
+        },
+        {
+          "required": [
+            "unit"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "achievement_version",
+        "operation",
+        "id",
+        "timestamp",
+        "achievement_id",
+        "amount"
+      ],
+      "properties": {
+        "achievement_version": {
+          "type": "integer",
+          "const": 3
+        },
+        "operation": {
+          "const": "progress_increment"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.:-]{1,100}$"
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "format": "date-time"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "achievement_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]{0,99}$"
+        },
+        "amount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        }
+      }
+    }
+  ]
+}

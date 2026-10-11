@@ -1,0 +1,12 @@
+{
+  "protocol_version": 1,
+  "session_id": "device-smoke-demo",
+  "title": "Device smoke test",
+  "created_at": "2026-10-06T19:00:00Z",
+  "auto_advance": true,
+  "blocks": [
+    {"id": "b1", "type": "focus", "title": "Test focus", "duration_seconds": 30},
+    {"id": "b2", "type": "break", "title": "Test break", "duration_seconds": 10},
+    {"id": "b3", "type": "focus", "title": "Test DONE early", "duration_seconds": 30}
+  ]
+}

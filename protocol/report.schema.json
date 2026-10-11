@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "report.schema.json",
+  "title": "FocusDeck report contract dispatcher (v1 and v2)",
+  "oneOf": [
+    {
+      "$ref": "report-v1.schema.json"
+    },
+    {
+      "$ref": "report-v2.schema.json"
+    }
+  ]
+}

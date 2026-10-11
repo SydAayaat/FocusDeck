@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "pairing.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol_version",
+    "host",
+    "port",
+    "token",
+    "certificate_sha256",
+    "desktop_id"
+  ],
+  "properties": {
+    "protocol_version": {
+      "const": 1,
+      "type": "integer"
+    },
+    "host": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9.:-]{1,253}$"
+    },
+    "port": {
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 65535
+    },
+    "token": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 200
+    },
+    "certificate_sha256": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "desktop_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "role": {
+      "enum": [
+        "phone",
+        "viewer"
+      ],
+      "default": "phone"
+    }
+  }
+}

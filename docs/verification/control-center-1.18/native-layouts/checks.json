@@ -1,0 +1,1158 @@
+{
+  "checks": [
+    {
+      "width": 1672,
+      "page": "overview",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 1672,
+      "page": "achievements",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 1672,
+      "page": "cards",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 1672,
+      "page": "sessions",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 1672,
+      "page": "history",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1672,
+      "page": "devices",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 1672,
+      "page": "settings",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 1440,
+      "page": "overview",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 1440,
+      "page": "achievements",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 1440,
+      "page": "cards",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 1440,
+      "page": "sessions",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 1440,
+      "page": "history",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1440,
+      "page": "devices",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 1440,
+      "page": "settings",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 1050,
+      "page": "overview",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 1050,
+      "page": "achievements",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 1050,
+      "page": "cards",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 1050,
+      "page": "sessions",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 1050,
+      "page": "history",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1050,
+      "page": "devices",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 1050,
+      "page": "settings",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 800,
+      "page": "overview",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 800,
+      "page": "achievements",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 800,
+      "page": "cards",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 800,
+      "page": "sessions",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 800,
+      "page": "history",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 800,
+      "page": "devices",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 800,
+      "page": "settings",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 600,
+      "page": "overview",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 600,
+      "page": "achievements",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 600,
+      "page": "cards",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 600,
+      "page": "sessions",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 600,
+      "page": "history",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 600,
+      "page": "devices",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 600,
+      "page": "settings",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 420,
+      "page": "overview",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 420,
+      "page": "achievements",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 420,
+      "page": "cards",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 420,
+      "page": "sessions",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 420,
+      "page": "history",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 420,
+      "page": "devices",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 420,
+      "page": "settings",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 1672,
+      "page": "overview",
+      "collapsed": true,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 1672,
+      "page": "achievements",
+      "collapsed": true,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 1672,
+      "page": "cards",
+      "collapsed": true,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 1672,
+      "page": "sessions",
+      "collapsed": true,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 1672,
+      "page": "history",
+      "collapsed": true,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1672,
+      "page": "devices",
+      "collapsed": true,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 1672,
+      "page": "settings",
+      "collapsed": true,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 1440,
+      "page": "overview",
+      "collapsed": true,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 1440,
+      "page": "achievements",
+      "collapsed": true,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 1440,
+      "page": "cards",
+      "collapsed": true,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 1440,
+      "page": "sessions",
+      "collapsed": true,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 1440,
+      "page": "history",
+      "collapsed": true,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1440,
+      "page": "devices",
+      "collapsed": true,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 1440,
+      "page": "settings",
+      "collapsed": true,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 1050,
+      "page": "overview",
+      "collapsed": true,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 1050,
+      "page": "achievements",
+      "collapsed": true,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 1050,
+      "page": "cards",
+      "collapsed": true,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 1050,
+      "page": "sessions",
+      "collapsed": true,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 1050,
+      "page": "history",
+      "collapsed": true,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1050,
+      "page": "devices",
+      "collapsed": true,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 1050,
+      "page": "settings",
+      "collapsed": true,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 800,
+      "page": "overview",
+      "collapsed": true,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 800,
+      "page": "achievements",
+      "collapsed": true,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 800,
+      "page": "cards",
+      "collapsed": true,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 800,
+      "page": "sessions",
+      "collapsed": true,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 800,
+      "page": "history",
+      "collapsed": true,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 800,
+      "page": "devices",
+      "collapsed": true,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 800,
+      "page": "settings",
+      "collapsed": true,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 600,
+      "page": "overview",
+      "collapsed": true,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 600,
+      "page": "achievements",
+      "collapsed": true,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 600,
+      "page": "cards",
+      "collapsed": true,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 600,
+      "page": "sessions",
+      "collapsed": true,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 600,
+      "page": "history",
+      "collapsed": true,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 600,
+      "page": "devices",
+      "collapsed": true,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 600,
+      "page": "settings",
+      "collapsed": true,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 420,
+      "page": "overview",
+      "collapsed": true,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Focus with purpose",
+        "controls": 26
+      }
+    },
+    {
+      "width": 420,
+      "page": "achievements",
+      "collapsed": true,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Current Achievements",
+        "controls": 38
+      }
+    },
+    {
+      "width": 420,
+      "page": "cards",
+      "collapsed": true,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Card Builder",
+        "controls": 47
+      }
+    },
+    {
+      "width": 420,
+      "page": "sessions",
+      "collapsed": true,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Session Builder",
+        "controls": 29
+      }
+    },
+    {
+      "width": 420,
+      "page": "history",
+      "collapsed": true,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 420,
+      "page": "devices",
+      "collapsed": true,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Your devices",
+        "controls": 15
+      }
+    },
+    {
+      "width": 420,
+      "page": "settings",
+      "collapsed": true,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Customize your FocusDeck",
+        "controls": 28
+      }
+    },
+    {
+      "width": 1672,
+      "page": "history_month",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1672,
+      "page": "history_year",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1672,
+      "page": "history_all",
+      "collapsed": false,
+      "metrics": {
+        "width": 1672,
+        "scroll": 1657,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1440,
+      "page": "history_month",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1440,
+      "page": "history_year",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1440,
+      "page": "history_all",
+      "collapsed": false,
+      "metrics": {
+        "width": 1440,
+        "scroll": 1425,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1050,
+      "page": "history_month",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1050,
+      "page": "history_year",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 1050,
+      "page": "history_all",
+      "collapsed": false,
+      "metrics": {
+        "width": 1050,
+        "scroll": 1035,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 800,
+      "page": "history_month",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 800,
+      "page": "history_year",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 800,
+      "page": "history_all",
+      "collapsed": false,
+      "metrics": {
+        "width": 800,
+        "scroll": 785,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 600,
+      "page": "history_month",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 600,
+      "page": "history_year",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 600,
+      "page": "history_all",
+      "collapsed": false,
+      "metrics": {
+        "width": 600,
+        "scroll": 585,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 420,
+      "page": "history_month",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 420,
+      "page": "history_year",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    },
+    {
+      "width": 420,
+      "page": "history_all",
+      "collapsed": false,
+      "metrics": {
+        "width": 420,
+        "scroll": 405,
+        "heading": "Your Analytics",
+        "controls": 27
+      }
+    }
+  ],
+  "workflow": {
+    "cardRedirect": true,
+    "previewEdit": true,
+    "sessionRedirect": true,
+    "duplicateUnique": true,
+    "savedTemplate": true,
+    "sevenTabs": true,
+    "detailEvidence": true,
+    "selectionReadOnly": true,
+    "categoryFilter": true,
+    "searchFilter": true,
+    "fullDetail": true,
+    "listView": true,
+    "sidebarSaved": true,
+    "packImport": true,
+    "dynamicTint": true,
+    "libraryPicker": true,
+    "unitIsolation": true,
+    "rewardPaste": true,
+    "policyForm": true,
+    "policyEditPreserved": true,
+    "batchRedirect": true,
+    "batchEdit": true,
+    "iconVariant": true,
+    "reportVisible": true,
+    "reportCopy": true,
+    "reportJson": true,
+    "exactHistoricalSelection": true,
+    "completedOutputActions": true,
+    "done": true
+  },
+  "errors": []
+}

@@ -197,12 +197,12 @@ internal data class DashboardMetric(val id: String, val label: String, val value
                         val w=((width+8.dp)*span/12f-8.dp).coerceIn(minOf(width,72.dp),width)
                         val body: @Composable () -> Unit = {
                             OmssMiniCard(Modifier.fillMaxWidth().fillMaxHeight()) {
-                                metric.icon?.let { BundledCardIcon(it,Modifier.size(24.dp),DeckColors.accent) }
-                                Text(metric.value,fontSize=18.sp,fontWeight=androidx.compose.ui.text.font.FontWeight.Medium,color=metric.color ?: OmssColors.text)
-                                Text(metric.label,color=DeckColors.muted,fontSize=10.sp)
+                                metric.icon?.let { BundledCardIcon(it,Modifier.size(20.dp),DeckColors.accent) }
+                                Text(metric.value,fontSize=15.sp,fontWeight=androidx.compose.ui.text.font.FontWeight.Medium,color=metric.color ?: OmssColors.text)
+                                Text(metric.label,color=DeckColors.muted,fontSize=9.sp)
                             }
                         }
-                        val frame=Modifier.width(w).then(if(state?.value?.cards?.get(metric.id)?.heightSized!=true) Modifier.fillMaxRowHeight() else Modifier)
+                        val frame=Modifier.width((w-.5.dp).coerceAtLeast(1.dp)).then(if(state?.value?.cards?.get(metric.id)?.heightSized!=true) Modifier.fillMaxRowHeight() else Modifier)
                         if(state!=null) ResizableCardFrame(metric.id,state,default,width,frame,content=body) else Box(frame) { body() }
                     }
                 }

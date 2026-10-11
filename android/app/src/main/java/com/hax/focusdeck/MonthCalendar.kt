@@ -77,7 +77,7 @@ internal fun monthCalendarSlots(anchor: LocalDate): List<LocalDate?> {
                 }
                 val x=slot*(i%7+.5f)-cell/2;val y=top+i/7*rowHeight
                 drawRoundRect(color,Offset(x,y),Size(cell,cell),CornerRadius(3.dp.toPx()))
-                if(state=="future") drawRect(Color.Black.copy(alpha=.65f),Offset(x,y),Size(cell,cell))
+                if(state=="future") drawRoundRect(Color.Black.copy(alpha=.65f),Offset(x,y),Size(cell,cell),CornerRadius(3.dp.toPx()))
                 if(state=="incomplete records") drawRoundRect(DeckColors.muted,Offset(x,y),Size(cell,cell),CornerRadius(3.dp.toPx()),style=Stroke(.8.dp.toPx(),pathEffect=PathEffect.dashPathEffect(floatArrayOf(2.dp.toPx(),2.dp.toPx()))))
                 if(value==0.0) drawRoundRect(DeckColors.muted,Offset(x,y),Size(cell,cell),CornerRadius(3.dp.toPx()),style=Stroke(.7.dp.toPx()))
                 paint.color=if(value!=null && value>0) Color.Black.toArgb() else DeckColors.muted.toArgb()

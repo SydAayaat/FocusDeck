@@ -125,7 +125,7 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
     Dialog(onDismissRequest = dismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         DialogNavigationRefresh()
         Surface(Modifier.fillMaxSize(), color = DashboardBackground) {
-            Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal=16.dp)) {
+            Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal=if(androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp>=380 && androidx.compose.ui.platform.LocalDensity.current.fontScale<=1.25f) 40.dp else 16.dp)) {
             Box(Modifier.weight(1f)) {
             EntryMotion(Modifier.fillMaxSize()) {
             if (summary == null) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = HistoryCyan) }

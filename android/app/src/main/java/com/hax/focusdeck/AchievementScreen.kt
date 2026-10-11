@@ -126,19 +126,23 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     FadeSlidePage(selected?.takeIf { id -> store.definitions.any { it.id == id } }, Modifier.fillMaxSize()) { visible ->
     val def = store.definitions.find { it.id == visible }
     if (def != null) AchievementDetail(store, def, now, zone, onRecordViewed, { selected = null }, close, statsById[def.id], readOnly, onIndexCommand, error)
-    else Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        EntryMotion { Column(verticalArrangement=Arrangement.spacedBy(5.dp)) { Text("Achievements",fontSize=30.sp,fontWeight=FontWeight.Bold);Text("Track your progress and build your streaks.",fontSize=12.sp,color=AGrey) } }
+    else Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        EntryMotion { Column(verticalArrangement=Arrangement.spacedBy(5.dp)) { Text("Achievements",fontSize=30.sp,fontWeight=FontWeight.Bold);Text("Track your streaks, goals, and progress.",fontSize=12.sp,lineHeight=16.sp,color=AGrey) } }
         if (error.isNotBlank()) Text(error, color = DeckColors.secondary, fontSize = 12.sp)
         EntryMotion(delay = 35) {
-            Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).semantics { contentDescription="Achievement category filters" },horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                AchievementEngine.categories.forEachIndexed { index,name->
-                    val chosen=pager.currentPage==index
-                    Column(Modifier.selectable(chosen,role=Role.Tab,onClick={scope.launch {
-                        if(mode==AchievementMotion.OFF) pager.scrollToPage(index) else pager.animateScrollToPage(index,animationSpec=tween(mode.duration))
-                    }}).semantics { contentDescription="Category $name" },horizontalAlignment=Alignment.CenterHorizontally) {
-                        Text(name,Modifier.padding(horizontal=14.dp,vertical=8.dp),fontSize=12.sp,color=if(chosen) ACyan else AGrey)
-                        Spacer(Modifier.height(4.dp))
-                        Box(Modifier.width((name.length*6+28).dp).height(2.dp).background(if(chosen) ACyan else DeckColors.track))
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val normal=maxWidth>=350.dp && androidx.compose.ui.platform.LocalDensity.current.fontScale<=1.25f
+                val fit=normal && AchievementEngine.categories.size<=6
+                val tabWidth=(maxWidth/6).coerceAtLeast(62.dp)
+                Row(Modifier.fillMaxWidth().then(if(fit) Modifier else Modifier.horizontalScroll(rememberScrollState())).semantics { contentDescription="Achievement category filters" }) {
+                    AchievementEngine.categories.forEachIndexed { index,name->
+                        val chosen=pager.currentPage==index
+                        Column((if(fit) Modifier.weight(1f) else if(normal) Modifier.width(tabWidth) else Modifier).selectable(chosen,role=Role.Tab,onClick={scope.launch {
+                            if(mode==AchievementMotion.OFF) pager.scrollToPage(index) else pager.animateScrollToPage(index,animationSpec=tween(mode.duration))
+                        }}).semantics { contentDescription="Category $name" },horizontalAlignment=Alignment.CenterHorizontally) {
+                            Text(name,Modifier.padding(horizontal=if(normal) 1.dp else 12.dp,vertical=8.dp),fontSize=11.sp,lineHeight=14.sp,letterSpacing=0.sp,maxLines=1,color=if(chosen) ACyan else AGrey)
+                            Box((if(normal) Modifier.fillMaxWidth() else Modifier.width((name.length*6+24).dp)).height(2.dp).background(if(chosen) ACyan else DeckColors.track))
+                        }
                     }
                 }
             }
@@ -156,7 +160,7 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
             Spacer(Modifier.weight(1f))
             if(editing) TextButton({layout.editing=false}) { Text("DONE",fontSize=11.sp) }
             Box {
-                IconButton({layoutMenu=true},Modifier.testTag("achievement-options")) { Text("⋮",color=AGrey,fontSize=24.sp) }
+                IconButton({layoutMenu=true},Modifier.size(32.dp).testTag("achievement-options")) { Text("⋮",color=AGrey,fontSize=24.sp) }
                 DropdownMenu(layoutMenu,{layoutMenu=false}) {
                     DropdownMenuItem(text={Text("Archived cards")},onClick={layoutMenu=false;archived=true})
                     DropdownMenuItem(text={Text("Edit layout")},onClick={layoutMenu=false;layout.editing=true})
@@ -201,7 +205,7 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     val records=all.sumOf { it.completed.count { segment -> segment.personalRecord } }+all.count { it.newRecord }
     val progressCards=definitions.filter { it.progressEnabled }
     FDCard(Modifier.fillMaxWidth()) {
-        Text("Overview",fontSize=18.sp,fontWeight=FontWeight.Bold)
+        Text("Overview",fontSize=15.sp,fontWeight=FontWeight.Bold)
         DashboardMetricStrip(listOf(
             DashboardMetric("overview-active","Active streaks","${all.count { it.current>0 }} / ${all.size}","flame"),
             DashboardMetric("overview-records","Personal bests",records.toString(),"trophy"),

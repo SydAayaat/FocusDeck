@@ -104,7 +104,7 @@ class LockedDashboardUiTest {
     }
     @Test fun periodTabsKeepCalendarAndYearChartInDistributionSlot() {
         shell(HistoryPeriod.WEEK)
-        ui.onNodeWithContentDescription("Focus duration chart, hours; missing data N/A").assertExists()
+        ui.onNode(hasContentDescription("Focus duration chart, hours; missing data N/A") and hasAnyAncestor(hasTestTag("analytics-focus"))).assertExists()
         ui.onNodeWithTag("focus-bars-weekly:$date").performTouchInput { click(Offset(width*.67f,height*.5f)) }
         ui.onNodeWithText("Open period").performClick()
         ui.onNodeWithTag("period-DAY").assertIsSelected()
@@ -115,7 +115,7 @@ class LockedDashboardUiTest {
         ui.onNodeWithTag("period-YEAR").performClick().assertIsSelected()
         ui.onNodeWithText("Productivity by Month").assertExists()
         ui.onNodeWithTag("month-calendar").assertDoesNotExist()
-        ui.onNodeWithContentDescription("Focus duration chart, hours; missing data N/A").assertExists()
+        ui.onNode(hasContentDescription("Focus duration chart, hours; missing data N/A") and hasAnyAncestor(hasTestTag("analytics-focus"))).assertExists()
         ui.onNodeWithContentDescription("Next Year").performClick()
         ui.onNodeWithText("YEAR 2027").assertExists()
     }
@@ -166,7 +166,7 @@ class LockedDashboardUiTest {
     @Test fun detailKeepsProgressAndInlineHistoriesReachableInLazyList() {
         scene { AchievementPages(AchievementEngine.seed(now,zone),now,zone,{},{}) }
         ui.waitUntil(5000) { ui.onAllNodesWithContentDescription("Open Porn Free achievement").fetchSemanticsNodes().isNotEmpty() }
-        ui.onNodeWithContentDescription("Category Learning",useUnmergedTree=true).performScrollTo().performClick()
+        ui.onNodeWithContentDescription("Category Learning",useUnmergedTree=true).performClick()
         ui.onNodeWithContentDescription("Open German achievement").performClick()
         ui.onNodeWithText("Achievement detail").assertExists()
         ui.onNodeWithTag("achievement-detail-list").performScrollToNode(hasText("Progress history"))
@@ -201,7 +201,7 @@ class LockedDashboardUiTest {
             }
         }
         val pixels=ui.onNodeWithTag("focus-bars-omss-layering").captureToImage().toPixelMap()
-        val dp=pixels.height/122f;val left=28*dp;val slot=(pixels.width-left-52*dp)/3
+        val dp=pixels.width/376f;val left=28*dp;val slot=(pixels.width-left-52*dp)/3
         val cyanRows=(0 until pixels.height).filter { y->
             ((left+slot*.84f).toInt()..(left+slot*1.15f).toInt()).any { x->
                 val c=pixels[x,y];c.red<.15f && c.green>.65f && c.blue>.65f

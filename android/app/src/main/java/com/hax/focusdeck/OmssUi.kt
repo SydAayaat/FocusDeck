@@ -115,7 +115,7 @@ internal fun Modifier.omssDirectionalShadow(shape: Shape = RoundedCornerShape(12
 
 @Composable internal fun OmssMiniCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     OmssSurface(modifier, nested = true) {
-        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp), content = content)
+        Column(Modifier.padding(6.dp), verticalArrangement = Arrangement.spacedBy(3.dp), content = content)
     }
 }
 
@@ -175,9 +175,9 @@ internal fun Modifier.omssDirectionalShadow(shape: Shape = RoundedCornerShape(12
 
 @Composable internal fun OmssFlatTab(label: String, chosen: Boolean, modifier: Modifier = Modifier, action: () -> Unit) {
     Column(modifier.semantics { selected = chosen; role = Role.Tab }.clickable(onClick = action)
-        .heightIn(min = 44.dp), horizontalAlignment = Alignment.CenterHorizontally,
+        .heightIn(min = 32.dp), horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween) {
-        Text(label, Modifier.padding(horizontal = 8.dp, vertical = 10.dp), fontSize = 12.sp,
+        Text(label, Modifier.padding(horizontal = 4.dp, vertical = 5.dp), fontSize = 12.sp,
             color = if (chosen) DeckColors.accent else DeckColors.muted)
         Box(Modifier.fillMaxWidth().height(2.dp).background(if (chosen) DeckColors.accent else OmssColors.material(OmssColors.separator)))
     }

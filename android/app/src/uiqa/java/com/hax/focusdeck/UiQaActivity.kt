@@ -26,7 +26,7 @@ class UiQaActivity : ComponentActivity() {
                 val fontScale=intent.getFloatExtra("fontScale",nativeDensity.fontScale).coerceIn(.8f,2f)
                 CompositionLocalProvider(LocalDashboardPreview provides true,LocalDensity provides Density(nativeDensity.density,fontScale)) {
                     Surface(Modifier.fillMaxSize(),color=DashboardBackground) {
-                        Column(Modifier.safeDrawingPadding().padding(horizontal=16.dp,vertical=if(intent.getStringExtra("screen")?.let { it.startsWith("home") || it=="achievements" }==true) 12.dp else 0.dp)) {
+                        Column(Modifier.safeDrawingPadding().padding(horizontal=if(intent.getStringExtra("screen")?.let { it.startsWith("home") || it=="achievements" }==true || androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp<380 || fontScale>1.25f) 16.dp else 40.dp,vertical=if(intent.getStringExtra("screen")?.let { it.startsWith("home") || it=="achievements" }==true) 12.dp else 0.dp)) {
                             val reports=remember { UiQaFixtures.reports() }
                             val data=remember { CalendarAnalytics.dataset(reports) }
                             val popup=if(intent.getStringExtra("screen")=="home-popup") data.activities.values.firstOrNull { it.schedule?.start==LocalDate.of(2026,10,9).atTime(6,0).atZone(UiQaFixtures.zone).toInstant().toEpochMilli() }?.id else null

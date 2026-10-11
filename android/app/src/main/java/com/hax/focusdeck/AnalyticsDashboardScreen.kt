@@ -66,16 +66,16 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
     if(e==null) { Box(modifier.fillMaxSize(),contentAlignment=Alignment.Center) { CircularProgressIndicator() };return }
     fun inspect(title: String,text: String,source: String=title) { popup=AnalyticsPopup(title,text,bounds[source] ?: bounds["Plan Execution Score"]) }
     fun card(id: String,title: String,height: Int=150,span: Int=12,trailing: String?=null,badge: String?=null,body: @Composable ColumnScope.()->Unit)=DashboardCard(id,span,height) {
-        FDCard(Modifier.fillMaxWidth().testTag("analytics-$id").onGloballyPositioned { bounds[title]=it.boundsInWindow() }) { FDTitle(title,trailing,badge=badge);body() }
+        FDCard(Modifier.fillMaxWidth().testTag("analytics-$id").onGloballyPositioned { bounds[title]=it.boundsInWindow() },padding=8.dp) { FDTitle(title,trailing,badge=badge,compact=true);body() }
     }
     val cards=mutableListOf<DashboardCard>()
     cards+=DashboardCard("analytics-summary",12,80) { AnalyticsKpis(e,period) }
     cards+=card("plan-score","Plan Execution Score",155,badge=if(e.score==null) "Score N/A" else if(e.performance.execution.provisional) "Provisional" else "Recorded") {
         val x=e.performance.execution
-        Text((if(x.provisional) "Provisional · " else "")+(if(x.partial) "Partial component coverage" else "Captured planned work"),fontSize=11.sp,color=DeckColors.muted)
-        Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) {
-            ScoreRing(e.score,Modifier.size(92.dp).clickable { inspect("Plan Execution Score",executionDetails(e.performance)) })
-            Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+        Text((if(x.provisional) "Provisional · " else "")+(if(x.partial) "Partial component coverage" else "Captured planned work"),fontSize=9.sp,color=DeckColors.muted)
+        Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
+            ScoreRing(e.score,Modifier.size(80.dp).clickable { inspect("Plan Execution Score",executionDetails(e.performance)) })
+            Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(5.dp)) {
                 AnalyticsMeasure("Plan Completion",performancePercent(x.completion),x.completion?.toFloat(),DeckColors.accent) { inspect("Plan Completion",executionDetails(e.performance)) }
                 AnalyticsMeasure("Start Punctuality",performancePercent(x.punctuality),x.punctuality?.toFloat(),DeckColors.accent) { inspect("Start Punctuality",executionDetails(e.performance)) }
                 AnalyticsMeasure("Time Efficiency",performancePercent(x.efficiency),x.efficiency?.toFloat(),OmssColors.analytical) { inspect("Time Efficiency",executionDetails(e.performance)) }
@@ -120,7 +120,7 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
         if(e.projects.isEmpty()) Text("No recorded projects or sessions",color=DeckColors.muted,fontSize=12.sp)
         Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
             Text("Project / Session",Modifier.weight(1f),fontSize=11.sp,color=DeckColors.muted)
-            listOf("Time","Total").forEach { title->TextButton({ascending=if(sortBy==title) !ascending else false;sortBy=title},contentPadding=PaddingValues(3.dp)) { Text(title+if(sortBy==title) if(ascending) " ↑" else " ↓" else " ↕",fontSize=10.sp) } }
+            listOf("Time","Total").forEach { title->TextButton({ascending=if(sortBy==title) !ascending else false;sortBy=title},Modifier.height(24.dp),contentPadding=PaddingValues(3.dp)) { Text(title+if(sortBy==title) if(ascending) " ↑" else " ↓" else " ↕",fontSize=10.sp) } }
         }
         val projects=e.projects.sortedWith(compareBy<DashboardProject> { if(ascending) it.focusMs else -it.focusMs }.thenBy { it.title })
         projects.forEach { project ->
@@ -148,7 +148,7 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
     if(period==HistoryPeriod.DAY) cards+=card("estimation","Time Estimation Accuracy",270) {
         TimeEstimationCard(e)
         var details by remember { mutableStateOf(false) }
-        TextButton({details=!details}) { Text(if(details) "Hide Session Detail" else "Daily Timeline & Session Detail",fontSize=11.sp) }
+        TextButton({details=!details},Modifier.height(28.dp)) { Text(if(details) "Hide Session Detail" else "Daily Timeline & Session Detail",fontSize=11.sp) }
         if(details) {
             DailyTimeline(data,anchor,selectedId=selectedActivity,select={selectedActivity=it})
             data.activities[selectedActivity]?.let { ActivityMetadata(it,true) }
@@ -159,14 +159,14 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
     cards+=card("telemetry","Executive Telemetry Insights",230,badge=if(e.performance.execution.provisional) "Provisional" else if(e.performance.execution.partial) "Partial" else if(e.days.isEmpty()) "Evidence N/A" else "Recorded") {
         TelemetryInsights(e,period)
         var details by remember { mutableStateOf(false) }
-        TextButton({details=!details},contentPadding=PaddingValues(0.dp)) { Text(if(details) "Hide report details" else "GPT Performance Report  ›",fontSize=11.sp) }
+        TextButton({details=!details},Modifier.height(28.dp),contentPadding=PaddingValues(0.dp)) { Text(if(details) "Hide report details" else "GPT Performance Report  ›",fontSize=11.sp) }
         if(details) {
             Text("Deterministic factual summary · Notable trends",fontSize=10.sp,color=DeckColors.muted)
             TextButton({inspect("Historical comparison",comparisonDetails(e.performance),"Executive Telemetry Insights")}) { Text(if(period==HistoryPeriod.ALL) "Lifetime trend" else e.performance.comparison?.focus_ms?.percentage_change?.let { "%+.1f%% vs previous".format(java.util.Locale.ROOT,it) } ?: "Comparison details · percentage N/A",fontSize=11.sp) }
             TextButton({inspect("Estimation & consistency",calibrationDetails(e.performance),"Executive Telemetry Insights")}) { Text("Planning calibration & consistency",fontSize=11.sp) }
             Text("Evidence to review: ${dashboardDuration(e.performance.unlocated_ms)} unlocated; ${e.performance.execution.missing_duration_blocks} blocks with unknown planned duration",fontSize=11.sp,color=DeckColors.muted)
         }
-        if(copyPerformance!=null) TextButton({copyPerformance(period,anchor)},contentPadding=PaddingValues(0.dp)) { Text("Copy Report",fontSize=11.sp) }
+        if(copyPerformance!=null) TextButton({copyPerformance(period,anchor)},Modifier.height(28.dp),contentPadding=PaddingValues(0.dp)) { Text("Copy Report",fontSize=11.sp) }
     }
     CompositionLocalProvider(LocalDashboardLayout provides layout,LocalTextStyle provides androidx.compose.ui.text.TextStyle(fontSize=14.sp), LocalAnalyticsActions provides AnalyticsScreenActions({layout.editing=true},{expanded=true},{archive=true})) {
         Box(modifier) {
@@ -182,7 +182,7 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
         DialogNavigationRefresh()
         FDCard(Modifier.fillMaxWidth().heightIn(max=650.dp).testTag("analytics-history-dialog")) {
             Row { Text("History & Export",Modifier.weight(1f),fontWeight=FontWeight.Bold);TextButton({archive=false}) { Text("Close") } }
-            LazyColumn(Modifier.weight(1f,fill=false),verticalArrangement=Arrangement.spacedBy(10.dp)) {
+            LazyColumn(Modifier.weight(1f,fill=false),verticalArrangement=Arrangement.spacedBy(5.dp)) {
                 items(e.reports,key={it.key}) { report ->
                     Text(report.title,fontSize=14.sp,fontWeight=FontWeight.Bold)
                     Text("${dashboardDuration(report.focusedMs)} · ${report.statusLabel}",fontSize=12.sp,color=DeckColors.muted)
@@ -194,18 +194,19 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable private fun AnalyticsKpis(e: DashboardAnalyticsEvidence,period: HistoryPeriod) {
     val list=listOf("FOCUS" to dashboardDuration(e.focus.takeIf { e.days.isNotEmpty() }),"SESSIONS" to e.reports.size.toString(),"BLOCKS DONE" to e.done.toString(),"BREAK TIME" to dashboardDuration(e.breaks.takeIf { e.days.isNotEmpty() }))
     val icons=mapOf("FOCUS" to "target","SESSIONS" to "trophy","BLOCKS DONE" to "cpu","BREAK TIME" to "zap")
     val large=LocalDensity.current.fontScale>1.25f || LocalConfiguration.current.screenWidthDp<360
     Column(verticalArrangement=Arrangement.spacedBy(8.dp)) { list.chunked(if(large) 2 else 4).forEach { group ->
-        Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) { group.forEach { (label,value)->
-            FDCard(Modifier.weight(1f),padding=8.dp) {
-                Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-                    BundledCardIcon(icons.getValue(label),Modifier.size(18.dp),DeckColors.accent)
+        FlowRow(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(5.dp)) { group.forEach { (label,value)->
+            FDCard(Modifier.weight(1f).fillMaxRowHeight(),padding=6.dp) {
+                Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(4.dp)) {
+                    BundledCardIcon(icons.getValue(label),Modifier.size(16.dp),DeckColors.accent)
                     Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                        Text(label,fontSize=9.sp,color=DeckColors.muted,maxLines=2)
-                        Text(value,fontSize=15.sp,style=OmssTypography.metric,maxLines=2)
+                        Text(label,fontSize=8.sp,color=DeckColors.muted,maxLines=2)
+                        Text(value,fontSize=13.sp,style=OmssTypography.metric,maxLines=2)
                     }
                 }
             }
@@ -219,8 +220,8 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
 }
 
 @Composable private fun AnalyticsMeasure(label: String,value: String,fraction: Float?,color: Color,action: ()->Unit) {
-    Column(Modifier.fillMaxWidth().clickable(onClick=action).semantics { contentDescription="$label $value" },verticalArrangement=Arrangement.spacedBy(5.dp)) {
-        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(4.dp),verticalAlignment=Alignment.CenterVertically) { BundledCardIcon(when(label) { "Start Punctuality","Punctual"->"clock";"Time Efficiency","Estimation"->"zap";else->"target" },Modifier.size(16.dp),DeckColors.accent);Text(label,Modifier.weight(1f),fontSize=11.sp,maxLines=2);Text(value,fontSize=11.sp,color=color) }
+    Column(Modifier.fillMaxWidth().clickable(onClick=action).semantics { contentDescription="$label $value" },verticalArrangement=Arrangement.spacedBy(3.dp)) {
+        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(4.dp),verticalAlignment=Alignment.CenterVertically) { BundledCardIcon(when(label) { "Start Punctuality","Punctual"->"clock";"Time Efficiency","Estimation"->"zap";else->"target" },Modifier.size(14.dp),DeckColors.accent);Text(label,Modifier.weight(1f),fontSize=10.sp,maxLines=2);Text(value,fontSize=10.sp,color=color) }
         FDTrack(fraction,color=color)
     }
 }

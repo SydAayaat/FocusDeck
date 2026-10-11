@@ -34,7 +34,7 @@ import kotlin.math.*
     var anchor by remember(key) { mutableStateOf(Offset.Zero) }
     val actions=values.mapIndexed { i,(label,value)->CustomAccessibilityAction("$label: ${dashboardDuration(value?.toLong())}") { selected=i;true } }
     Box(Modifier.fillMaxWidth()) {
-        Box(Modifier.fillMaxWidth().height(if(values.size==24) 96.dp else 122.dp).testTag("focus-bars-$key")
+        Box(Modifier.fillMaxWidth().height(if(values.size==24) 68.dp else 84.dp).testTag("focus-bars-$key")
             .semantics { contentDescription="Focus duration chart, ${if(minutes) "minutes" else "hours"}; missing data N/A";customActions=actions }
             .pointerInput(values,key) { detectTapGestures { at->
                 if(values.isNotEmpty()) {
@@ -43,10 +43,10 @@ import kotlin.math.*
                     selected=if(selected==i) null else i;anchor=at
                 }
             } }.drawWithCache {
-                val left=28.dp.toPx();val top=18.dp.toPx();val bottom=size.height-20.dp.toPx()
+                val left=28.dp.toPx();val top=8.dp.toPx();val bottom=size.height-20.dp.toPx()
                 val plot=(bottom-top).coerceAtLeast(1f);val width=(size.width-left-(if(benchmark!=null) 52.dp.toPx()*fontScale else 0f)).coerceAtLeast(1f)
                 val slot=width/values.size.coerceAtLeast(1)
-                val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { color=DeckColors.muted.toArgb();textSize=10.sp.toPx() }
+                val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { color=DeckColors.muted.toArgb();textSize=9.sp.toPx() }
                 val barPath=android.graphics.Path()
                 val bars=values.mapIndexed { i,(_,value)->
                     val height=((value ?: 0.0)/scale*plot).toFloat().coerceIn(0f,plot)
@@ -111,10 +111,10 @@ import kotlin.math.*
     val colors=listOf(DeckColors.accent,OmssColors.analytical,DeckColors.muted)
     var selected by remember(e) { mutableStateOf<Int?>(null) }
     var anchor by remember(e) { mutableStateOf(Offset.Zero) }
-    Box(Modifier.fillMaxWidth().height(106.dp),contentAlignment=Alignment.Center) {
+    Box(Modifier.fillMaxWidth().height(82.dp),contentAlignment=Alignment.Center) {
         Text(dashboardDuration(e.tracked.takeIf { e.days.isNotEmpty() }),Modifier.align(Alignment.TopEnd),fontSize=11.sp,color=DeckColors.muted)
         OmssSegmentedGauge(amounts.mapIndexed { i,amount->(if(e.tracked>0) amount.toFloat()/e.tracked else 0f) to colors[i] },
-            Modifier.size(106.dp).semantics {
+            Modifier.size(82.dp).semantics {
                 contentDescription=if(e.tracked>0) "Time Split, ${(e.focus*100/e.tracked)} percent focus" else "Time Split, no measured data"
                 customActions=labels.indices.map { i->CustomAccessibilityAction("Inspect ${labels[i]}, ${dashboardDuration(amounts[i])}") {selected=i;true} }
             }.pointerInput(amounts) { detectTapGestures { at ->
@@ -124,7 +124,7 @@ import kotlin.math.*
                     selected=if(selected==i) null else i;anchor=at
                 }
             } }) {
-            Column(horizontalAlignment=Alignment.CenterHorizontally) { Text(e.focusShare?.let { "${(it*100).roundToInt()}%" } ?: "N/A",fontSize=23.sp,style=OmssTypography.metric);Text("Focus",fontSize=11.sp,color=DeckColors.muted) }
+            Column(horizontalAlignment=Alignment.CenterHorizontally) { Text(e.focusShare?.let { "${(it*100).roundToInt()}%" } ?: "N/A",fontSize=21.sp,style=OmssTypography.metric);Text("Focus",fontSize=11.sp,color=DeckColors.muted) }
         }
         Text("›",Modifier.align(Alignment.CenterEnd).clickable { inspect("Time Split",amounts.mapIndexed { i,ms->"${labels[i]}: ${dashboardDuration(ms)}" }.joinToString("\n")) },fontSize=22.sp,color=DeckColors.muted)
         selected?.let { i->AnchoredWidgetPopup(anchor,{selected=null}) {
@@ -140,7 +140,7 @@ import kotlin.math.*
         Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) { BundledCardIcon("chart-no-axes-column",Modifier.size(23.dp),DeckColors.accent);Text("Est. vs. actual",fontSize=10.sp,color=DeckColors.muted);Text(estimate?.let { "${dashboardDuration(it.planned)} → ${dashboardDuration(it.actual)}" } ?: "N/A",fontSize=11.sp) }
     }
     var calibration by remember { mutableStateOf(false) }
-    TextButton({calibration=!calibration},contentPadding=PaddingValues(0.dp)) { Text(if(calibration) "Hide project calibration" else "By project type  ›",fontSize=11.sp) }
+    TextButton({calibration=!calibration},Modifier.height(28.dp),contentPadding=PaddingValues(0.dp)) { Text(if(calibration) "Hide project calibration" else "By project type  ›",fontSize=11.sp) }
     if(calibration) {
     HorizontalDivider(color=OmssColors.separator)
     Text("By project type",fontSize=12.sp,fontWeight=FontWeight.Bold)

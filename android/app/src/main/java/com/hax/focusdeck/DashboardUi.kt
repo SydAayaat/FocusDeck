@@ -18,16 +18,16 @@ internal val DashboardBackground get() = if (DeckColors.palette.id == "monochrom
 internal val DashboardRaised get() = OmssColors.material(OmssColors.nested)
 internal val DashboardInset get() = OmssColors.material(OmssColors.hub)
 @Composable internal fun FDCard(modifier: Modifier = Modifier, onClick: (() -> Unit)? = null,
-    padding: Dp = 12.dp, content: @Composable ColumnScope.() -> Unit) {
-    OmssSurface(modifier.then(if(onClick == null) Modifier else Modifier.clickable(onClick=onClick))) {
+    padding: Dp = 10.dp, content: @Composable ColumnScope.() -> Unit) {
+    OmssSurface(modifier.then(LocalDashboardCardHeight.current?.let { Modifier.heightIn(min=it) } ?: Modifier).then(if(onClick == null) Modifier else Modifier.clickable(onClick=onClick))) {
         CompositionLocalProvider(LocalTextStyle provides androidx.compose.ui.text.TextStyle(fontSize=14.sp,fontFeatureSettings="tnum")) {
-            Column(Modifier.padding(padding), verticalArrangement=Arrangement.spacedBy(8.dp), content=content)
+            Column(Modifier.padding(padding), verticalArrangement=Arrangement.spacedBy(6.dp), content=content)
         }
     }
 }
-@Composable internal fun FDTitle(title: String, trailing: String? = null,trailingAction: (() -> Unit)? = null,badge: String? = null) {
+@Composable internal fun FDTitle(title: String, trailing: String? = null,trailingAction: (() -> Unit)? = null,badge: String? = null, compact: Boolean = false) {
     Row(Modifier.fillMaxWidth(), verticalAlignment=Alignment.CenterVertically) {
-        Text(title,Modifier.weight(1f),fontSize=15.sp,fontWeight=FontWeight.Bold)
+        Text(title,Modifier.weight(1f),fontSize=if(compact) 12.sp else 15.sp,fontWeight=FontWeight.Bold)
         trailing?.let { Text(it,Modifier.then(if(trailingAction!=null) Modifier.clickable(onClick=trailingAction) else Modifier),color=DeckColors.muted,fontSize=11.sp) }
         badge?.let { OmssStatusPill(it) }
     }

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "index_ptfs_dev",
+    "title": "PTfS — Synthetic Demonstration Index",
+    "total": 126,
+    "sections": 7,
+    "category": "INDEX",
+    "card_type": "HYBRID",
+    "completed_topics": 52,
+    "reopened_events": 3,
+    "completion_percent": 41.27,
+    "synthetic": true
+  },
+  {
+    "id": "index_embedded_dev",
+    "title": "Embedded Systems — Synthetic Index",
+    "total": 64,
+    "sections": 8,
+    "category": "INDEX",
+    "card_type": "PROGRESS_ONLY",
+    "completed_topics": 63,
+    "reopened_events": 2,
+    "completion_percent": 98.44,
+    "synthetic": true
+  }
+]

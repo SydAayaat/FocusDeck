@@ -45,7 +45,7 @@ private val HistoryYellow get() = DeckColors.secondary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report) -> Unit, initialPeriod: HistoryPeriod = HistoryPeriod.WEEK, initialExpanded: Boolean=false, home: () -> Unit = dismiss, achievements: () -> Unit = dismiss) {
+fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report) -> Unit, initialPeriod: HistoryPeriod = HistoryPeriod.WEEK, initialExpanded: Boolean=false, home: () -> Unit = dismiss, achievements: () -> Unit = dismiss, focus: (() -> Unit)? = null) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val achievementStore by repo.achievements.collectAsStateWithLifecycle()
@@ -122,10 +122,11 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
         }
     }
 
+    CompositionLocalProvider(LocalPrimaryNavigation provides PrimaryNavigation("analytics",home,achievements,{},focus)) {
     Dialog(onDismissRequest = dismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         DialogNavigationRefresh()
         Surface(Modifier.fillMaxSize(), color = DashboardBackground) {
-            Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal=if(androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp>=380 && androidx.compose.ui.platform.LocalDensity.current.fontScale<=1.25f) 40.dp else 16.dp)) {
+            Column(Modifier.fillMaxSize().windowInsetsPadding(dashboardViewportInsets()).padding(horizontal=OmssGeometry.analyticsGutter.dp)) {
             Box(Modifier.weight(1f)) {
             EntryMotion(Modifier.fillMaxSize()) {
             if (summary == null) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = HistoryCyan) }
@@ -138,7 +139,7 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
                     }
                 },openReport={selectedReport=it},copy=copy,delete=if(viewer) null else ({deleteTarget=it}),header={
                     if (viewer) TabletViewerBanner(repo)
-                    AnalyticsHeader(period,anchor,{period=it},{anchor=it},connection,{pickingDate=true},{anchor=today},dismiss)
+                    AnalyticsHeader(period,anchor,{period=it},{anchor=it},connection,{pickingDate=true},{anchor=today},dismiss,home,achievements)
                 },archiveActions={
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Box(Modifier.weight(1f)) {
@@ -186,10 +187,11 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
                 })
             }
             }
-            DashboardNavigation("analytics",home,achievements,{})
+            if(!LocalDeckImmersive.current) DashboardNavigation("analytics",home,achievements,{},focus)
             }
         }
     }
+    } // Main destination callbacks dismiss this dialog before selecting their existing route.
     if (!viewer && (deleteAll || deleteTarget != null)) DeckAlertDialog(
         onDismissRequest = { deleteAll = false; deleteTarget = null },
         title = { Text(if (deleteAll) "Delete all previous logs?" else "Delete this session?") },
@@ -208,7 +210,7 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
         val picker=rememberDatePickerState(initialSelectedDateMillis=anchor.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli())
         DatePickerDialog(onDismissRequest={pickingDate=false},confirmButton={TextButton({picker.selectedDateMillis?.let { anchor=Instant.ofEpochMilli(it).atZone(java.time.ZoneOffset.UTC).toLocalDate() };pickingDate=false}) { Text("SELECT") }},dismissButton={TextButton({pickingDate=false}) { Text("CANCEL") }}) { DatePicker(picker) }
     }
-    selectedReport?.let { report -> ReportDetailsDialog(report, { selectedReport = null }, { copy(report) }) }
+    selectedReport?.let { report -> ReportDetailsDialog(report, { selectedReport = null }, { repo.history.value.find { it.key==report.key }?.let(copy) },currentReport={repo.history.value.find { it.key==report.key }}) }
 }
 
 @Composable

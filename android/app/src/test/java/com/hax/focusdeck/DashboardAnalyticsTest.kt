@@ -115,7 +115,23 @@ class DashboardAnalyticsTest {
     @Test fun referenceLabelsAlwaysRetainHoursAndMinutes() {
         assertEquals("0h 30m",referenceDuration(30*60000.0))
         assertEquals("2h 15m",referenceDuration(135*60000.0))
-        assertEquals("0h 0m",referenceDuration(0.0))
+        assertEquals("0h 00m",referenceDuration(0.0))
+    }
+
+    @Test fun calendarBinsConserveLocatedHoursAndNeverInventUnlocatedZeroes() {
+        assertEquals(listOf(null,null,null),calendarFocusBins(null))
+        assertEquals(listOf(null,null,null),calendarFocusBins(CalendarDay(date,hasRecord=true)))
+        val d=CalendarDay(date,hasRecord=true,hourCoverage=true).apply { hours[7]=3600000;hours[8]=1800000;hours[23]=7200000 }
+        assertEquals(listOf(1.0,.5,2.0),calendarFocusBins(d))
+        assertEquals(d.hours.sum()/3600000.0,calendarFocusBins(d).filterNotNull().sum(),0.0)
+        assertEquals(listOf(0.0,0.0,0.0),calendarFocusBins(CalendarDay(date,hasRecord=true,hourCoverage=true)))
+    }
+    @Test fun suppliedObservationClockAlsoOwnsPeriodClosure() {
+        val observed=CalendarDataset(mapOf(date to CalendarDay(date,zones=linkedSetOf(zone),hasRecord=true)),emptyMap())
+        val before=date.minusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+        val after=date.plusDays(1).atStartOfDay(zone).toInstant().toEpochMilli()
+        assertFalse(PerformanceAnalytics.report(observed,HistoryPeriod.DAY,date,before).period_closed)
+        assertTrue(PerformanceAnalytics.report(observed,HistoryPeriod.DAY,date,after).period_closed)
     }
 
 }

@@ -109,14 +109,14 @@ fun AchievementScreen(repo: DeckRepository, close: () -> Unit) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, onRecordViewed: suspend (String) -> Unit, close: () -> Unit,
-    onLayout: (String, String?, String?) -> Unit = { _, _, _ -> }, onManage: (String, String) -> Unit = { _, _ -> }, error: String = "", readOnly: Boolean = false, onIndexCommand: (AchievementCommand) -> Unit = {}) {
+    onLayout: (String, String?, String?) -> Unit = { _, _, _ -> }, onManage: (String, String) -> Unit = { _, _ -> }, error: String = "", readOnly: Boolean = false, onIndexCommand: (AchievementCommand) -> Unit = {}, initialCategory: String = "All") {
     val layout=rememberDashboardLayout("achievements")
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
     val editing=layout.editing
     var archived by remember { mutableStateOf(false) }
     var layoutMenu by remember { mutableStateOf(false) }
     val mode = LocalAchievementMotion.current
-    val pager = rememberPagerState(pageCount = { AchievementEngine.categories.size })
+    val pager = rememberPagerState(initialPage=AchievementEngine.categories.indexOf(initialCategory).coerceAtLeast(0), pageCount = { AchievementEngine.categories.size })
     val scope = rememberCoroutineScope()
     BackHandler { if(selected!=null) selected=null else if(layout.editing) layout.editing=false else close() }
     val statsById by produceState<Map<String, AchievementStats>>(emptyMap(), store, now, zone) {
@@ -127,7 +127,10 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     val def = store.definitions.find { it.id == visible }
     if (def != null) AchievementDetail(store, def, now, zone, onRecordViewed, { selected = null }, close, statsById[def.id], readOnly, onIndexCommand, error)
     else Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        EntryMotion { Column(verticalArrangement=Arrangement.spacedBy(5.dp)) { Text("Achievements",fontSize=30.sp,fontWeight=FontWeight.Bold);Text("Track your streaks, goals, and progress.",fontSize=12.sp,lineHeight=16.sp,color=AGrey) } }
+        EntryMotion { Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
+            Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(5.dp)) { Text("Achievements",fontSize=30.sp,fontWeight=FontWeight.Bold);Text("Track your streaks, goals, and progress.",fontSize=12.sp,lineHeight=16.sp,color=AGrey) }
+            if(LocalDeckImmersive.current && LocalPrimaryNavigation.current==null) IconButton(close,Modifier.size(32.dp).semantics { contentDescription="Go to Home" }) { BundledCardIcon("house",Modifier.size(20.dp),ACyan) }
+        } }
         if (error.isNotBlank()) Text(error, color = DeckColors.secondary, fontSize = 12.sp)
         EntryMotion(delay = 35) {
             BoxWithConstraints(Modifier.fillMaxWidth()) {
@@ -222,12 +225,12 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     val scale by animateFloatAsState(if(pressed && mode!=AchievementMotion.OFF) .985f else 1f,tween(mode.duration),label="Card press")
     val def=stats.definition;val p=def.progress
     val touch=Modifier.combinedClickable(interactionSource=interaction,indication=null,onClick=open,onLongClick=longPress)
-    FDCard(modifier.graphicsLayer { scaleX=scale;scaleY=scale }.then(touch).semantics { contentDescription="Open ${def.title} achievement" },padding=10.dp) {
+    FDCard(modifier.graphicsLayer { scaleX=scale;scaleY=scale }.then(touch).semantics { contentDescription="Open ${def.title} achievement" },padding=8.dp,minimumContentHeight=100.dp) {
         if(size=="compact") {
             Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
-                AchievementRing(stats,store,onRecordViewed,Modifier.size(44.dp))
+                AchievementRing(stats,store,onRecordViewed,Modifier.size(48.dp))
                 Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                    Text(def.title,fontSize=12.sp,fontWeight=FontWeight.SemiBold)
+                    Text(def.title,fontSize=11.sp,lineHeight=14.sp,fontWeight=FontWeight.SemiBold)
                     Text(def.category.replaceFirstChar { it.uppercase() },fontSize=10.sp,color=AGrey)
                 }
             }
@@ -239,12 +242,12 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
             }
         }
         if(LocalDashboardLayout.current?.editing==true && options!=null) TextButton(options,contentPadding=PaddingValues(0.dp)) { Text("Card options",fontSize=10.sp,color=AGrey) }
+        Spacer(Modifier.weight(1f))
         if(def.progressEnabled) {
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(3.dp)) {
-                Text("${AchievementEngine.progressValue(p?.currentValue ?: 0.0)} / ${p?.targetValue?.let(AchievementEngine::progressValue) ?: "—"}",Modifier.weight(1f),fontSize=11.sp)
+                Text("${AchievementEngine.progressValue(p?.currentValue ?: 0.0)} / ${p?.targetValue?.let(AchievementEngine::progressValue) ?: "—"} ${p?.unit ?: "units"}",Modifier.weight(1f),fontSize=if(size=="compact") 9.sp else 11.sp)
                 Text(p?.percent?.let { "${it.toInt()}%" } ?: "N/A",fontSize=10.sp,color=ACyan)
             }
-            Text(p?.unit ?: "units",fontSize=10.sp,color=AGrey)
             val fraction by animateFloatAsState(((p?.percent ?: 0.0)/100).toFloat().coerceIn(0f,1f),tween(mode.duration),label="Card progress")
             FDTrack(fraction,color=if(p?.complete==true) AGreen else ACyan)
             if(p?.complete==true) Text("COMPLETE",fontSize=10.sp,color=AGreen)
@@ -338,7 +341,7 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     if(!detail) {
         OmssCircularGauge(fraction.value,modifier.semantics {
             contentDescription = if(stats.definition.progressEnabled) "Progress ${p?.percent?.toInt()?.let { "$it%" } ?: "N/A"}" else if(stats.newRecord) "New record ring" else "Current streak ring"
-        },color=accent.value,radiusFraction=.36f) {
+        },color=accent.value,radiusFraction=.42f) {
             CardIconView(stats.definition,store,Modifier.size(22.dp),ACyan)
         }
         return

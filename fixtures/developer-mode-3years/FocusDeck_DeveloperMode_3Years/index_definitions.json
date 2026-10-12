@@ -1,0 +1,18 @@
+[
+  {
+    "id": "index_ptfs_dev",
+    "title": "PTfS — Synthetic Demonstration Index",
+    "total": 126,
+    "sections": 7,
+    "category": "INDEX",
+    "card_type": "HYBRID"
+  },
+  {
+    "id": "index_embedded_dev",
+    "title": "Embedded Systems — Synthetic Index",
+    "total": 64,
+    "sections": 8,
+    "category": "INDEX",
+    "card_type": "PROGRESS_ONLY"
+  }
+]

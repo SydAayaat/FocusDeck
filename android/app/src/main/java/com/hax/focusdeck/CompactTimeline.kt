@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.*
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +32,8 @@ internal fun startDeltaDescription(delta: Long?): String = when {
 /** Compact overview only. Expanded analytics retains lanes and connected drill motion. */
 @Composable internal fun CompactDailyTimeline(data: CalendarDataset, date: LocalDate, now: Long?, expand: (() -> Unit)?,
     initialSelection: String? = null, displayZone: ZoneId? = null) {
+    val navigation=LocalTimelineNavigation.current
+    var trackBounds: Rect?=null
     val day=data.days[date]
     val zone=displayZone ?: day?.zones?.firstOrNull() ?: ZoneId.systemDefault()
     val (start,end)=CalendarAnalytics.bounds(date,zone)
@@ -42,10 +45,10 @@ internal fun startDeltaDescription(delta: Long?): String = when {
     val safeBottom=WindowInsets.safeDrawing.getBottom(density)
     Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(4.dp)) {
         Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
-            UiGlyph("clock",Modifier.size(22.dp),DeckColors.accent)
+            ActivityGlyph("clock",Modifier.size(22.dp),DeckColors.accent)
             Spacer(Modifier.width(8.dp))
             Text("Daily Timeline",Modifier.weight(1f),fontSize=16.sp,fontWeight=FontWeight.Bold)
-            TextButton(onClick={expand?.invoke()},enabled=expand!=null,contentPadding=PaddingValues(0.dp)) {
+            TextButton(onClick={navigation?.origin=trackBounds;expand?.invoke()},enabled=expand!=null,contentPadding=PaddingValues(0.dp)) {
                 Text(date.format(DateTimeFormatter.ofPattern("d MMM"))+"  ›",fontSize=11.sp,color=DeckColors.muted)
             }
         }
@@ -57,7 +60,7 @@ internal fun startDeltaDescription(delta: Long?): String = when {
             fun choose(s: CalendarSegment) { selected=if(selected==s.activityId) null else s.activityId;anchor=Offset(with(density){(width*(s.left+s.right)/2).toPx()},0f) }
             val actions=segments.distinctBy { it.activityId }.map { s -> CustomAccessibilityAction("Inspect ${data.activities[s.activityId]?.title ?: "activity"}") { choose(s);true } }
             Box(Modifier.fillMaxWidth().height(56.dp)) {
-                Canvas(Modifier.fillMaxWidth().height(48.dp).testTag("home-timeline-tracks").drawWithCache {
+                Canvas(Modifier.fillMaxWidth().height(48.dp).testTag("home-timeline-tracks").onGloballyPositioned { trackBounds=it.boundsInRoot() }.drawWithCache {
                     val path=android.graphics.Path()
                     repeat(2) { i ->
                         val y=10.dp.toPx()+i*13.dp.toPx()
@@ -100,13 +103,13 @@ internal fun startDeltaDescription(delta: Long?): String = when {
                 }
                 selected?.let { id -> data.activities[id]?.let { a ->
                     DashboardPopup(dismiss={selected=null},anchorPoint=anchor) {
-                        OmssSurface(Modifier.widthIn(max=280.dp).testTag("home-task-popup"),nested=true) {
-                            Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                        OmssSurface(Modifier.widthIn(max=280.dp).testTag("home-task-popup")
+                            .border(1.dp,DeckColors.accent,OmssCalloutShape),nested=true,shape=OmssCalloutShape) {
+                            Column(Modifier.padding(start=12.dp,end=12.dp,top=12.dp,bottom=19.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) {
                                 Text(a.title,fontSize=13.sp,fontWeight=FontWeight.Bold)
-                                fun clock(t: Long?,z: ZoneId)=t?.let { Instant.ofEpochMilli(it).atZone(z).format(DateTimeFormatter.ofPattern("HH:mm")) } ?: "N/A"
                                 val plannedZone=a.schedule?.timezone?.let(ZoneId::of) ?: a.zone
-                                Text("Planned: ${clock(a.schedule?.start,plannedZone)} – ${clock(a.schedule?.end,plannedZone)}",fontSize=12.sp,color=DeckColors.muted)
-                                Text("Actual: ${clock(a.start,a.zone)} – ${clock(a.end,a.zone)}",fontSize=12.sp,color=DeckColors.muted)
+                                Text("Planned: ${compactClock(a.schedule?.start,plannedZone)} – ${compactClock(a.schedule?.end,plannedZone)}",fontSize=12.sp,color=DeckColors.muted)
+                                Text("Actual: ${compactClock(a.start,a.zone)} – ${compactClock(a.end,a.zone)}",fontSize=12.sp,color=DeckColors.muted)
                                 Text("Focus ${dashboardDuration(a.focusMs)}",fontSize=11.sp,color=DeckColors.muted)
                                 Text(startDeltaDescription(a.punctuality),fontSize=12.sp,color=when { a.punctuality==null || a.punctuality==0L->DeckColors.muted;a.punctuality!!<0->DeckColors.success;else->DeckColors.error })
                             }

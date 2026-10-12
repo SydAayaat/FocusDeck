@@ -122,10 +122,11 @@ internal val LocalDashboardCardHeight = staticCompositionLocalOf<Dp?> { null }
         }
     }
 }
-internal data class DashboardCard(val id: String, val span: Int = 12, val height: Int = 260, val minimumWidth: Int = 144, val content: @Composable () -> Unit)
+internal data class DashboardCard(val id: String, val span: Int = 12, val height: Int = 260, val minimumWidth: Int = 144,
+    val frameContent: Boolean = true, val content: @Composable () -> Unit)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable internal fun DashboardGrid(cards: List<DashboardCard>, state: DashboardLayoutState, modifier: Modifier = Modifier,
-    header: (@Composable () -> Unit)? = null, allowReorder: Boolean = true, onReorder: ((String,String) -> Unit)? = null, scrollTag: String? = null) {
+    header: (@Composable () -> Unit)? = null, allowReorder: Boolean = true, onReorder: ((String,String) -> Unit)? = null, scrollTag: String? = null, bottomPadding: Dp = 24.dp) {
     val mode=LocalAchievementMotion.current;val grid=rememberLazyGridState()
     var pendingTarget by remember { mutableStateOf<String?>(null) }
     var dragged by remember { mutableStateOf<String?>(null) };var offset by remember { mutableStateOf(Offset.Zero) };var origin by remember { mutableStateOf(Offset.Zero) }
@@ -142,9 +143,9 @@ internal data class DashboardCard(val id: String, val span: Int = 12, val height
         val totalWidth=maxWidth;val columns=12
         fun effectiveSpan(card: DashboardCard): Int {
             val minimum=kotlin.math.ceil((card.minimumWidth+8f)/(totalWidth.value+8f)*12).toInt().coerceIn(1,12)
-            return state.dimensions(card.id,CardDimensions(card.span,card.height)).span.coerceIn(minimum,12)
+            return if(!card.frameContent) 12 else state.dimensions(card.id,CardDimensions(card.span,card.height)).span.coerceIn(minimum,12)
         }
-        LazyVerticalGrid(GridCells.Fixed(columns),state=grid,modifier=Modifier.fillMaxSize().then(if(scrollTag!=null) Modifier.testTag(scrollTag) else Modifier),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(bottom=24.dp)) {
+        LazyVerticalGrid(GridCells.Fixed(columns),state=grid,modifier=Modifier.fillMaxSize().then(if(scrollTag!=null) Modifier.testTag(scrollTag) else Modifier),horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(8.dp),contentPadding=PaddingValues(bottom=bottomPadding)) {
             if(header!=null) item(key="layout-header",span={GridItemSpan(maxLineSpan)}) { header() }
             items(ordered,key={it.id},span={card->GridItemSpan(effectiveSpan(card))}) { card ->
                 val reorder=Modifier.semantics {
@@ -161,10 +162,14 @@ internal data class DashboardCard(val id: String, val span: Int = 12, val height
                         dragged=null;offset=Offset.Zero;pendingTarget=null
                     })
                 }
-                ResizableCardFrame(card.id,state,CardDimensions(effectiveSpan(card),card.height),totalWidth,
-                    Modifier.fillMaxWidth().animateItem(fadeInSpec=tween(mode.duration),placementSpec=if(mode==AchievementMotion.FULL) spring() else tween(mode.duration),fadeOutSpec=tween(mode.duration))
+                val frameModifier=Modifier.fillMaxWidth().animateItem(fadeInSpec=tween(mode.duration),placementSpec=if(mode==AchievementMotion.FULL) spring() else tween(mode.duration),fadeOutSpec=tween(mode.duration))
                         .onGloballyPositioned { bounds[card.id]=it.boundsInRoot() }.zIndex(if(dragged==card.id) 4f else 0f)
-                        .graphicsLayer { if(dragged==card.id) { translationX=offset.x;translationY=offset.y;if(mode==AchievementMotion.FULL) { scaleX=1.02f;scaleY=1.02f;shadowElevation=8.dp.toPx() } } },reorder=if(allowReorder) reorder else null,content=card.content)
+                        .graphicsLayer { if(dragged==card.id) { translationX=offset.x;translationY=offset.y;if(mode==AchievementMotion.FULL) { scaleX=1.02f;scaleY=1.02f;shadowElevation=8.dp.toPx() } } }
+                if(card.frameContent) ResizableCardFrame(card.id,state,CardDimensions(effectiveSpan(card),card.height),totalWidth,frameModifier,reorder=if(allowReorder) reorder else null,content=card.content)
+                else Box(frameModifier) {
+                    card.content()
+                    if(state.editing && allowReorder) Text("⠿",Modifier.align(Alignment.TopEnd).size(48.dp).then(reorder).background(DeckColors.surface,RoundedCornerShape(8.dp)).semantics { contentDescription="Reorder card row" },color=DeckColors.accent,fontSize=24.sp)
+                }
             }
         }
     }

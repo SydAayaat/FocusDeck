@@ -12,13 +12,16 @@ internal object UiQaFixtures {
     fun reports(): List<Report> {
         val out=mutableListOf<Report>()
         fun add(day: LocalDate,hour: Int,minutes: Int,title: String,serial: Int) {
+            val referencePopup=day==date && hour==6
+            val actualMinutes=if(referencePopup) 89 else minutes
+            val plannedMinutes=if(referencePopup) 120 else minutes+9
             val planned=day.atTime(hour,0).atZone(zone)
             val start=planned.plusMinutes(if(serial%2==0) 3 else -2).toInstant().toEpochMilli()
-            val schedule=PlannedSchedule(planned.toInstant().toString(),planned.plusMinutes(minutes.toLong()+9).toInstant().toString(),zone.id)
-            val plan=Session(1,"qa-$serial",title,"2026-01-01T00:00:00Z",listOf(Block("f","focus",title,((minutes+9)*60).toLong(),schedule=schedule,category="projects",achievementId="ptfs"),Block("b","break","Break",600)),schedule=schedule,rewardStrategy=RewardStrategy())
+            val schedule=PlannedSchedule(planned.toInstant().toString(),planned.plusMinutes(plannedMinutes.toLong()).toInstant().toString(),zone.id)
+            val plan=Session(1,"qa-$serial",title,"2026-01-01T00:00:00Z",listOf(Block("f","focus",title,(plannedMinutes*60).toLong(),schedule=schedule,category="projects",achievementId="ptfs"),Block("b","break","Break",600)),schedule=schedule,rewardStrategy=RewardStrategy())
             val timer=TimerEngine();timer.load(plan,true,ClockNow(start,0,1))
-            timer.done(ClockNow(start+minutes*60000L,minutes*60000L,1));timer.rewardDone(ClockNow(start+minutes*60000L,minutes*60000L,1),skip=true);timer.done(ClockNow(start+(minutes+10)*60000L,(minutes+10)*60000L,1))
-            out+=timer.report(ClockNow(start+(minutes+10)*60000L,(minutes+10)*60000L,1))!!.copy(recordedTimezone=zone.id)
+            timer.done(ClockNow(start+actualMinutes*60000L,actualMinutes*60000L,1));timer.rewardDone(ClockNow(start+actualMinutes*60000L,actualMinutes*60000L,1),skip=true);timer.done(ClockNow(start+(actualMinutes+10)*60000L,(actualMinutes+10)*60000L,1))
+            out+=timer.report(ClockNow(start+(actualMinutes+10)*60000L,(actualMinutes+10)*60000L,1))!!.copy(recordedTimezone=zone.id)
         }
         for(m in 1..9) add(LocalDate.of(2026,m,15),10,60+m*9,"PTfS · Core Theory",m)
         for(d in 5..11) { add(LocalDate.of(2026,10,d),6,65+d*3,"PTfS · Phase 1 · Core Theory",d*10);add(LocalDate.of(2026,10,d),14,50+d*2,"Development · ProtoK",d*10+1) }

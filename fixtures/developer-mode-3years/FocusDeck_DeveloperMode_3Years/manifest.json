@@ -1,0 +1,139 @@
+{
+  "format": "focusdeck.synthetic-fixtures.v1",
+  "version": 1,
+  "target_android_version": "1.22.0",
+  "fixture_only": true,
+  "synthetic": true,
+  "source": "GENERATED_OFFLINE",
+  "seed": 122026,
+  "timezone": "Europe/Berlin",
+  "start_date": "2023-10-12",
+  "end_date": "2026-10-12",
+  "fixed_clock": "2026-10-12T23:59:30+02:00",
+  "storage_policy": "READ_ONLY_EPHEMERAL_ISOLATED_VISUALTEST_ONLY",
+  "default_fixture": "REFERENCE_3Y",
+  "no_network": true,
+  "no_sync": true,
+  "no_production_import": true,
+  "punctuality_sign": "actual_start - planned_start; positive means late",
+  "absent_evidence": "unknown (N/A); observed_zero is distinct",
+  "counts": {
+    "dates": 1097,
+    "sessions": 1321,
+    "blocks": 2832,
+    "timeline_events": 15206,
+    "history_activity": 15206,
+    "daily_analytics": 1097,
+    "period_analytics": 199,
+    "achievement_definitions": 9,
+    "achievement_events": 5083,
+    "index_definitions": 2,
+    "index_topics": 190,
+    "index_events": 125
+  },
+  "caution": [
+    "Schema-neutral generated fixtures. Codex must map to existing repository contracts.",
+    "All GPT, card, achievement and device activity is synthetic—not historical fact.",
+    "Index topic names are placeholders, not the real 126-topic PTfS index.",
+    "No QR pairing keys, credentials, addresses or user records are present.",
+    "Do not use this payload with production import, archive restoration or sync routines.",
+    "Session scoring and Time Split values must be derived with existing production formulae."
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 5549,
+      "sha256": "0f7a51e20cd9c6780ead7ede1ec17f6fb851686acf55ccc5717a89ff31ae6cfc"
+    },
+    {
+      "path": "achievement_definitions.json",
+      "bytes": 1233,
+      "sha256": "37f9039bb945e5317fde868181e18ea7a80baac14546dcedde71193fffaa50b7"
+    },
+    {
+      "path": "achievement_events.jsonl",
+      "bytes": 834520,
+      "sha256": "a5d2d2c7274e7211ebc65dbc27aca3de2c41d6e1be10e83f5e7c353ade13f917"
+    },
+    {
+      "path": "achievement_snapshots.json",
+      "bytes": 3348,
+      "sha256": "49a7f58e60042fdf42459e5e688bb9a1f5b6a7790c5db9dc7e964985e718a5d8"
+    },
+    {
+      "path": "blocks.jsonl",
+      "bytes": 1798915,
+      "sha256": "9f0671fccd92fe9082b0dd44956c17737453eb96cc3de517d7c590de83731a30"
+    },
+    {
+      "path": "daily_analytics.jsonl",
+      "bytes": 526574,
+      "sha256": "9cb857ce173bc9de3cd27423c507ee6645488e58ccd1b56120428378392c7afb"
+    },
+    {
+      "path": "developer_scenarios.json",
+      "bytes": 1968,
+      "sha256": "469d85da96481e20b6e5167394627159cc5fdfe6b1b20ad223253ba4839d9457"
+    },
+    {
+      "path": "generate_fixtures.py",
+      "bytes": 41125,
+      "sha256": "f6aa50208c40fe66011c5cf29247d04b1d6a6cb23a869ca782dfebc1917a0dab"
+    },
+    {
+      "path": "history_activity.jsonl",
+      "bytes": 4211338,
+      "sha256": "d91b946e2ef77a502445a36540414314117d8f0d06c873ec00f7aef3b3817185"
+    },
+    {
+      "path": "index_definitions.json",
+      "bytes": 371,
+      "sha256": "fa7e83688e778048a555cff214c293ade01e78e3cd5f69bf1d65af433f010f8d"
+    },
+    {
+      "path": "index_events.jsonl",
+      "bytes": 23281,
+      "sha256": "91640b0d57c591a6c9b01ae2b170d3c1737e57798f6b72b686c4fa5fa552ebaa"
+    },
+    {
+      "path": "index_snapshots.json",
+      "bytes": 591,
+      "sha256": "f08052e64a7d4c41c97b8266bda69ccba740d969e6cc6728f985d3e95814e031"
+    },
+    {
+      "path": "index_topics.jsonl",
+      "bytes": 40487,
+      "sha256": "3f3dc56d9a467a4758038b9f4104832e13604c798df0d366175eebc2eaae27ea"
+    },
+    {
+      "path": "period_analytics.jsonl",
+      "bytes": 90147,
+      "sha256": "774953663d962c1df3f402d25c729ac98c62b9f540327dc37045c5745d91b4e2"
+    },
+    {
+      "path": "projects.json",
+      "bytes": 1016,
+      "sha256": "d98874c659910e8048fb2e7efc155841ac22516ee63ae6b5738a7405f13a3db8"
+    },
+    {
+      "path": "schema_notes.md",
+      "bytes": 3415,
+      "sha256": "1b7f8979d536b3140dbc3172a5e213e19a75792ee42a5284940e9291f19de8ad"
+    },
+    {
+      "path": "sessions.jsonl",
+      "bytes": 853488,
+      "sha256": "06695c06ff55c624e5e5895892dcce7e83cc7384da4d0d01d3d4f33b98c806dd"
+    },
+    {
+      "path": "timeline_events.jsonl",
+      "bytes": 3963942,
+      "sha256": "bc94cb100aa5b7845a712061dfad194a9aeb6d64ff8bd3bdf7ec4ad719ffa643"
+    },
+    {
+      "path": "validate_fixtures.py",
+      "bytes": 2158,
+      "sha256": "73f5a44bff0a7a51c7a200493a2be1877efcad2160b4fc0cea3f590204f37add"
+    }
+  ]
+}

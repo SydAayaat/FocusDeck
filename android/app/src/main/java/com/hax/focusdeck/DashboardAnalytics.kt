@@ -2,6 +2,7 @@ package com.hax.focusdeck
 
 import java.time.*
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 /** Presentation projections only. Stored totals, policy scores and source zones remain authoritative. */
 internal data class EstimationEvidence(val planned: Long,val actual: Long,val absoluteError: Long=abs(actual-planned)) {
@@ -64,7 +65,7 @@ internal fun completionContribution(store: AchievementStore,id: String,start: Lo
     if(history.any { it.timestamp in startMs until endMs && (it.unit!=after.third || it.targetValueAtThatTime!=target || it.previousTarget!=target) }) return null
     return CompletionContribution(before.first,after.first-before.first,after.first,target,after.third)
 }
-internal fun dashboardAnalytics(data: CalendarDataset,reports: List<Report>,period: HistoryPeriod,anchor: LocalDate,store: AchievementStore): DashboardAnalyticsEvidence {
+internal fun dashboardAnalytics(data: CalendarDataset,reports: List<Report>,period: HistoryPeriod,anchor: LocalDate,store: AchievementStore,now: Long=System.currentTimeMillis()): DashboardAnalyticsEvidence {
     val (start,end)=analyticsRange(period,anchor,data)
     val days=data.days.values.filter { it.hasRecord && it.date>=start && it.date<=end }
     val keys=days.flatMap { it.sessions }.toSet()
@@ -82,9 +83,9 @@ internal fun dashboardAnalytics(data: CalendarDataset,reports: List<Report>,peri
         val progress=if(associations.size==1 && z.size==1) completionContribution(store,associations.single(),start,end,z.single()) else null
         DashboardProject(title,days.sumOf { d->ids.sumOf { d.sessionFocus[it] ?: 0 } },ids,progress)
     }.sortedByDescending { it.focusMs }
-    val performance=PerformanceAnalytics.report(data,period,anchor)
+    val performance=PerformanceAnalytics.report(data,period,anchor,now)
     return DashboardAnalyticsEvidence(days,matching.sortedByDescending { it.finishedAtMs },activities,days.sumOf { it.focusMs },days.sumOf { it.breakMs },days.sumOf { it.trackedMs },days.sumOf { it.done },
-        count,days.flatMap { it.punctuality },performance.execution.score,performance,PerformanceAnalytics.records(data).groupBy { LocalDate.parse(it.date) }.mapValues { PerformanceAnalytics.score(it.value) },
+        count,days.flatMap { it.punctuality },performance.execution.score,performance,PerformanceAnalytics.records(data,now).groupBy { LocalDate.parse(it.date) }.mapValues { PerformanceAnalytics.score(it.value) },
         performance.estimation.takeIf { it.samples>0 }?.let { EstimationEvidence(it.planned_ms,it.actual_ms,it.absolute_error_ms) },
         performance.estimation_by_category.mapValues { (_,it)->EstimationEvidence(it.planned_ms,it.actual_ms,it.absolute_error_ms) },projects)
 }
@@ -101,5 +102,57 @@ internal fun dailyFocusReference(days: List<CalendarDay>): Double? = days.filter
     .takeIf { it.isNotEmpty() }?.map { it.focusMs.toDouble() }?.average()
 internal fun referenceDuration(ms: Double): String {
     val minutes = (ms.coerceAtLeast(0.0) / 60000).toLong()
-    return "${minutes / 60}h ${minutes % 60}m"
+    return "${minutes / 60}h ${(minutes % 60).toString().padStart(2, '0')}m"
 }
+
+internal data class PunctualityBucket(val label: String, val meanMs: Double?, val samples: Int)
+internal data class PunctualityTrend(val buckets: List<PunctualityBucket>, val averageMs: Double?)
+
+/** Calendar punctuality already owns actual-start attribution in the captured source zone.
+ * Average observations, not daily averages: a busy day must not lose its sample weight.
+ */
+internal fun punctualityTrend(data: CalendarDataset, period: HistoryPeriod, anchor: LocalDate): PunctualityTrend {
+    val (begin,end)=analyticsRange(period,anchor,data)
+    val ranges: List<Triple<String,LocalDate,LocalDate>> = when(period) {
+        HistoryPeriod.DAY,HistoryPeriod.WEEK -> {
+            val start=if(period==HistoryPeriod.DAY) anchor.minusDays(6) else begin
+            (0..6).map { start.plusDays(it.toLong()).let { d -> Triple(d.format(java.time.format.DateTimeFormatter.ofPattern("EEE")),d,d) } }
+        }
+        HistoryPeriod.MONTH -> generateSequence(begin) { it.plusDays(7-it.dayOfWeek.value+1L) }
+            .takeWhile { it<=end }.map { start -> Triple("${start.dayOfMonth}",start,minOf(end,start.plusDays(7-start.dayOfWeek.value.toLong()))) }.toList()
+        HistoryPeriod.YEAR -> (1..12).map { month -> LocalDate.of(anchor.year,month,1).let { d -> Triple(d.format(java.time.format.DateTimeFormatter.ofPattern("MMM")),d,d.plusMonths(1).minusDays(1)) } }
+        HistoryPeriod.ALL -> (begin.year..end.year).map { y -> Triple(y.toString(),LocalDate.of(y,1,1),LocalDate.of(y,12,31)) }
+    }
+    fun observations(start: LocalDate,finish: LocalDate)=data.days.values.filter { it.date in start..finish }.flatMap { it.punctuality }
+    val buckets=ranges.map { (label,start,finish) -> observations(start,finish).let { values -> PunctualityBucket(label,values.takeIf { it.isNotEmpty() }?.average(),values.size) } }
+    val values=observations(ranges.first().second,ranges.last().third)
+    return PunctualityTrend(buckets,values.takeIf { it.isNotEmpty() }?.average())
+}
+
+internal data class AnalyticsKpi(val label: String,val value: String,val trend: Double?=null,val varianceMs: Double?=null)
+internal data class CompactAnalyticsEvidence(val kpis: List<AnalyticsKpi>,val punctuality: PunctualityTrend,val captions: Map<String,String>)
+internal fun compactAnalytics(data: CalendarDataset,reports: List<Report>,period: HistoryPeriod,anchor: LocalDate,e: DashboardAnalyticsEvidence): CompactAnalyticsEvidence {
+    val valid=e.performance.contributions.filter { it.eligible && (it.planned_ms ?: 0)>0 }
+    val captions=mapOf(
+        "completion" to valid.takeIf { it.isNotEmpty() }?.let { "${it.count { r->r.done }}/${it.size}" }.orEmpty(),
+        "punctuality" to valid.count { it.start_deviation_ms!=null }.takeIf { it>0 }?.let { "$it starts" }.orEmpty(),
+        "efficiency" to e.performance.estimation.takeIf { it.samples>0 }?.let { signedStartDelta(it.signed_error_ms.toDouble()) }.orEmpty())
+    return CompactAnalyticsEvidence(analyticsKpis(data,reports,e),punctualityTrend(data,period,anchor),captions)
+}
+/** Same previous-period window and coverage gate as the existing performance comparison. */
+internal fun analyticsKpis(data: CalendarDataset,reports: List<Report>,e: DashboardAnalyticsEvidence): List<AnalyticsKpi> {
+    val previous=e.performance.comparison?.previous_bounds
+    val priorDays=if(previous==null) emptyList() else data.days.values.filter { it.hasRecord && it.date in LocalDate.parse(previous[0])..LocalDate.parse(previous[1]) }
+    val keys=priorDays.flatMap { it.sessions }.toSet()
+    val priorSessions=reports.distinctBy { it.key }.count { it.key in keys }
+    fun change(current: Int,prior: Int)=if(e.performance.comparison?.comparable_coverage==true && prior>0) (current-prior)*100.0/prior else null
+    val variance=e.punctual.takeIf { it.isNotEmpty() }?.average()
+    return listOf(AnalyticsKpi("FOCUS",dashboardDuration(e.focus.takeIf { e.days.isNotEmpty() }),e.performance.comparison?.focus_ms?.percentage_change),
+        AnalyticsKpi("SESSIONS",e.reports.size.takeIf { e.days.isNotEmpty() }?.toString() ?: "N/A",change(e.reports.size,priorSessions)),
+        AnalyticsKpi("BLOCKS DONE",e.done.takeIf { e.days.isNotEmpty() }?.toString() ?: "N/A",change(e.done,priorDays.sumOf { it.done })),
+        AnalyticsKpi("VARIANCE",signedStartDelta(variance),varianceMs=variance))
+}
+internal fun signedStartDelta(ms: Double?): String = ms?.let {
+    val magnitude=abs(it)
+    (if(it>0) "+" else if(it<0) "−" else "") + if(magnitude in 1.0..<60000.0) "${(magnitude/1000).roundToInt()}s" else dashboardDuration(magnitude.toLong())
+} ?: "N/A"

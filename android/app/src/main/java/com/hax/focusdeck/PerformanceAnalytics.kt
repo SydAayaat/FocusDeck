@@ -67,9 +67,9 @@ internal object PerformanceAnalytics {
         return CalibrationBias(items.size,total,items.sumOf { it.actual_ms!! },items.sumOf { it.estimation!!.signed_error_ms },items.sumOf { it.estimation!!.absolute_error_ms },
             if(total>0) items.sumOf { it.original_planned_ms!!*it.estimation!!.accuracy }/total else null)
     }
-    fun summary(data: CalendarDataset,begin: LocalDate,end: LocalDate,records: List<PerformanceRecord> = records(data)): PerformanceSummary {
+    fun summary(data: CalendarDataset,begin: LocalDate,end: LocalDate,records: List<PerformanceRecord>? = null,now: Long=System.currentTimeMillis()): PerformanceSummary {
         val days=data.days.values.filter { it.hasRecord && it.date in begin..end }
-        val rows=records.filter { LocalDate.parse(it.date) in begin..end };val unique=rows.filter { it.eligible }.distinctBy { it.id }
+        val rows=(records ?: this.records(data,now)).filter { LocalDate.parse(it.date) in begin..end };val unique=rows.filter { it.eligible }.distinctBy { it.id }
         val estimates=unique.filter { it.estimation!=null }
         val daily=rows.groupBy { it.date }.mapValues { score(it.value) }
         val valid=daily.values.filter { it.score!=null && it.missing_duration_blocks==0 && !it.provisional }
@@ -79,7 +79,7 @@ internal object PerformanceAnalytics {
             score_standard_deviation=mean?.let { m->sqrt(scores.sumOf { (it-m).pow(2) }/scores.size) },excluded_partial_or_provisional_days=daily.size-valid.size)
         return PerformanceSummary(begin.toString(),end.toString(),score(rows),days.sumOf { it.focusMs },days.sumOf { it.breakMs },days.sumOf { it.pausedMs },days.sumOf { it.overtimeMs },
             days.sumOf { it.overtimeUnlocatedMs },days.takeIf { it.isNotEmpty() && it.none { d->d.incomplete } }?.sumOf { it.pauseCount },days.sumOf { it.done },days.size,days.count { it.hourComplete },days.sumOf { it.unlocatedMs },
-            bias(estimates),estimates.groupBy { it.category }.mapValues { bias(it.value) },estimates.groupBy { it.project }.mapValues { bias(it.value) },consistency,daily,unique,start_deviations=unique.filter { it.start_deviation_ms!=null }.map { StartDeviation(it.id,it.date,it.start_deviation_ms!!) },period_closed=(days.flatMap { it.zones }.toSet().ifEmpty { setOf(ZoneOffset.UTC) }).all { end<CalendarAnalytics.date(System.currentTimeMillis(),it) },calendar_days=java.time.temporal.ChronoUnit.DAYS.between(begin,end)+1)
+            bias(estimates),estimates.groupBy { it.category }.mapValues { bias(it.value) },estimates.groupBy { it.project }.mapValues { bias(it.value) },consistency,daily,unique,start_deviations=unique.filter { it.start_deviation_ms!=null }.map { StartDeviation(it.id,it.date,it.start_deviation_ms!!) },period_closed=(days.flatMap { it.zones }.toSet().ifEmpty { setOf(ZoneOffset.UTC) }).all { end<CalendarAnalytics.date(now,it) },calendar_days=java.time.temporal.ChronoUnit.DAYS.between(begin,end)+1)
     }
     fun compare(current: PerformanceSummary,previous: PerformanceSummary): PerformanceComparison {
         val comparable=current.recorded_days>0 && previous.recorded_days>0 && current.complete_days==current.recorded_days && previous.complete_days==previous.recorded_days && current.period_closed && previous.period_closed && current.complete_days*previous.calendar_days==previous.complete_days*current.calendar_days
@@ -91,8 +91,8 @@ internal object PerformanceAnalytics {
             diff(current.execution.score,previous.execution.score,scoreCoverage),diff(current.estimation.accuracy,previous.estimation.accuracy),diff(current.consistency.average_daily_score,previous.consistency.average_daily_score,scoreCoverage))
     }
     fun report(data: CalendarDataset,period: HistoryPeriod,anchor: LocalDate,now: Long=System.currentTimeMillis()): PerformanceSummary {
-        val records=records(data,now);val (begin,end)=analyticsRange(period,anchor,data);val current=summary(data,begin,end,records)
-        val previous=if(period==HistoryPeriod.ALL) null else analyticsRange(period,begin.minusDays(1),data).let { (a,b)->summary(data,a,b,records) }
+        val records=records(data,now);val (begin,end)=analyticsRange(period,anchor,data);val current=summary(data,begin,end,records,now)
+        val previous=if(period==HistoryPeriod.ALL) null else analyticsRange(period,begin.minusDays(1),data).let { (a,b)->summary(data,a,b,records,now) }
         return current.copy(comparison=previous?.let { compare(current,it) },scope=period.name.lowercase())
     }
     private val exportJson=Json { prettyPrint=true;encodeDefaults=true }

@@ -71,6 +71,12 @@ internal val LocalAmbientEnabled = staticCompositionLocalOf { true }
         fun line(x:Float,y:Float,x2:Float,y2:Float)=drawLine(color,point(x,y),point(x2,y2),stroke,StrokeCap.Round)
         fun circle(x:Float,y:Float,r:Float)=drawCircle(color,r*unit,point(x,y),style=Stroke(stroke))
         when(name) {
+            "search" -> {circle(10f,10f,7f);line(15f,15f,21f,21f)}
+            "arrow-up-down" -> {line(8f,3f,8f,21f);line(4f,7f,8f,3f);line(12f,7f,8f,3f);line(16f,3f,16f,21f);line(12f,17f,16f,21f);line(20f,17f,16f,21f)}
+            "play" -> {val p=Path().apply {moveTo(7*unit,3*unit);lineTo(21*unit,12*unit);lineTo(7*unit,21*unit);close()};drawPath(p,color)}
+            "square" -> drawRoundRect(color,point(5f,5f),Size(14*unit,14*unit),androidx.compose.ui.geometry.CornerRadius(unit))
+            "skip-forward" -> {val p=Path().apply {moveTo(4*unit,4*unit);lineTo(17*unit,12*unit);lineTo(4*unit,20*unit);close()};drawPath(p,color,style=Stroke(stroke));line(20f,4f,20f,20f)}
+            "file-text" -> {drawRoundRect(color,point(5f,3f),Size(14*unit,18*unit),androidx.compose.ui.geometry.CornerRadius(unit),style=Stroke(stroke));line(9f,8f,15f,8f);line(9f,12f,15f,12f);line(9f,16f,12f,16f)}
             "close" -> {line(5f,5f,19f,19f);line(19f,5f,5f,19f)}
             "pause" -> {circle(12f,12f,9f);line(9f,8f,9f,16f);line(15f,8f,15f,16f)}
             "calendar" -> {drawRoundRect(color,point(3f,5f),Size(18*unit,16*unit),androidx.compose.ui.geometry.CornerRadius(2*unit),style=Stroke(stroke));line(3f,10f,21f,10f);line(8f,3f,8f,7f);line(16f,3f,16f,7f);for(x in listOf(8f,12f,16f)) for(y in listOf(14f,18f)) drawCircle(color,unit*.6f,point(x,y))}

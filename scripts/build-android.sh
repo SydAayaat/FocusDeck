@@ -7,9 +7,10 @@ if [[ -z "${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}" && ! -f "$ROOT/android/local.p
 fi
 case "$mode" in
   debug) task=assembleDebug ;;
+  visualtest) task=assembleVisualtest ;;
   release) task=assembleRelease ;;
   test) task=testDebugUnitTest ;;
-  *) echo "Usage: $0 [debug|release|test]" >&2; exit 2 ;;
+  *) echo "Usage: $0 [debug|visualtest|release|test]" >&2; exit 2 ;;
 esac
 cd "$ROOT/android"
 exec "$ROOT/android/gradlew" "$task"

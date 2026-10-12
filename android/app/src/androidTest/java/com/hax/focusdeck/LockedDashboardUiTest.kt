@@ -125,7 +125,7 @@ class LockedDashboardUiTest {
         scene { val d=def.copy(progress=AchievementProgress(value,126.0,"topics"));AchievementRing(AchievementEngine.stats(seed,d,now,zone),seed,{},Modifier.size(100.dp)) }
         fun litFraction(description: String): Double {
             val p=ui.onNodeWithContentDescription(description).captureToImage().toPixelMap()
-            return (0..359).count { angle->val rad=(angle-90)*PI/180;val x=(p.width*.5+p.width*.36*cos(rad)).toInt();val y=(p.height*.5+p.height*.36*sin(rad)).toInt();val c=p[x,y];c.red>.7 && c.green>.35 && c.blue<.3 }/360.0
+            return (0..359).count { angle->val rad=(angle-90)*PI/180;val x=(p.width*.5+p.width*.42*cos(rad)).toInt();val y=(p.height*.5+p.height*.42*sin(rad)).toInt();val c=p[x,y];c.red>.7 && c.green>.35 && c.blue<.3 }/360.0
         }
         assertEquals(0.0,litFraction("Progress 0%"),.01)
         ui.runOnIdle { value=32.0 };assertEquals(32.0/126,litFraction("Progress 25%"),.045)
@@ -137,8 +137,8 @@ class LockedDashboardUiTest {
     @Test fun emptyHomeHasPurposefulStatesAndNoFakeSessions() {
         scene { HomeDashboard(CalendarDataset(emptyMap(),emptyMap()),null,0,null,date,now,false,{},{},{},{},{},true) }
         ui.onNodeWithText("No recorded activity today").assertExists()
-        ui.onNodeWithTag("home-grid").performScrollToNode(hasText("No plan loaded"))
-        ui.onNodeWithText("No plan loaded").assertIsDisplayed()
+        ui.onNodeWithTag("home-grid").performScrollToNode(hasText("No active session"))
+        ui.onNodeWithText("No active session").assertIsDisplayed()
         ui.onNodeWithText("▶  Start").assertDoesNotExist()
     }
     @Test fun largeFontNarrowWidthStacksHeaderAndKeepsLowerContentReachable() {
@@ -201,7 +201,7 @@ class LockedDashboardUiTest {
             }
         }
         val pixels=ui.onNodeWithTag("focus-bars-omss-layering").captureToImage().toPixelMap()
-        val dp=pixels.width/376f;val left=28*dp;val slot=(pixels.width-left-52*dp)/3
+        val dp=pixels.width/376f;val left=28*dp;val slot=(pixels.width-left)/3
         val cyanRows=(0 until pixels.height).filter { y->
             ((left+slot*.84f).toInt()..(left+slot*1.15f).toInt()).any { x->
                 val c=pixels[x,y];c.red<.15f && c.green>.65f && c.blue>.65f

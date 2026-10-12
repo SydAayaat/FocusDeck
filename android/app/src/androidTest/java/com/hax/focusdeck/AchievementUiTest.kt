@@ -48,7 +48,8 @@ class AchievementUiTest {
         compose.onNodeWithText("Achievement detail").assertExists()
         compose.onNodeWithContentDescription("Select streak 1, 2 days").performScrollTo().performClick()
         compose.onNodeWithContentDescription("Streak #1 · 2 days",useUnmergedTree=true).assertExists()
-        compose.onNodeWithText("Detailed history").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("achievement-detail-list").performScrollToNode(hasText("Detailed history"))
+        compose.onNodeWithText("Detailed history").assertIsDisplayed()
     }
     @Test fun signed_negative_gap_and_green_new_record_states_are_visible() {
         show(ledger(true))

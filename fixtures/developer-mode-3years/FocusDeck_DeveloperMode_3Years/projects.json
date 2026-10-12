@@ -1,0 +1,56 @@
+[
+  {
+    "id": "proj_ptfs",
+    "name": "PTfS Exam Preparation",
+    "category": "College",
+    "weight": 1.25
+  },
+  {
+    "id": "proj_compute",
+    "name": "Custom Compute SoC",
+    "category": "Projects",
+    "weight": 1.1
+  },
+  {
+    "id": "proj_german",
+    "name": "German Speaking Practice",
+    "category": "Learning",
+    "weight": 1.15
+  },
+  {
+    "id": "proj_embedded",
+    "name": "Embedded Systems",
+    "category": "College",
+    "weight": 1.0
+  },
+  {
+    "id": "proj_radar",
+    "name": "Radar & SDR",
+    "category": "Projects",
+    "weight": 1.0
+  },
+  {
+    "id": "proj_robotics",
+    "name": "Robotics & Drones",
+    "category": "Projects",
+    "weight": 0.9
+  },
+  {
+    "id": "proj_control",
+    "name": "Control Systems",
+    "category": "College",
+    "weight": 0.9
+  },
+  {
+    "id": "proj_fpga",
+    "name": "FPGA Design",
+    "category": "Projects",
+    "weight": 0.8
+  },
+  {
+    "id": "proj_guitar",
+    "name": "Guitar Practice",
+    "category": "Learning",
+    "weight": 0.45
+  }
+]

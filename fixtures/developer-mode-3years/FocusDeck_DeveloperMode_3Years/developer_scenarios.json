@@ -1,0 +1,75 @@
+[
+  {
+    "id": "idle",
+    "description": "No active session",
+    "session": null,
+    "network_disabled": true
+  },
+  {
+    "id": "active",
+    "description": "Active countdown and a red recording state",
+    "session": {
+      "id": "SCENE-ACTIVE",
+      "title": "Synthetic Deep Work",
+      "status": "ACTIVE",
+      "timer_mode": "countdown",
+      "planned_seconds": 5400,
+      "elapsed_seconds": 1880,
+      "focus_seconds": 1660,
+      "pause_seconds": 220,
+      "started_at": "2026-10-12T21:30:00+02:00",
+      "synthetic": true
+    },
+    "network_disabled": true
+  },
+  {
+    "id": "paused",
+    "description": "Paused countdown and amber indicator",
+    "session": {
+      "id": "SCENE-PAUSED",
+      "title": "Synthetic Study Sprint",
+      "status": "PAUSED",
+      "timer_mode": "countdown",
+      "planned_seconds": 5400,
+      "elapsed_seconds": 2300,
+      "focus_seconds": 1880,
+      "pause_seconds": 420,
+      "started_at": "2026-10-12T21:25:00+02:00",
+      "synthetic": true
+    },
+    "network_disabled": true
+  },
+  {
+    "id": "ended_early",
+    "description": "Finished but partial and not credited as DONE",
+    "session": {
+      "id": "SCENE-EARLY",
+      "status": "ENDED_EARLY",
+      "synthetic": true
+    },
+    "network_disabled": true
+  },
+  {
+    "id": "empty",
+    "description": "All numbers unavailable; distinguish unknown from observed zero",
+    "session": null,
+    "network_disabled": true
+  },
+  {
+    "id": "zero",
+    "description": "Observed zero activity is displayed as zero, not N/A",
+    "session": null,
+    "network_disabled": true
+  },
+  {
+    "id": "long_text",
+    "description": "Very long session/card titles and 1.4 font scale for layout stress testing",
+    "session": {
+      "id": "SCENE-LONG",
+      "title": "Extremely Long Synthetic Programming Techniques for Supercomputers Optimization Defense Session",
+      "status": "DONE",
+      "synthetic": true
+    },
+    "network_disabled": true
+  }
+]

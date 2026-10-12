@@ -1,3 +1,7 @@
+## Android 1.22.0 — Read-only three-year Developer Mode
+
+Enable Developer Mode in Display settings to preview the supplied deterministic dataset across Home, Analytics, Achievements, Index, History, Timeline and Summary. Every preview uses a labeled simulated clock; **Use real data** restores the existing repository views. Synthetic records cannot enter production history, sync, rewards or genuine exports. The generator is retained as an optional utility and was not run. The existing isolated visualtest app is verified on the USB S24 Ultra; production installation remains unchanged. See [integration and verification](docs/UPDATE_1.22.0.md). Desktop remains 1.20.0.
+
 ## Android 1.21.0 — Locked native dashboard UI
 
 Native Kotlin/Compose Home, two-track timeline and anchored popup, Day/Week/Month/Year Analytics and compact Achievements now follow the supplied locked references with real stored evidence. Existing timer/stopwatch, rewards, archives, synchronization, navigation and layout editing remain in place. Desktop stays at 1.20.0. See [update and verification](docs/UPDATE_1.21.0.md) and [install the included APK](docs/INSTALL_1.21.0.md).

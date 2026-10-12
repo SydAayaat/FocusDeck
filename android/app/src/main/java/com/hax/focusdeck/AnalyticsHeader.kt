@@ -7,6 +7,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.style.TextOverflow
@@ -23,17 +26,29 @@ internal fun analyticsPeriodLabel(period: HistoryPeriod,date: LocalDate): String
     HistoryPeriod.ALL->"All history"
 }
 @Composable internal fun AnalyticsHeader(period: HistoryPeriod,anchor: LocalDate,setPeriod: (HistoryPeriod)->Unit,
-    setAnchor: (LocalDate)->Unit,connection: String,chooseDate: ()->Unit,current: ()->Unit,close: ()->Unit) {
+    setAnchor: (LocalDate)->Unit,connection: String,chooseDate: ()->Unit,current: ()->Unit,close: ()->Unit,
+    home: (() -> Unit)?=null,achievements: (() -> Unit)?=null) {
     val actions=LocalAnalyticsActions.current
+    val dateLabel=analyticsPeriodLabel(period,anchor)
+    val textMeasurer=rememberTextMeasurer()
+    val density=LocalDensity.current
+    val dateStyle=MaterialTheme.typography.bodyLarge.copy(fontSize=11.sp)
+    val dateWidth=remember(dateLabel,dateStyle,density.density,density.fontScale) {
+        with(density) { textMeasurer.measure(dateLabel,dateStyle).size.width.toDp() }+98.dp
+    }
     var menu by remember { mutableStateOf(false) }
     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
     Column(verticalArrangement=Arrangement.spacedBy(2.dp)) {
         Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
-            Text(if(connection=="Connected") "●  Connected" else "○  $connection",Modifier.weight(1f),fontSize=11.sp,color=if(connection=="Connected") DeckColors.success else DeckColors.muted)
-            Text(when(period){HistoryPeriod.WEEK->"WEEK ${anchor.get(WeekFields.ISO.weekOfWeekBasedYear())}";HistoryPeriod.YEAR->"YEAR ${anchor.year}";else->analyticsPeriodLabel(period,anchor)},fontSize=10.sp,color=DeckColors.muted)
+            if(LocalDeckImmersive.current && LocalPrimaryNavigation.current!=null) {
+                ImmersiveTopNavigation()
+            } else Text(if(connection=="Connected") "●  Connected" else "○  $connection",Modifier.weight(1f),fontSize=11.sp,color=if(connection=="Connected") DeckColors.success else DeckColors.muted)
+            Text(when(period){HistoryPeriod.WEEK->"WEEK ${anchor.get(WeekFields.ISO.weekOfWeekBasedYear())}";HistoryPeriod.YEAR->"YEAR ${anchor.year}";else->analyticsPeriodLabel(period,anchor)},Modifier.then(if(LocalDeckImmersive.current && LocalPrimaryNavigation.current!=null) Modifier.weight(1f) else Modifier),fontSize=10.sp,maxLines=2,color=DeckColors.muted)
             Box {
-                TextButton({menu=true},Modifier.height(24.dp).testTag("analytics-options").semantics { contentDescription="Analytics options" },contentPadding=PaddingValues(horizontal=6.dp)) { Text("⋮",fontSize=21.sp) }
+                IconButton({menu=true},Modifier.size(48.dp).testTag("analytics-options").semantics { contentDescription="Analytics options" }) { Text("⋮",fontSize=21.sp) }
                 DropdownMenu(menu,{menu=false}) {
+                    home?.let { DropdownMenuItem(text={Text("Home")},onClick={menu=false;it()}) }
+                    achievements?.let { DropdownMenuItem(text={Text("Achievements")},onClick={menu=false;it()}) }
                     actions?.let { a ->
                         DropdownMenuItem(text={Text("Edit layout")},onClick={menu=false;a.edit()})
                         DropdownMenuItem(text={Text("Expanded timeline & charts")},onClick={menu=false;a.expanded()})
@@ -47,20 +62,22 @@ internal fun analyticsPeriodLabel(period: HistoryPeriod,date: LocalDate): String
             }
         }
         BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val stacked=maxWidth<300.dp || androidx.compose.ui.platform.LocalDensity.current.fontScale>1.25f
+            val stacked=maxWidth<350.dp || androidx.compose.ui.platform.LocalDensity.current.fontScale>1.25f
             val navigator: @Composable ()->Unit = {
-                OmssSurface(Modifier.testTag("analytics-date"),nested=true) {
-                    Row(Modifier.heightIn(min=30.dp),verticalAlignment=Alignment.CenterVertically) {
-                        IconButton({setAnchor(StudyHistory.shift(period,anchor,-1))},enabled=period!=HistoryPeriod.ALL,modifier=Modifier.size(30.dp).semantics { contentDescription="Previous ${period.label}" }) { BundledCardIcon("chevron-left",Modifier.size(16.dp),DeckColors.muted) }
-                        Text(analyticsPeriodLabel(period,anchor),Modifier.weight(1f),fontSize=11.sp,maxLines=1,overflow=TextOverflow.Ellipsis)
-                        IconButton({setAnchor(StudyHistory.shift(period,anchor,1))},enabled=period!=HistoryPeriod.ALL,modifier=Modifier.size(30.dp).semantics { contentDescription="Next ${period.label}" }) { BundledCardIcon("chevron-right",Modifier.size(16.dp),DeckColors.muted) }
+                // Explicit text measurement avoids weighted-row intrinsic collapse for Month/Year.
+                // width() remains constrained by the real header slot; long ranges can wrap.
+                OmssSurface(Modifier.width(dateWidth).testTag("analytics-date"),nested=true) {
+                    Row(Modifier.fillMaxWidth().heightIn(min=40.dp),verticalAlignment=Alignment.CenterVertically) {
+                        IconButton({setAnchor(StudyHistory.shift(period,anchor,-1))},enabled=period!=HistoryPeriod.ALL,modifier=Modifier.size(40.dp).semantics { contentDescription="Previous ${period.label}" }) { BundledCardIcon("chevron-left",Modifier.size(16.dp),DeckColors.muted) }
+                        Text(dateLabel,Modifier.weight(1f).clickable(onClick=chooseDate).padding(horizontal=3.dp),style=dateStyle,maxLines=2)
+                        IconButton({setAnchor(StudyHistory.shift(period,anchor,1))},enabled=period!=HistoryPeriod.ALL,modifier=Modifier.size(40.dp).semantics { contentDescription="Next ${period.label}" }) { BundledCardIcon("chevron-right",Modifier.size(16.dp),DeckColors.muted) }
                     }
                 }
             }
             if(stacked) Column(verticalArrangement=Arrangement.spacedBy(8.dp)) { Text("Analytics",Modifier.testTag("analytics-title"),fontSize=27.sp,fontWeight=FontWeight.Bold);navigator() }
             else Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(10.dp)) {
                 Text("Analytics",Modifier.testTag("analytics-title"),fontSize=26.sp,fontWeight=FontWeight.Bold)
-                Box(Modifier.weight(1f)) { navigator() }
+                Box(Modifier.weight(1f),contentAlignment=Alignment.CenterEnd) { navigator() }
             }
         }
         Row(Modifier.fillMaxWidth()) {

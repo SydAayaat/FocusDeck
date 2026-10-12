@@ -20,6 +20,8 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.*
 import kotlin.math.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 
 /** One amber focus series. Null bins remain unknown; no break/line series or averaged partial days. */
 @Composable internal fun NativeFocusBars(values: List<Pair<String,Double?>>,minutes: Boolean=false,key: String="focus",
@@ -30,21 +32,26 @@ import kotlin.math.*
     val ceiling=nice.firstOrNull { it>=max/unit }?.times(unit) ?: ceil(max/unit/100)*100*unit
     val scale=ceiling.coerceAtLeast(unit)
     val density=LocalDensity.current
+    val mode=LocalAchievementMotion.current
+    val reveal=remember(key) { Animatable(if(mode==AchievementMotion.OFF) 1f else 0f) }
+    LaunchedEffect(key,mode) {
+        if(mode==AchievementMotion.OFF) reveal.snapTo(1f) else reveal.animateTo(1f,tween(mode.duration))
+    }
     var selected by remember(key) { mutableStateOf<Int?>(null) }
     var anchor by remember(key) { mutableStateOf(Offset.Zero) }
     val actions=values.mapIndexed { i,(label,value)->CustomAccessibilityAction("$label: ${dashboardDuration(value?.toLong())}") { selected=i;true } }
     Box(Modifier.fillMaxWidth()) {
-        Box(Modifier.fillMaxWidth().height(if(values.size==24) 68.dp else 84.dp).testTag("focus-bars-$key")
+        Box(Modifier.fillMaxWidth().height(if(values.size==24) OmssGeometry.hourlyHeight.dp else OmssGeometry.chartHeight.dp).testTag("focus-bars-$key")
             .semantics { contentDescription="Focus duration chart, ${if(minutes) "minutes" else "hours"}; missing data N/A";customActions=actions }
             .pointerInput(values,key) { detectTapGestures { at->
                 if(values.isNotEmpty()) {
-                    val left=with(density){28.dp.toPx()};val width=size.width-left-with(density) { if(benchmark!=null) 52.dp.toPx()*fontScale else 0f }
+                    val left=with(density){28.dp.toPx()};val width=size.width-left
                     val i=((at.x-left)/width*values.size).toInt().coerceIn(0,values.lastIndex)
                     selected=if(selected==i) null else i;anchor=at
                 }
             } }.drawWithCache {
                 val left=28.dp.toPx();val top=8.dp.toPx();val bottom=size.height-20.dp.toPx()
-                val plot=(bottom-top).coerceAtLeast(1f);val width=(size.width-left-(if(benchmark!=null) 52.dp.toPx()*fontScale else 0f)).coerceAtLeast(1f)
+                val plot=(bottom-top).coerceAtLeast(1f);val width=(size.width-left).coerceAtLeast(1f)
                 val slot=width/values.size.coerceAtLeast(1)
                 val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { color=DeckColors.muted.toArgb();textSize=9.sp.toPx() }
                 val barPath=android.graphics.Path()
@@ -69,10 +76,13 @@ import kotlin.math.*
                     // Reference first, then shadow and opaque bars: bars occlude the dotted line.
                     val referenceY=benchmark?.takeIf { it>=0 && it<=scale }?.let { bottom-(it/scale*plot).toFloat() }
                     if(referenceY!=null) drawLine(cyan,Offset(left,referenceY),Offset(size.width,referenceY),.8.dp.toPx(),pathEffect=dash)
+                    // Animation reads occur only in drawing; cached bar paths/display lists stay fixed.
+                    clipRect(top=if(mode==AchievementMotion.FULL) bottom-plot*reveal.value else 0f,bottom=size.height) {
                     drawIntoCanvas { barShadow.draw(it.nativeCanvas) }
                     bars.forEachIndexed { i,(at,bar)->
                         if(bar.height>0) drawRoundRect(amber,at,bar,CornerRadius(1.3.dp.toPx()))
                         if(values[i].second==null) drawLine(DeckColors.muted.copy(alpha=.35f),Offset(at.x,bottom-2.dp.toPx()),Offset(at.x+bar.width,bottom-2.dp.toPx()),1.dp.toPx())
+                    }
                     }
                     values.forEachIndexed { i,(label,_)->
                         if(values.size<=12 || i%2==0) drawIntoCanvas {
@@ -111,12 +121,12 @@ import kotlin.math.*
     val colors=listOf(DeckColors.accent,OmssColors.analytical,DeckColors.muted)
     var selected by remember(e) { mutableStateOf<Int?>(null) }
     var anchor by remember(e) { mutableStateOf(Offset.Zero) }
-    Box(Modifier.fillMaxWidth().height(82.dp),contentAlignment=Alignment.Center) {
-        Text(dashboardDuration(e.tracked.takeIf { e.days.isNotEmpty() }),Modifier.align(Alignment.TopEnd),fontSize=11.sp,color=DeckColors.muted)
+    BoxWithConstraints(Modifier.fillMaxWidth(),contentAlignment=Alignment.Center) {
+        val gauge=minOf(maxWidth,96.dp)
         OmssSegmentedGauge(amounts.mapIndexed { i,amount->(if(e.tracked>0) amount.toFloat()/e.tracked else 0f) to colors[i] },
-            Modifier.size(82.dp).semantics {
+            Modifier.size(gauge).semantics {
                 contentDescription=if(e.tracked>0) "Time Split, ${(e.focus*100/e.tracked)} percent focus" else "Time Split, no measured data"
-                customActions=labels.indices.map { i->CustomAccessibilityAction("Inspect ${labels[i]}, ${dashboardDuration(amounts[i])}") {selected=i;true} }
+                customActions=labels.indices.map { i->CustomAccessibilityAction("Inspect ${labels[i]}, ${dashboardDuration(amounts[i])}") {selected=i;true} } + CustomAccessibilityAction("Time Split details") { inspect("Time Split",amounts.mapIndexed { i,ms->"${labels[i]}: ${dashboardDuration(ms)}" }.joinToString("\n"));true }
             }.pointerInput(amounts) { detectTapGestures { at ->
                 if(e.tracked>0) {
                     val angle=((atan2(at.y-size.height/2,at.x-size.width/2)*180/PI+450)%360).toFloat()
@@ -126,7 +136,6 @@ import kotlin.math.*
             } }) {
             Column(horizontalAlignment=Alignment.CenterHorizontally) { Text(e.focusShare?.let { "${(it*100).roundToInt()}%" } ?: "N/A",fontSize=21.sp,style=OmssTypography.metric);Text("Focus",fontSize=11.sp,color=DeckColors.muted) }
         }
-        Text("›",Modifier.align(Alignment.CenterEnd).clickable { inspect("Time Split",amounts.mapIndexed { i,ms->"${labels[i]}: ${dashboardDuration(ms)}" }.joinToString("\n")) },fontSize=22.sp,color=DeckColors.muted)
         selected?.let { i->AnchoredWidgetPopup(anchor,{selected=null}) {
             Text(labels[i],fontSize=13.sp,fontWeight=FontWeight.Bold,color=colors[i]);Text("${dashboardDuration(amounts[i])} · ${if(e.tracked>0) amounts[i]*100/e.tracked else 0}%",fontSize=12.sp)
         } }
@@ -153,7 +162,7 @@ import kotlin.math.*
     }
 }
 }
-@Composable internal fun TelemetryInsights(e: DashboardAnalyticsEvidence,period: HistoryPeriod) {
+@Composable internal fun TelemetryInsights(e: DashboardAnalyticsEvidence,period: HistoryPeriod,presentation: TelemetryPresentation?=null) {
     val summary=buildAnnotatedString {
         if(e.days.isEmpty()) append("No recorded measurements for this ${period.label.lowercase()} period. Plan Execution Score N/A.")
         else {
@@ -164,16 +173,16 @@ import kotlin.math.*
             append(".")
         }
     }
-    Text(summary,fontSize=12.sp,color=OmssColors.text)
+    if(presentation!=null) Text(presentation.summary,fontSize=12.sp,color=OmssColors.text) else Text(summary,fontSize=12.sp,color=OmssColors.text)
     Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min),horizontalArrangement=Arrangement.spacedBy(8.dp)) {
         OmssMiniCard(Modifier.weight(1f).fillMaxHeight()) {
             Text("KEY STRENGTHS",fontSize=10.sp,color=OmssColors.analytical)
-            Text((if(e.days.isEmpty()) "• DONE evidence N/A" else "• ${e.done} DONE blocks")+"\n"+
+            Text(presentation?.strengths ?: (if(e.days.isEmpty()) "• DONE evidence N/A" else "• ${e.done} DONE blocks")+"\n"+
                 (if(e.punctual.isEmpty()) "• Start evidence N/A" else "• ${e.punctual.count { it<=0 }} starts on time or early"),fontSize=11.sp)
         }
         OmssMiniCard(Modifier.weight(1f).fillMaxHeight()) {
             Text("FRICTION POINTS",fontSize=10.sp,color=DeckColors.accent)
-            Text((if(e.punctual.isEmpty()) "• Late start evidence N/A" else "• ${e.punctual.count { it>0 }} late starts")+"\n"+
+            Text(presentation?.friction ?: (if(e.punctual.isEmpty()) "• Late start evidence N/A" else "• ${e.punctual.count { it>0 }} late starts")+"\n"+
                 "• ${dashboardDuration(e.days.takeIf { it.isNotEmpty() }?.sumOf { it.unlocatedMs })} unlocated evidence",fontSize=11.sp)
         }
     }

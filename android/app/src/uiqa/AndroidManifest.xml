@@ -1,6 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
-    <application android:name="android.app.Application" android:label="FocusDeck UI QA" tools:replace="android:name,android:label">
-        <activity android:name="com.hax.focusdeck.UiQaActivity" android:exported="true" />
+    <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" tools:node="remove" />
+    <application android:name="android.app.Application" android:label="FocusDeck Visual Test" tools:replace="android:name,android:label">
+        <activity android:name="com.hax.focusdeck.UiQaActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name="com.hax.focusdeck.MainActivity" tools:node="remove" />
         <service android:name="com.hax.focusdeck.FocusService" tools:node="remove" />
     </application>

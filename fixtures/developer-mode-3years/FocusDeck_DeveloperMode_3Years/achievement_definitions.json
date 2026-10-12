@@ -1,0 +1,65 @@
+[
+  {
+    "id": "ach_objectives",
+    "title": "Daily Objectives",
+    "category": "Discipline",
+    "card_type": "STREAK_ONLY",
+    "target": null
+  },
+  {
+    "id": "ach_focus_blocks",
+    "title": "Focus Blocks",
+    "category": "Discipline",
+    "card_type": "HYBRID",
+    "target": 2200
+  },
+  {
+    "id": "ach_german",
+    "title": "German",
+    "category": "Learning",
+    "card_type": "HYBRID",
+    "target": 1500
+  },
+  {
+    "id": "ach_guitar",
+    "title": "Guitar",
+    "category": "Learning",
+    "card_type": "STREAK_ONLY",
+    "target": null
+  },
+  {
+    "id": "ach_gym",
+    "title": "Gym",
+    "category": "Health",
+    "card_type": "STREAK_ONLY",
+    "target": null
+  },
+  {
+    "id": "ach_cardio",
+    "title": "Cardio",
+    "category": "Health",
+    "card_type": "STREAK_ONLY",
+    "target": null
+  },
+  {
+    "id": "ach_compute",
+    "title": "Custom Compute",
+    "category": "Projects",
+    "card_type": "PROGRESS_ONLY",
+    "target": 350
+  },
+  {
+    "id": "ach_college",
+    "title": "College",
+    "category": "College",
+    "card_type": "HYBRID",
+    "target": 1200
+  },
+  {
+    "id": "ach_ptfs_index",
+    "title": "PTfS Index",
+    "category": "INDEX",
+    "card_type": "HYBRID",
+    "target": 126
+  }
+]

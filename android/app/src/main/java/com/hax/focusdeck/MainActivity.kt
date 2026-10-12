@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Canvas
@@ -36,6 +37,11 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
 import java.time.Instant
@@ -60,7 +66,7 @@ class MainActivity : ComponentActivity() {
     private var touchStartY = 0f
     override fun dispatchTouchEvent(event: android.view.MotionEvent): Boolean {
         if(event.actionMasked == android.view.MotionEvent.ACTION_DOWN) {touchStartX=event.x;touchStartY=event.y}
-        if(event.actionMasked == android.view.MotionEvent.ACTION_UP && kotlin.math.abs(event.x-touchStartX)<12*resources.displayMetrics.density && kotlin.math.abs(event.y-touchStartY)<12*resources.displayMetrics.density) sounds.play("ui")
+        if(event.actionMasked == android.view.MotionEvent.ACTION_UP && kotlin.math.abs(event.x-touchStartX)<12*resources.displayMetrics.density && kotlin.math.abs(event.y-touchStartY)<12*resources.displayMetrics.density) { if(!repo.display.value.developerMode) sounds.play("ui") }
         return super.dispatchTouchEvent(event)
     }
     private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -68,10 +74,16 @@ class MainActivity : ComponentActivity() {
     override fun onStop() { repo.setUiVisible(false); super.onStop() }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         setContent {
             val stored by repo.display.collectAsStateWithLifecycle()
             DeckTheme(stored.theme, stored.motion, stored.immersive) {
+                if(stored.developerMode) {
+                    val previewScope=rememberCoroutineScope()
+                    SyntheticPreviewLoader(disable={previewScope.launch { repo.developerMode(false) }})
+                    return@DeckTheme
+                }
                 val connection by repo.connection.collectAsStateWithLifecycle()
                 val tabletSnapshot by repo.tablet.snapshot.collectAsStateWithLifecycle()
                 val storageError by repo.error.collectAsStateWithLifecycle()
@@ -80,11 +92,19 @@ class MainActivity : ComponentActivity() {
                 var settingsDialog by remember { mutableStateOf(false) }
                 var soundDialog by remember { mutableStateOf(false) }
                 var developerDialog by remember { mutableStateOf(false) }
+                var activityHistory by remember { mutableStateOf(false) }
+                var dailyTimeline by remember { mutableStateOf(false) }
+                val timelineNavigation=remember { TimelineNavigationState() }
+                val observedDate by remember(repo) {
+                    combine(repo.now,repo.displayZone) { stamp,zone -> Instant.ofEpochMilli(stamp.wall).atZone(ZoneId.of(zone)).toLocalDate() }.distinctUntilChanged()
+                }.collectAsStateWithLifecycle(initialValue=remember(repo) { Instant.ofEpochMilli(repo.now.value.wall).atZone(ZoneId.of(repo.displayZone.value)).toLocalDate() })
+                val archivedReports by repo.history.collectAsStateWithLifecycle()
                 var historyDialog by remember { mutableStateOf(false) }
                 var historyInitialPeriod by remember { mutableStateOf(HistoryPeriod.WEEK) }
                 var historyExpanded by remember { mutableStateOf(false) }
                 val homeLayout=rememberDashboardLayout("overview")
                 var reportDialog by remember { mutableStateOf<Report?>(null) }
+                LaunchedEffect(archivedReports) { if(reportDialog?.let { selected -> archivedReports.none { it.key==selected.key } }==true) reportDialog=null }
                 var menu by remember { mutableStateOf(false) }
                 var menuRevision by remember { mutableStateOf(0L) }
                 var endRequest by remember { mutableStateOf<Triple<String, Long, String>?>(null) }
@@ -112,9 +132,9 @@ class MainActivity : ComponentActivity() {
                 }
                 val viewer = stored.pairing?.viewer == true
                 val active = !viewer && stored.state.phase in listOf("active", "paused")
-                val timerVisible = active && !homeSelected && !achievementsPage && !historyDialog && !settingsDialog && !soundDialog && !developerDialog && !pairDialog && reportDialog == null
+                val timerVisible = active && !homeSelected && !achievementsPage && !historyDialog && !activityHistory && !dailyTimeline && !settingsDialog && !soundDialog && !developerDialog && !pairDialog && reportDialog == null
                 val clockPage = !viewer && stored.state.session != null && stored.state.phase in listOf("active", "paused", "ready", "between") &&
-                    !homeSelected && !achievementsPage && !historyDialog && !settingsDialog && !soundDialog && !developerDialog && !pairDialog && reportDialog == null
+                    !homeSelected && !achievementsPage && !historyDialog && !activityHistory && !dailyTimeline && !settingsDialog && !soundDialog && !developerDialog && !pairDialog && reportDialog == null
                 val skipColor = Color(0xFFFFC857)
                 val endColor = Color(0xFFFF6B6B)
                 val panelMax = remember { display?.supportedModes?.maxOfOrNull { it.refreshRate } ?: 60f }
@@ -135,6 +155,8 @@ class MainActivity : ComponentActivity() {
                     if (stored.keepAwake && active) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     val controller = WindowCompat.getInsetsController(window, window.decorView)
+                    controller.isAppearanceLightStatusBars=false
+                    controller.isAppearanceLightNavigationBars=false
                     controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                     if (stored.immersive) controller.hide(WindowInsetsCompat.Type.systemBars())
                     else controller.show(WindowInsetsCompat.Type.systemBars())
@@ -152,6 +174,9 @@ class MainActivity : ComponentActivity() {
                             Box {
                                 TextButton(onClick = { menuRevision = stored.state.revision; menu = true }) { Text("⋮", color = Grey, fontSize = 22.sp) }
                                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                                    DropdownMenuItem(text = { Text("Home") }, onClick = { menu=false;achievementsPage=false;homeSelected=true })
+                                    DropdownMenuItem(text = { Text("Achievements") }, onClick = { menu=false;achievementsPage=true;homeSelected=false })
+                                    if(stored.state.session!=null) DropdownMenuItem(text = { Text("Focus session") }, onClick = { menu=false;achievementsPage=false;homeSelected=false })
                                     DropdownMenuItem(text = { Text("Pair desktop") }, onClick = { menu = false; pairDialog = true })
                                     DropdownMenuItem(text = { Text("Sounds") }, onClick = { menu = false; soundDialog = true })
                                     if(stored.developerMode && !viewer) DropdownMenuItem(text = { Text("Developer preview") }, onClick = { menu = false; developerDialog = true })
@@ -171,12 +196,21 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                 }
+                val navigation=PrimaryNavigation(if(page in listOf("viewer","reward")) "focus" else page,
+                    home={achievementsPage=false;homeSelected=true},achievements={achievementsPage=true;homeSelected=false},
+                    analytics={historyDialog=true},focus=if(stored.state.session!=null || viewer) ({achievementsPage=false;homeSelected=false}) else null)
+                androidx.activity.compose.BackHandler(homeSelected && stored.state.session!=null && !achievementsPage && !historyDialog) { homeSelected=false }
+                CompositionLocalProvider(LocalPrimaryNavigation provides navigation,LocalTimelineNavigation provides timelineNavigation,
+                    LocalDashboardDate provides observedDate) {
                 Surface(Modifier.fillMaxSize(), color = if(page in listOf("home","achievements")) DashboardBackground else Background) {
-                    Column(Modifier.safeDrawingPadding().padding(horizontal = if(page in listOf("home","achievements")) 16.dp else 24.dp, vertical = 12.dp)) {
+                    Column(Modifier.windowInsetsPadding(dashboardViewportInsets()).padding(horizontal = if(page in listOf("home","achievements")) 16.dp else 24.dp, vertical = if(stored.immersive) 4.dp else 12.dp)) {
+                        if(page=="achievements" && stored.immersive) ImmersiveTopNavigation()
                         if(page=="home") DashboardHomeHeader(connection,toolbarMenu)
                         else if(page!="achievements") Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
-                            IconButton({historyDialog=true}) { UiGlyph("chart",Modifier.size(24.dp)) }
-                            IconButton({achievementsPage=!achievementsPage}) { UiGlyph("trophy",Modifier.size(24.dp)) }
+                            if(stored.immersive) ImmersiveTopNavigation() else {
+                                IconButton({historyDialog=true}) { UiGlyph("chart",Modifier.size(24.dp)) }
+                                IconButton({achievementsPage=!achievementsPage}) { UiGlyph("trophy",Modifier.size(24.dp)) }
+                            }
                             Spacer(Modifier.weight(1f))
                             Text(if(connection=="Connected") "● LAN" else "○ OFFLINE",fontSize=10.sp,color=if(connection=="Connected") { if(page=="reward") White else Cyan } else Grey)
                             toolbarMenu()
@@ -186,17 +220,17 @@ class MainActivity : ComponentActivity() {
                         if (message.isNotEmpty()) Text(message, color = Yellow, fontSize = 12.sp)
                         FadeSlidePage(page, Modifier.weight(1f).fillMaxWidth()) { visible ->
                             when (visible) {
-                                "achievements" -> AchievementScreen(repo) { achievementsPage = false }
+                                "achievements" -> AchievementScreen(repo) { achievementsPage = false;homeSelected=true }
                                 "viewer" -> TabletSessionScreen(repo)
                                 "reward" -> RewardScreen(stored.state, pending, ::action)
                                 "focus" -> FocusScreen(stored.state, repo, stored.dimDesk, pending, ::action)
-                                else -> CompositionLocalProvider(LocalDashboardLayout provides homeLayout, LocalAmbientEnabled provides (page == "home" && !historyDialog && !pairDialog && !settingsDialog && !soundDialog && !developerDialog && reportDialog == null && !menu)) {
+                                else -> CompositionLocalProvider(LocalDashboardLayout provides homeLayout, LocalAmbientEnabled provides (page == "home" && !historyDialog && !activityHistory && !dailyTimeline && !pairDialog && !settingsDialog && !soundDialog && !developerDialog && reportDialog == null && !menu)) {
                                     HomeScreen(repo, stored.pairing != null, connection,
-                                        history = { historyDialog = true }, pair = { pairDialog = true }, openReport = { reportDialog = it }, expandAnalytics = { historyInitialPeriod=HistoryPeriod.DAY;historyExpanded=true;historyDialog=true }, openSession={homeSelected=false})
+                                        history = { activityHistory = true }, pair = { pairDialog = true }, openReport = { reportDialog = it }, expandAnalytics = { dailyTimeline=true }, openSession={homeSelected=false},achievements={achievementsPage=true;homeSelected=false})
                                 }
                             }
                         }
-                        DashboardNavigation(page,home={achievementsPage=false;homeSelected=true},achievements={achievementsPage=true;homeSelected=false},
+                        if(!stored.immersive) DashboardNavigation(page,home={achievementsPage=false;homeSelected=true},achievements={achievementsPage=true;homeSelected=false},
                             analytics={historyDialog=true},focus=if(stored.state.session!=null) ({achievementsPage=false;homeSelected=false}) else null)
                     }
                 }
@@ -227,16 +261,24 @@ class MainActivity : ComponentActivity() {
                     developer = { enabled -> scope.launch { repo.developerMode(enabled) } })
                 if(soundDialog) SoundSettingsDialog(stored,repo) { soundDialog=false }
                 if(developerDialog && stored.developerMode) DeveloperPreviewDialog { developerDialog=false }
-                if (historyDialog) StudyHistoryDialog(repo, { historyDialog = false;historyInitialPeriod=HistoryPeriod.WEEK;historyExpanded=false }, ::copySummary, historyInitialPeriod, initialExpanded=historyExpanded, home={historyDialog=false;historyExpanded=false;achievementsPage=false;homeSelected=true}, achievements={historyDialog=false;historyExpanded=false;achievementsPage=true;homeSelected=false})
+                if(activityHistory) ActivityHistoryDialog(repo,{activityHistory=false},{reportDialog=it},{activityHistory=false;historyDialog=true})
+                if(dailyTimeline) RepositoryTimelineDialog(repo,{dailyTimeline=false},{reportDialog=it})
+                if (historyDialog) StudyHistoryDialog(repo, { historyDialog = false;historyInitialPeriod=HistoryPeriod.WEEK;historyExpanded=false }, ::copySummary, historyInitialPeriod, initialExpanded=historyExpanded, home={historyDialog=false;historyExpanded=false;achievementsPage=false;homeSelected=true}, achievements={historyDialog=false;historyExpanded=false;achievementsPage=true;homeSelected=false}, focus=navigation.focus?.let { go -> { historyDialog=false;historyExpanded=false;go() } })
                 reportDialog?.let { report -> ReportDetailsDialog(report, { reportDialog = null }, { copySummary(report) },
                     delivered = report.key in stored.delivered, online = !viewer && connection == "Connected",
-                    send = if (!viewer && stored.reports.any { it.key == report.key }) ({ scope.launch { repo.resendReport(report.key) }; Unit }) else null) }
+                    send = if (!viewer && stored.reports.any { it.key == report.key }) ({ scope.launch { repo.resendReport(report.key) }; Unit }) else null,currentReport={repo.history.value.find { it.key==report.key }}) }
+                } // Primary destination navigation is also inherited by app dialogs.
             }
         }
     }
 
     private fun copySummary(report: Report) {
-        getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("FocusDeck report", report.summary()))
+        lifecycleScope.launch {
+            val canonical=repo.history.value.find { it.key==report.key } ?: return@launch
+            val text=withContext(Dispatchers.Default) { canonical.summary() }
+            if(repo.history.value.none { it.key==canonical.key }) return@launch
+            getSystemService(ClipboardManager::class.java).setPrimaryClip(ClipData.newPlainText("FocusDeck report",text))
+        }
     }
 }
 
@@ -441,7 +483,7 @@ private fun SettingsDialog(stored: StoredDeck, connection: String, dismiss: () -
             } } }
             Text("Navigation requests up to 120 Hz. Dim timer requests 30 Hz. Actual refresh depends on phone display and power settings.", fontSize = 12.sp, color = Grey)
             Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(dev, { dev = it }); Text("Developer mode") }
-            Text("Enables a temporary achievement sandbox in the menu.", fontSize = 12.sp, color = Grey)
+            Text("Shows the read-only three-year synthetic preview at its fixed simulated date. Use real data returns to your saved activity.", fontSize = 12.sp, color = Grey)
             Text(connection, fontSize = 12.sp, color = Grey)
             TextButton(connect) { Text("CONNECT DESKTOP") }
             TextButton(disconnect) { Text("DISCONNECT DESKTOP") }

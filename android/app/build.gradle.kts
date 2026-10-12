@@ -12,8 +12,8 @@ android {
         applicationId = "com.hax.focusdeck"
         minSdk = 34
         targetSdk = 35
-        versionCode = 25
-        versionName = "1.21.0"
+        versionCode = 26
+        versionName = "1.22.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
@@ -28,7 +28,14 @@ android {
         }
     }
     if(project.hasProperty("uiQaTests")) testBuildType = "uiqa"
+    if(project.hasProperty("visualTestTests")) testBuildType = "visualtest"
     buildTypes {
+        create("visualtest") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".visualtest"
+            matchingFallbacks += "debug"
+            signingConfig = signingConfigs.getByName("debug")
+        }
         create("uiqa") {
             initWith(getByName("debug"))
             applicationIdSuffix = ".uiqa"
@@ -42,6 +49,11 @@ android {
             }
         }
     }
+    sourceSets.getByName("visualtest") {
+        java.srcDir("src/uiqa/java")
+        manifest.srcFile("src/uiqa/AndroidManifest.xml")
+    }
+    sourceSets.getByName("main").assets.srcDir("../../fixtures/developer-mode-3years")
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -70,4 +82,5 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.6.2")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
     add("uiqaImplementation", "androidx.compose.ui:ui-test-manifest")
+    add("visualtestImplementation", "androidx.compose.ui:ui-test-manifest")
 }

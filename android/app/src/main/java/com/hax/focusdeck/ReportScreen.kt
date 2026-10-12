@@ -4,6 +4,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.animation.core.*
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -30,26 +33,26 @@ import java.util.Locale
 
 @Composable
 fun ReportDetailsDialog(report: Report, dismiss: () -> Unit, copy: () -> Unit,
-    delivered: Boolean = false, online: Boolean = false, send: (() -> Unit)? = null) {
+    delivered: Boolean = false, online: Boolean = false, send: (() -> Unit)? = null, currentReport: () -> Report? = { report }) {
     Dialog(onDismissRequest = dismiss, properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
         DialogNavigationRefresh()
-        Surface(Modifier.fillMaxSize(), color = Color.Black) {
-            EntryMotion(Modifier.fillMaxSize()) { ReportScreen(report, dismiss, delivered, online, send, copy) }
+        Surface(Modifier.fillMaxSize(), color = DashboardBackground) {
+            ReportContinuity { ReportScreen(report, dismiss, delivered, online, send, copy,currentReport) }
         }
     }
 }
 
 private fun reportNumber(value: Double?): String = value?.let { String.format(Locale.getDefault(), "%.1f", it) } ?: "N/A"
 @Composable
-private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean, online: Boolean, send: (() -> Unit)?, copy: () -> Unit) {
+internal fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean=false, online: Boolean=false, send: (() -> Unit)?=null, copy: () -> Unit={},currentReport: () -> Report?={report}) {
+    val synthetic=LocalSyntheticPreview.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var saveMessage by remember(report.key) { mutableStateOf("") }
     var saving by remember { mutableStateOf(false) }
-    var payload by remember { mutableStateOf("") }
     var timelineOpen by remember(report.key) { mutableStateOf(true) }
     var allEvents by remember(report.key) { mutableStateOf(false) }
-    val zone = ZoneId.systemDefault()
+    val zone = CalendarAnalytics.zone(report)
     val fmt = remember { DateTimeFormatter.ofPattern("HH:mm") }
     val eventFmt = remember { DateTimeFormatter.ofPattern("HH:mm:ss") }
     val range = remember(report, zone) {
@@ -58,10 +61,11 @@ private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean
         "${start.format(DateTimeFormatter.ofPattern("d MMM yyyy"))} · ${start.format(fmt)} – ${finish.format(if (start.toLocalDate() == finish.toLocalDate()) fmt else DateTimeFormatter.ofPattern("d MMM yyyy HH:mm"))}"
     }
     val saveReport = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
-        if (uri != null) scope.launch {
+        if (uri != null && !synthetic) scope.launch {
             saving = true
             try {
-                val snapshot = payload
+                val canonical=currentReport() ?: error("This report is no longer available")
+                val snapshot=withContext(Dispatchers.Default) { WireJson.encodeToString(canonical) }
                 withContext(Dispatchers.IO) {
                     val output = context.contentResolver.openOutputStream(uri, "wt") ?: error("Cannot open report destination")
                     output.use { it.write(snapshot.toByteArray(Charsets.UTF_8)) }
@@ -74,26 +78,27 @@ private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean
     val behavior by produceState<BehaviorMetrics?>(null, report) {
         value = withContext(Dispatchers.Default) { TimelineAnalysis.metrics(report) }
     }
-    LazyColumn(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 20.dp),
+    LazyColumn(Modifier.fillMaxSize().testTag("session-summary").windowInsetsPadding(dashboardViewportInsets()).padding(horizontal = 14.dp),
         contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if(synthetic) item(key="synthetic") { Text("SYNTHETIC · READ ONLY · Simulated ${LocalDashboardDate.current}",color=DeckColors.secondary,fontSize=11.sp) }
         item(key = "heading") {
-            Box(Modifier.fillMaxWidth()) {
-                IconButton(dismiss, Modifier.align(Alignment.TopStart).size(36.dp)) { UiGlyph("close", Modifier.size(22.dp), DeckColors.muted) }
-                Column(Modifier.fillMaxWidth().padding(horizontal = 40.dp), horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                    Text(report.title, fontSize = 14.sp, textAlign = TextAlign.Center)
-                    Text(range, color = DeckColors.muted, fontSize = 12.sp, textAlign = TextAlign.Center)
+            Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                IconButton(dismiss,Modifier.size(36.dp)) { ActivityGlyph("close",Modifier.size(22.dp),DeckColors.muted) }
+                Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) {
+                    Text(report.title,fontSize=18.sp,fontWeight=FontWeight.Bold)
+                    Text(report.blocks.map { it.type.replaceFirstChar { c -> c.titlecase() } }.distinct().joinToString(" / ")+" · "+report.blocks.map { it.timerMode }.distinct().joinToString(" / "),fontSize=11.sp,color=DeckColors.muted)
+                    Text(range,color=DeckColors.muted,fontSize=11.sp)
+                }
+                Column(Modifier.widthIn(max=108.dp),verticalArrangement=Arrangement.spacedBy(6.dp)) {
+                    ExecutionStatus(if(report.statusLabel=="Finished with skips") "skipped" else report.status,if(report.status=="complete") "Session Complete" else report.statusLabel)
+                    Text(report.outcomeSummary,fontSize=10.sp,color=DeckColors.muted)
                 }
             }
-            Column(Modifier.fillMaxWidth().padding(top = 14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(if (report.status == "complete") "Session Complete" else report.statusLabel, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                CompletionOrbit(report.status == "complete", Modifier.size(width = 260.dp, height = 174.dp))
-                Text(report.outcomeSummary, fontSize = 13.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-            }
         }
+
         item(key = "summary") {
             val c = report.competition
-            RefCard(Modifier.fillMaxWidth(), accented = true) {
+            FDCard(Modifier.fillMaxWidth(),padding=12.dp) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     ReportMetric("Planned", humanTime(report.plannedMs), "calendar", Modifier.weight(1f))
                     VerticalDivider(Modifier.height(42.dp), color = DeckColors.track)
@@ -109,14 +114,14 @@ private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean
                     VerticalDivider(Modifier.height(42.dp), color = DeckColors.track)
                     ReportMetric("BeatScore", reportNumber(c?.beatScore), "target", Modifier.weight(1f))
                 }
-                HorizontalDivider(color = DeckColors.border)
+                HorizontalDivider(color = DeckColors.track)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    HaloRing(((c?.focusRatio ?: 0.0) / 100.0).toFloat(), Modifier.size(86.dp)) {
-                        Text(c?.focusRatio?.let { "${it.toInt()}%" } ?: "N/A", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    OmssCircularGauge(c?.focusRatio?.let { (it / 100).toFloat() }, Modifier.size(60.dp)) {
+                        Text(c?.focusRatio?.let { "${it.toInt()}%" } ?: "N/A", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
                     Column(Modifier.weight(1f).padding(start = 10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         RefLabel("OVERALL FOCUS RATIO")
-                        Text(c?.focusRatio?.let { "${reportNumber(it)}%" } ?: "N/A", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Text(c?.focusRatio?.let { "${reportNumber(it)}%" } ?: "N/A", fontSize = 19.sp, fontWeight = FontWeight.Bold)
                         if (c != null) {
                             Text("${if (c.scoreScope == "countdown_only") "Countdown-only " else ""}BeatScore ${reportNumber(c.beatScore)} · ${c.completedFocusBlocks} / ${c.plannedFocusBlocks} completed", color = DeckColors.muted, fontSize = 11.sp)
                             c.weighted?.let { w -> Text(if (c.scoreScope == "none") "Time-based score · N/A"
@@ -125,27 +130,34 @@ private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean
                         }
                     }
                 }
+                HorizontalDivider(color=DeckColors.track)
+                DurationAccuracy(reportDurationComparison(report))
             }
         }
         item(key = "blocks-label") {
             Row(Modifier.fillMaxWidth()) { RefLabel("SESSION BLOCKS", Modifier.weight(1f)); RefLabel("${report.blocks.size} BLOCKS") }
         }
         itemsIndexed(report.blocks, key = { index, block -> "block-$index-${block.id}" }) { _, block -> ReportBlock(block) }
+        report.scheduleSnapshot?.activities.orEmpty().filter { planned -> report.blocks.none { it.id==planned.id } }.forEach { planned ->
+            item(key="unstarted-${planned.id}") { FDCard(Modifier.fillMaxWidth()) {
+                Row(verticalAlignment=Alignment.CenterVertically) { ActivityGlyph("clock",Modifier.size(24.dp),DeckColors.muted);Spacer(Modifier.width(12.dp));Column(Modifier.weight(1f)) { Text(planned.title,fontSize=14.sp);Text("Not Started · no completion credit",fontSize=11.sp,color=DeckColors.muted) };Text("N/A",fontSize=12.sp,color=DeckColors.muted) }
+            } }
+        }
         item(key = "timeline-label") { RefLabel("DETAILED TIMELINE", Modifier.padding(top = 8.dp)) }
         item(key = "timeline") {
-            RefCard(Modifier.fillMaxWidth(), onClick = { timelineOpen = !timelineOpen }) {
+            FDCard(Modifier.fillMaxWidth(), onClick = { timelineOpen = !timelineOpen }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    UiGlyph("clock", Modifier.size(26.dp), DeckColors.muted); Spacer(Modifier.width(12.dp))
+                    ActivityGlyph("clock", Modifier.size(26.dp), DeckColors.muted); Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text("Detailed timeline", fontSize = 15.sp)
                         Text("${report.events.size} events · Session start to ${if (report.status == "complete") "completion" else "stop"}", color = DeckColors.muted, fontSize = 11.sp)
                     }
-                    UiGlyph(if (timelineOpen) "chevron-up" else "chevron-down", Modifier.size(18.dp), DeckColors.muted)
+                    ActivityGlyph(if (timelineOpen) "chevron-up" else "chevron-down", Modifier.size(18.dp), DeckColors.muted)
                 }
                 if (timelineOpen) {
                     HorizontalDivider(color = DeckColors.track)
                     if (report.events.isEmpty()) Text("This older session has no individual pause/resume timestamps.", color = DeckColors.muted, fontSize = 12.sp)
-                    report.events.take(5).forEach { event ->
+                    report.events.sortedBy { it.seq }.take(5).forEach { event ->
                         ReportEvent(report, event, zone, eventFmt)
                         HorizontalDivider(color = DeckColors.track.copy(alpha = .5f))
                     }
@@ -156,8 +168,8 @@ private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean
             }
         }
         // Expanded events remain lazy, with no arbitrary truncation of stored history.
-        if (timelineOpen && allEvents) itemsIndexed(report.events.drop(5), key = { index, event -> "event-$index-${event.seq}" }) { _, event ->
-            RefCard(Modifier.fillMaxWidth()) { ReportEvent(report, event, zone, eventFmt) }
+        if (timelineOpen && allEvents) itemsIndexed(report.events.sortedBy { it.seq }.drop(5), key = { index, event -> "event-$index-${event.seq}" }) { _, event ->
+            FDCard(Modifier.fillMaxWidth()) { ReportEvent(report, event, zone, eventFmt) }
         }
         item(key = "timeline-info") {
             behavior?.let { b -> if (b.pauseCount != null) Text("${b.pauseCount} pauses · ${b.extensionCount} extensions · longest uninterrupted ${humanTime(b.longestActiveMs)}",
@@ -165,13 +177,13 @@ private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean
             Text("${zone.id} · Timeline coverage: ${report.timelineCoverage}", color = DeckColors.muted, fontSize = 10.sp)
             ReportExtraDetails(report)
         }
-        item(key = "actions") {
+        if(!synthetic) item(key = "actions") {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 RefAction("SAVE REPORT", "download", Modifier.weight(1f), enabled = !saving) {
                     scope.launch {
                         saving = true
                         try {
-                            payload = withContext(Dispatchers.Default) { WireJson.encodeToString(report) }
+                            currentReport() ?: error("This report is no longer available")
                             val safeId = report.sessionId.filter { it.isLetterOrDigit() || it == '-' }.take(48).ifEmpty { "session" }
                             saveReport.launch("focusdeck-$safeId-${report.startedAtMs}.json")
                         } catch (e: Exception) { saveMessage = "Report could not prepare: ${e.message}" }
@@ -192,7 +204,7 @@ private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean
 @Composable private fun ReportMetric(label: String, value: String, icon: String, modifier: Modifier) {
     Row(modifier.padding(horizontal = 4.dp, vertical = 3.dp), verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        UiGlyph(icon, Modifier.size(19.dp))
+        ActivityGlyph(icon, Modifier.size(19.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(label, color = DeckColors.muted, fontSize = 10.sp)
             Text(value, fontSize = 15.sp, fontWeight = FontWeight.Medium)
@@ -212,9 +224,9 @@ private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean
 }
 @Composable private fun ReportBlock(block: BlockResult) {
     var expanded by remember(block.id) { mutableStateOf(false) }
-    RefCard(Modifier.fillMaxWidth(), onClick = { expanded = !expanded }) {
+    FDCard(Modifier.fillMaxWidth().activityExpansion(LocalAchievementMotion.current), onClick = { expanded = !expanded }) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            UiGlyph(if (block.outcome == "done") "check-ring" else "clock", Modifier.size(27.dp))
+            ActivityGlyph(when(block.outcome) { "done"->"check-ring";"skipped"->"skip-forward";"stopped"->"square";else->"clock" }, Modifier.size(27.dp),statusColor(block.outcome))
             Column(Modifier.weight(1f)) {
                 Text(block.title, fontSize = 14.sp)
                 Text(when (block.outcome) { "done" -> "Completed · DONE confirmed"; "skipped" -> "Skipped · no completion credit"; "stopped" -> "Ended early · no completion credit"; else -> block.outcome.replace('_', ' ') },
@@ -248,13 +260,17 @@ private fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolean
         if (event.kind == "block_started") report.blocks.getOrNull(event.blockIndex)?.let { Text(humanTime(it.activeMs), color = DeckColors.muted, fontSize = 10.sp) }
     }
 }
-@Composable private fun CompletionOrbit(complete: Boolean, modifier: Modifier) {
-    Box(modifier, contentAlignment = Alignment.Center) {
-        // The art contains only atmospheric light, tilted orbits and two moons.
-        // Ring/check remain native, so stopped reports never inherit a baked completion mark.
-        ThemedArtwork(R.drawable.session_orbit_art, Modifier.fillMaxSize())
-        HaloRing(if (complete) 1f else 0f, Modifier.size(128.dp), illuminate = complete) {
-            if (complete) UiGlyph("check", Modifier.size(48.dp)) else Text("—", color = DeckColors.accent, fontSize = 40.sp)
+@Composable private fun ReportContinuity(content: @Composable ()->Unit) {
+    val mode=LocalAchievementMotion.current
+    val navigator=LocalTimelineNavigation.current
+    val origin=remember { navigator?.summaryOrigin.also { navigator?.summaryOrigin=null } }
+    val phase=remember { Animatable(if(mode==AchievementMotion.OFF) 1f else 0f) }
+    LaunchedEffect(mode) { phase.animateTo(1f,tween(mode.duration)) }
+    Box(Modifier.fillMaxSize().graphicsLayer {
+        alpha=phase.value
+        if(mode==AchievementMotion.FULL) {
+            translationY=(1-phase.value)*(origin?.top ?: 10.dp.toPx()).coerceAtMost(80.dp.toPx())
+            scaleX=.98f+.02f*phase.value;scaleY=scaleX
         }
-    }
+    }) { content() }
 }

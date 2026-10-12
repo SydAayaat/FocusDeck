@@ -17,6 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -28,6 +31,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import kotlin.math.ceil
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.getValue
 
 /** Opaque dashboard materials. Saved palettes still own accents and icon tint. */
 internal object OmssColors {
@@ -60,6 +66,22 @@ internal object OmssElevations {
     val nested = OmssElevation(3.dp, 5.dp, 10.dp, .48f)
     val component = OmssElevation(2.dp, 4.dp, 7.dp, .50f)
     val micro = OmssElevation(1.dp, 2.dp, 3.dp, .28f)
+}
+
+/** The reference timeline callout has one restrained accent outline and a pointing foot. */
+internal object OmssCalloutShape : Shape {
+    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
+        val foot=with(density) { 7.dp.toPx() }
+        val radius=with(density) { 10.dp.toPx() }
+        val bottom=(size.height-foot).coerceAtLeast(0f)
+        return Outline.Generic(Path().apply {
+            addRoundRect(RoundRect(Rect(0f,0f,size.width,bottom),CornerRadius(radius)))
+            moveTo(size.width/2-foot,bottom-.5f)
+            lineTo(size.width/2,size.height)
+            lineTo(size.width/2+foot,bottom-.5f)
+            close()
+        })
+    }
 }
 
 /** A cached GPU display list, never a generated shadow bitmap or a software layer. */
@@ -123,7 +145,8 @@ internal fun Modifier.omssDirectionalShadow(shape: Shape = RoundedCornerShape(12
 @Composable internal fun OmssCircularGauge(fraction: Float?, modifier: Modifier = Modifier,
     color: Color = DeckColors.accent, rounded: Boolean = true, radiusFraction: Float = .42f,
     content: @Composable BoxScope.() -> Unit) {
-    OmssSegmentedGauge(listOf((fraction ?: 0f).coerceIn(0f, 1f) to color), modifier, rounded, radiusFraction, content)
+    val progress by animateFloatAsState((fraction ?: 0f).coerceIn(0f,1f),tween(LocalAchievementMotion.current.duration),label="Gauge progress")
+    OmssSegmentedGauge(listOf(progress to color), modifier, rounded, radiusFraction, content)
 }
 
 @Composable internal fun OmssSegmentedGauge(segments: List<Pair<Float, Color>>, modifier: Modifier = Modifier,

@@ -18,10 +18,13 @@ internal val DashboardBackground get() = if (DeckColors.palette.id == "monochrom
 internal val DashboardRaised get() = OmssColors.material(OmssColors.nested)
 internal val DashboardInset get() = OmssColors.material(OmssColors.hub)
 @Composable internal fun FDCard(modifier: Modifier = Modifier, onClick: (() -> Unit)? = null,
-    padding: Dp = 10.dp, content: @Composable ColumnScope.() -> Unit) {
+    padding: Dp = 10.dp, minimumContentHeight: Dp = 0.dp, content: @Composable ColumnScope.() -> Unit) {
     OmssSurface(modifier.then(LocalDashboardCardHeight.current?.let { Modifier.heightIn(min=it) } ?: Modifier).then(if(onClick == null) Modifier else Modifier.clickable(onClick=onClick))) {
-        CompositionLocalProvider(LocalTextStyle provides androidx.compose.ui.text.TextStyle(fontSize=14.sp,fontFeatureSettings="tnum")) {
-            Column(Modifier.padding(padding), verticalArrangement=Arrangement.spacedBy(6.dp), content=content)
+        // Compact controls specify their own bounds. Material's 48dp layout reservation
+        // otherwise creates empty rows; Compose's minimum touch hit testing still applies.
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp,
+            LocalTextStyle provides androidx.compose.ui.text.TextStyle(fontSize=14.sp,fontFeatureSettings="tnum")) {
+            Column(Modifier.padding(padding).heightIn(min=minimumContentHeight), verticalArrangement=Arrangement.spacedBy(6.dp), content=content)
         }
     }
 }
@@ -39,6 +42,33 @@ internal fun dashboardDuration(ms: Long?): String = ms?.let {
     val minutes=it.coerceAtLeast(0)/60000
     if(minutes>=60) "${minutes/60}h ${minutes%60}m" else "${minutes}m"
 } ?: "N/A"
+
+internal data class PrimaryNavigation(val selected: String,val home: ()->Unit,val achievements: ()->Unit,
+    val analytics: ()->Unit,val focus: (() -> Unit)?)
+internal val LocalPrimaryNavigation=staticCompositionLocalOf<PrimaryNavigation?> { null }
+
+/** Compact visible icons retain explicit 48dp targets, even under the compact card policy. */
+@Composable internal fun ImmersiveTopNavigation() {
+    val nav=LocalPrimaryNavigation.current ?: return
+    if(!LocalDeckImmersive.current) return
+    Row(Modifier.testTag("immersive-navigation"),verticalAlignment=Alignment.CenterVertically) {
+        listOf(Triple("home","Home","house"),Triple("achievements","Achievements","trophy"),
+            Triple("focus","Focus","timer"),Triple("analytics","Analytics","chart-no-axes-column")).forEach { (key,label,icon) ->
+            val action=when(key) { "home"->nav.home;"achievements"->nav.achievements;"focus"->nav.focus;else->nav.analytics }
+            IconButton(onClick={action?.invoke()},enabled=action!=null,modifier=Modifier.size(48.dp).testTag("immersive-$key").semantics {
+                contentDescription="Go to $label";selected=nav.selected==key;role=Role.Tab
+            }) { BundledCardIcon(icon,Modifier.size(20.dp),if(nav.selected==key) DeckColors.accent else DeckColors.muted.copy(alpha=if(action==null) .4f else 1f)) }
+        }
+    }
+}
+
+/** Apply once per window. Hidden bars reserve no Scaffold space; actual cutouts/IME and
+ * mandatory gesture edges remain safe, including transient system bars in immersion.
+ */
+@Composable internal fun dashboardViewportInsets(): WindowInsets {
+    val drawing=if(LocalDeckImmersive.current) WindowInsets.displayCutout.union(WindowInsets.systemBars).union(WindowInsets.ime) else WindowInsets.safeDrawing
+    return drawing.union(WindowInsets.mandatorySystemGestures.only(WindowInsetsSides.Bottom))
+}
 @Composable internal fun DashboardNavigation(selected: String, home: () -> Unit, achievements: () -> Unit,
     analytics: () -> Unit, focus: (() -> Unit)? = null) {
     OmssSurface(Modifier.fillMaxWidth().testTag("dashboard-navigation")) {
@@ -68,7 +98,9 @@ internal fun dashboardDuration(ms: Long?): String = ms?.let {
 
 @Composable internal fun DashboardHomeHeader(connection: String,options: @Composable ()->Unit) {
     Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
-        FDBrand();Spacer(Modifier.weight(1f))
+        val date=LocalDashboardDate.current ?: java.time.LocalDate.now()
+        Text(date.format(java.time.format.DateTimeFormatter.ofPattern("EEE, d MMM yyyy")).uppercase(),fontSize=11.sp,color=DeckColors.muted,modifier=Modifier.weight(1f))
+        Spacer(Modifier.weight(1f))
         Text(if(connection=="Connected") "● Connected" else "○ $connection",fontSize=11.sp,
             color=if(connection=="Connected") DeckColors.success else DeckColors.muted)
         options()

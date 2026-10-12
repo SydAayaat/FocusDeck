@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.*
@@ -50,8 +51,8 @@ internal fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolea
     val scope = rememberCoroutineScope()
     var saveMessage by remember(report.key) { mutableStateOf("") }
     var saving by remember { mutableStateOf(false) }
-    var timelineOpen by remember(report.key) { mutableStateOf(true) }
-    var allEvents by remember(report.key) { mutableStateOf(false) }
+    var timelineOpen by rememberSaveable(report.key) { mutableStateOf(true) }
+    var allEvents by rememberSaveable(report.key) { mutableStateOf(false) }
     val zone = CalendarAnalytics.zone(report)
     val fmt = remember { DateTimeFormatter.ofPattern("HH:mm") }
     val eventFmt = remember { DateTimeFormatter.ofPattern("HH:mm:ss") }
@@ -85,7 +86,7 @@ internal fun ReportScreen(report: Report, dismiss: () -> Unit, delivered: Boolea
             Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.Top,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
                 IconButton(dismiss,Modifier.size(36.dp)) { ActivityGlyph("close",Modifier.size(22.dp),DeckColors.muted) }
                 Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                    Text(report.title,fontSize=18.sp,fontWeight=FontWeight.Bold)
+                    Text(report.title,Modifier.testTag("summary-report-${report.key}"),fontSize=18.sp,fontWeight=FontWeight.Bold)
                     Text(report.blocks.map { it.type.replaceFirstChar { c -> c.titlecase() } }.distinct().joinToString(" / ")+" · "+report.blocks.map { it.timerMode }.distinct().joinToString(" / "),fontSize=11.sp,color=DeckColors.muted)
                     Text(range,color=DeckColors.muted,fontSize=11.sp)
                 }

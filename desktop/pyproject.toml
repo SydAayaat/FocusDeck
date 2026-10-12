@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "focusdeck"
-version = "1.20.0"
+version = "1.21.0"
 description = "Local LAN companion for the native FocusDeck Android cockpit"
 requires-python = ">=3.10"
-dependencies = ["websockets>=14,<17", "Pillow>=11,<13", "PyYAML>=6,<7"]
+dependencies = ["websockets>=14,<17", "Pillow>=11,<13", "PyYAML>=6,<7", "qrcode>=8,<9"]
 license = {text = "MIT"}
 
 [project.optional-dependencies]

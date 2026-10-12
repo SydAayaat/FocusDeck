@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.*
 import androidx.compose.ui.geometry.*
 import androidx.compose.ui.graphics.*
@@ -35,17 +36,22 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
     setPeriod: (HistoryPeriod)->Unit,setAnchor: (LocalDate)->Unit,modifier: Modifier=Modifier,
     openReport: (Report)->Unit,copy: (Report)->Unit,delete: ((Report)->Unit)?,header: @Composable ()->Unit,archiveActions: @Composable ()->Unit,
     store: AchievementStore=AchievementStore(),initialExpanded: Boolean=false,copyPerformance: ((HistoryPeriod,LocalDate)->Unit)?=null,presentation: AnalyticsPresentation?=null,observationNow: Long?=null) {
-    var expanded by remember { mutableStateOf(initialExpanded) }
-    var archive by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(initialExpanded) }
+    var archive by rememberSaveable { mutableStateOf(false) }
     val bounds=remember { mutableMapOf<String,Rect>() }
     val latestReports by rememberUpdatedState(reports)
     var popup by remember(period,anchor) { mutableStateOf<AnalyticsPopup?>(null) }
     val layout=rememberDashboardLayout(if(period==HistoryPeriod.DAY) "analytics-day" else if(period==HistoryPeriod.WEEK) "analytics-week" else "analytics-aggregate")
-    var drillStack by remember { mutableStateOf(emptyList<Pair<HistoryPeriod,LocalDate>>()) }
-    var expected by remember { mutableStateOf<Pair<HistoryPeriod,LocalDate>?>(null) }
-    LaunchedEffect(period,anchor) { if(expected!=(period to anchor)) drillStack=emptyList();expected=null }
-    fun drill(next: HistoryPeriod,date: LocalDate) { drillStack=drillStack+(period to anchor);expected=next to date;setPeriod(next);setAnchor(date) }
-    fun back() { val target=drillStack.last();drillStack=drillStack.dropLast(1);expected=target;setPeriod(target.first);setAnchor(target.second) }
+    var drillStack by rememberSaveable(stateSaver=DrillStackSaver) { mutableStateOf(emptyList<Pair<HistoryPeriod,LocalDate>>()) }
+    var expected by rememberSaveable { mutableStateOf<String?>(null) }
+    var lastWindow by rememberSaveable { mutableStateOf("${period.name}|$anchor") }
+    LaunchedEffect(period,anchor) {
+        val window="${period.name}|$anchor"
+        if(lastWindow!=window && expected!=window) drillStack=emptyList()
+        lastWindow=window;expected=null
+    }
+    fun drill(next: HistoryPeriod,date: LocalDate) { drillStack=drillStack+(period to anchor);expected="${next.name}|$date";setPeriod(next);setAnchor(date) }
+    fun back() { val target=drillStack.last();drillStack=drillStack.dropLast(1);expected="${target.first.name}|${target.second}";setPeriod(target.first);setAnchor(target.second) }
     BackHandler(expanded || drillStack.isNotEmpty() || layout.editing) { if(layout.editing) layout.editing=false else if(expanded) expanded=false else back() }
     if(expanded) {
         LegacyAnalyticsDashboard(data,reports,period,anchor,setPeriod,setAnchor,modifier,openReport,copy,delete,
@@ -58,11 +64,11 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
     val evidence by produceState<DashboardAnalyticsEvidence?>(null,data,reports,period,anchor,store,evidenceMinute,fixedNow) {
         value=withContext(Dispatchers.Default) { dashboardAnalytics(data,reports,period,anchor,store,fixedNow ?: System.currentTimeMillis()) }
     }
-    var sortBy by remember { mutableStateOf("Time") }
-    var ascending by remember { mutableStateOf(false) }
-    var metric by remember { mutableStateOf(CalendarMetric.FOCUS_HOURS) }
-    var calendarMonth by remember(anchor) { mutableStateOf(anchor.withDayOfMonth(1)) }
-    var selectedActivity by remember(period,anchor) { mutableStateOf<String?>(null) }
+    var sortBy by rememberSaveable { mutableStateOf("Time") }
+    var ascending by rememberSaveable { mutableStateOf(false) }
+    var metric by rememberSaveable { mutableStateOf(CalendarMetric.FOCUS_HOURS) }
+    var calendarMonth by rememberSaveable(anchor,stateSaver=LocalDateSaver) { mutableStateOf(anchor.withDayOfMonth(1)) }
+    var selectedActivity by rememberSaveable(period,anchor) { mutableStateOf<String?>(null) }
     val visual=presentation.takeIf { LocalDashboardPreview.current }
     val e=visual?.evidence ?: evidence
     if(e==null) { Box(modifier.fillMaxSize(),contentAlignment=Alignment.Center) { CircularProgressIndicator() };return }
@@ -151,20 +157,13 @@ internal val LocalAnalyticsActions=staticCompositionLocalOf<AnalyticsScreenActio
             }
         }
     }
-    if(period==HistoryPeriod.DAY) cards+=card("estimation","Time Estimation Accuracy",270) {
+    if(period==HistoryPeriod.DAY) cards+=card("estimation","Time Estimation Accuracy",170) {
         TimeEstimationCard(e)
-        var details by remember { mutableStateOf(false) }
-        TextButton({details=!details},Modifier.height(28.dp)) { Text(if(details) "Hide Session Detail" else "Daily Timeline & Session Detail",fontSize=11.sp) }
-        if(details) {
-            DailyTimeline(data,anchor,selectedId=selectedActivity,select={selectedActivity=it})
-            data.activities[selectedActivity]?.let { ActivityMetadata(it,true) }
-            e.activities.filter { it.schedule==null }.forEach { a->TextButton({selectedActivity=a.id}) { Text(a.title,fontSize=11.sp) } }
-        }
     }
     if(period!=HistoryPeriod.DAY) cards+=hourlyCard()
     cards+=card("telemetry","Executive Telemetry Insights",230,badge=if(e.performance.execution.provisional) "Provisional" else if(e.performance.execution.partial) "Partial" else if(e.days.isEmpty()) "Evidence N/A" else "Recorded") {
         TelemetryInsights(e,period,visual?.telemetry)
-        var details by remember { mutableStateOf(false) }
+        var details by rememberSaveable { mutableStateOf(false) }
         TextButton({details=!details},Modifier.height(28.dp),contentPadding=PaddingValues(0.dp)) { Text(if(details) "Hide report details" else "GPT Performance Report  ›",fontSize=11.sp) }
         if(details) {
             Text("Deterministic factual summary · Notable trends",fontSize=10.sp,color=DeckColors.muted)

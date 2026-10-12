@@ -47,21 +47,6 @@ internal data class PrimaryNavigation(val selected: String,val home: ()->Unit,va
     val analytics: ()->Unit,val focus: (() -> Unit)?)
 internal val LocalPrimaryNavigation=staticCompositionLocalOf<PrimaryNavigation?> { null }
 
-/** Compact visible icons retain explicit 48dp targets, even under the compact card policy. */
-@Composable internal fun ImmersiveTopNavigation() {
-    val nav=LocalPrimaryNavigation.current ?: return
-    if(!LocalDeckImmersive.current) return
-    Row(Modifier.testTag("immersive-navigation"),verticalAlignment=Alignment.CenterVertically) {
-        listOf(Triple("home","Home","house"),Triple("achievements","Achievements","trophy"),
-            Triple("focus","Focus","timer"),Triple("analytics","Analytics","chart-no-axes-column")).forEach { (key,label,icon) ->
-            val action=when(key) { "home"->nav.home;"achievements"->nav.achievements;"focus"->nav.focus;else->nav.analytics }
-            IconButton(onClick={action?.invoke()},enabled=action!=null,modifier=Modifier.size(48.dp).testTag("immersive-$key").semantics {
-                contentDescription="Go to $label";selected=nav.selected==key;role=Role.Tab
-            }) { BundledCardIcon(icon,Modifier.size(20.dp),if(nav.selected==key) DeckColors.accent else DeckColors.muted.copy(alpha=if(action==null) .4f else 1f)) }
-        }
-    }
-}
-
 /** Apply once per window. Hidden bars reserve no Scaffold space; actual cutouts/IME and
  * mandatory gesture edges remain safe, including transient system bars in immersion.
  */

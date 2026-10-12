@@ -1,0 +1,25 @@
+# Local QR pairing invitations
+
+Android 1.22.0 and desktop 1.21.0 add an invitation method alongside the existing manual v1 pairing JSON. Existing tokens, certificates, identities, persisted pairing format and wire/session/achievement contracts are unchanged. Both updated components are needed for QR redemption; manual JSON remains directly accessible from Devices on the desktop and Pair desktop on Android.
+
+## Flow and trust
+
+1. Desktop Devices → Pair phone / Pair tablet viewer asks the existing owner-only Unix control plane for `pair-invite`. No HTTP UI server, cloud account or remote QR service is used.
+2. The running TLS companion creates a role-specific invitation with a crypto-random UUID and 256-bit random nonce. The invitation is held only in memory, expires after 120 seconds using a monotonic clock, and contains the host address, desktop identity, public certificate SHA-256, role and invitation/wire versions. It contains no permanent token or private key. The GUI renders a local PNG with `qrcode`; it never writes that PNG to the user archive.
+3. Android Pair desktop → Scan QR Code uses bundled offline ZXing. Camera permission denial and scanner cancellation leave manual JSON available. Validation rejects arbitrary QR contents, unsupported versions, malformed identities/pins, expired and unreasonable future invitations.
+4. Android shows the host, role and fingerprint, and explicitly confirms any existing trust replacement. Compare against the invitation shown on your trusted desktop. Changing desktops during a live/prepared/reward session is blocked before redemption; reconnecting the existing trust remains available in Settings.
+5. Android opens the companion’s existing pinned TLS listener at `/v1/pair`, submits the invitation proof and its existing device identity, and validates the returned host, certificate, role and versions. The listener bounds the first request and waits at most ten seconds. Fixed error messages never echo raw JSON/nonces. Browser origins are rejected.
+6. Under the host’s existing mutex, redemption validates expiry, proof, role, host and known phone identity and consumes the invitation atomically. A pending phone reservation prevents another identity from racing the ordinary hello. An invitation cannot replace a different already-trusted phone; explicit local host recovery remains necessary. Viewer grants use the separate viewer token and endpoint.
+7. The permanent v1 token is returned only inside pinned TLS. Android then performs the ordinary Bearer-authenticated phone/viewer `hello` and checks the desktop’s `hello_ack`. Only afterward does it store trust through `DeckRepository.pair`, with an expected-existing-pairing guard under its mutex. This probe applies no pending commands, reports or rewards. The normal connection continues through the existing service.
+
+New invitation replaces/revokes the previous pending invitation for that role. Revoke invitation retires it immediately. Successful redemption is one-use, including if the later handshake is interrupted; issue a fresh invitation to retry. Companion restart invalidates all invitations. A consumed invitation is never silently retried. Scanned nonces and manual tokens are excluded from Android saved-state Bundles; rotation during pairing asks for a fresh scan/paste, while normal navigation selections are restored. Cancel aborts the pending request. The QR itself conveys a temporary pairing capability: show it only to the intended device.
+
+## Compatibility and limitations
+
+Manual JSON keeps the original validation and durable storage route, now with a trust-review confirmation and an initially empty input instead of displaying the saved permanent token. Neither method uninstalls, clears or resets an app or archive. A first QR connection reserves and then normally binds the consenting phone identity on the host. Existing paired phones are not replaced automatically. An already-paired Android client uses CONNECT DESKTOP rather than redeeming a new invitation unnecessarily.
+
+`protocol/pairing-invitation-v1.schema.json` describes only this additional invitation format; it does not bump existing wire or storage contracts. Host monotonic expiry is authoritative; the phone uses wall-clock expiry for immediate feedback and rejects large clock skew. Correct the clocks and create a new invitation if needed.
+
+The isolated `.visualtest` app may scan locally but has no INTERNET permission and cannot redeem or store trust. Its shared pairing UI states that limit. Protocol verification uses temporary host directories, certificates, credentials and identities; the real phone’s production pairing is never changed for QA. A physical camera-to-host pairing using genuine configured devices is a separate check requiring an explicitly designated disposable counterpart; it was not performed for this stage.
+
+Dependencies: bundled Android scanning follows the [ZXing Embedded ScanContract API](https://github.com/journeyapps/zxing-android-embedded); local desktop rendering uses [python-qrcode](https://pypi.org/project/qrcode/). No third-party decoding website is involved.

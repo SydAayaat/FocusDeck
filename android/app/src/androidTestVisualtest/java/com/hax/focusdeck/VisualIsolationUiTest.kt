@@ -46,21 +46,23 @@ class VisualIsolationUiTest {
         assertTrue(split.right-plate.left > root.width*.98f)
         assertEquals(plate.top,split.top,1f);assertEquals(plate.bottom,split.bottom,1f)
         assertTrue(plate.right<split.left);assertTrue(split.right<=root.right)
-        ui.onNodeWithTag("immersive-analytics").assertIsSelected()
-        ui.onNodeWithTag("immersive-home").performClick()
+        ui.onNodeWithTag("immersive-navigation").assertDoesNotExist()
+        ui.onNodeWithTag("analytics-options").performClick()
+        ui.onNodeWithText("Home").performClick()
         ui.runOnIdle { assertTrue(navigated) }
     }
-    @Test fun immersiveIconsUseExistingCallbacksAndNormalModeKeepsBottomNavigation() {
+    @Test fun immersiveMenuUsesExistingCallbacksAndNormalModeKeepsBottomNavigation() {
         val selected=mutableStateOf("home");val immersive=mutableStateOf(true)
         ui.setContent { DeckTheme("gold","OFF",immersive.value) {
             CompositionLocalProvider(LocalPrimaryNavigation provides PrimaryNavigation(selected.value,
                 {selected.value="home"},{selected.value="achievements"},{selected.value="analytics"},{selected.value="focus"})) {
-                Column { ImmersiveTopNavigation();if(!immersive.value) DashboardNavigation(selected.value,{},{},{},{}) }
+                Column { AnalyticsHeader(HistoryPeriod.DAY,java.time.LocalDate.of(2026,10,12),{},{},"Offline",{},{},{},home={selected.value="home"},achievements={selected.value="achievements"});if(!immersive.value) DashboardNavigation(selected.value,{},{},{},{}) }
             }
         } }
-        listOf("achievements","focus","analytics","home").forEach { destination ->
-            ui.onNodeWithTag("immersive-$destination").performClick().assertIsSelected()
-            ui.runOnIdle { assertEquals(destination,selected.value) }
+        listOf("Achievements","Focus session","Home").forEach { destination ->
+            ui.onNodeWithTag("analytics-options").performClick()
+            ui.onNodeWithText(destination).performClick()
+            ui.runOnIdle { assertEquals(when(destination) {"Achievements"->"achievements";"Focus session"->"focus";else->"home"},selected.value) }
         }
         ui.runOnIdle { immersive.value=false }
         ui.onNodeWithTag("immersive-navigation").assertDoesNotExist()

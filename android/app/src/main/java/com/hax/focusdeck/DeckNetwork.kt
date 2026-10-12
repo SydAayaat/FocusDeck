@@ -54,35 +54,10 @@ class DeckNetwork(private val repo: DeckRepository, private val scope: Coroutine
 
     fun stop() { job?.cancel(); job = null; repo.connection.value = "Disconnected" }
 
-    private fun client(pairing: Pairing): OkHttpClient {
-        val trust = object : X509TrustManager {
-            override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
-            override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) =
-                throw CertificateException("Client certificates unsupported")
-            override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
-                val leaf = chain?.firstOrNull() ?: throw CertificateException("Missing server certificate")
-                leaf.checkValidity()
-                val hash = MessageDigest.getInstance("SHA-256").digest(leaf.encoded).joinToString("") { "%02x".format(it) }
-                if (!MessageDigest.isEqual(hash.toByteArray(), pairing.certificateSha256.lowercase().toByteArray()))
-                    throw CertificateException("Desktop certificate changed. Pair again on a trusted network.")
-            }
-        }
-        val ssl = SSLContext.getInstance("TLS").apply { init(null, arrayOf(trust), SecureRandom()) }
-        return OkHttpClient.Builder().sslSocketFactory(ssl.socketFactory, trust)
-            // Identity is the exact certificate fingerprint supplied through trusted pairing,
-            // not the changing LAN hostname/IP. This verifier still explicitly checks the pin.
-            .hostnameVerifier { _, session ->
-                runCatching { trust.checkServerTrusted(arrayOf(session.peerCertificates[0] as X509Certificate), "RSA"); true }.getOrDefault(false)
-            }
-            // Desktop alone sends keepalive pings. Avoid two independent ping clocks.
-            .pingInterval(0, TimeUnit.SECONDS).connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(0, TimeUnit.MILLISECONDS).build()
-    }
-
     private suspend fun connect(pairing: Pairing) = coroutineScope {
         val messages = Channel<String>(32)
         val closed = CompletableDeferred<Unit>()
-        val http = client(pairing)
+        val http = pinnedPairingClient(pairing)
         val request = Request.Builder().url(HttpUrl.Builder().scheme("https").host(pairing.host).port(pairing.port)
             .addPathSegments(if (pairing.viewer) "v1/viewer" else "v1/device").build()).header("Authorization", "Bearer ${pairing.token}").build()
         val socket = http.newWebSocket(request, object : WebSocketListener() {
@@ -279,4 +254,29 @@ class DeckNetwork(private val repo: DeckRepository, private val scope: Coroutine
             http.dispatcher.executorService.shutdown(); http.connectionPool.evictAll()
         }
     }
+}
+
+internal fun pinnedPairingClient(pairing: Pairing): OkHttpClient {
+    val trust = object : X509TrustManager {
+        override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
+        override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) =
+            throw CertificateException("Client certificates unsupported")
+        override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+            val leaf = chain?.firstOrNull() ?: throw CertificateException("Missing server certificate")
+            leaf.checkValidity()
+            val hash = MessageDigest.getInstance("SHA-256").digest(leaf.encoded).joinToString("") { "%02x".format(it) }
+            if (!MessageDigest.isEqual(hash.toByteArray(), pairing.certificateSha256.lowercase().toByteArray()))
+                throw CertificateException("Desktop certificate changed. Pair again on a trusted network.")
+        }
+    }
+    val ssl = SSLContext.getInstance("TLS").apply { init(null, arrayOf(trust), SecureRandom()) }
+    return OkHttpClient.Builder().sslSocketFactory(ssl.socketFactory, trust)
+        // Identity is the exact certificate fingerprint supplied through trusted pairing,
+        // not the changing LAN hostname/IP. This verifier still explicitly checks the pin.
+        .hostnameVerifier { _, session ->
+            runCatching { trust.checkServerTrusted(arrayOf(session.peerCertificates[0] as X509Certificate), "RSA"); true }.getOrDefault(false)
+        }
+        // Desktop alone sends keepalive pings. Avoid two independent ping clocks.
+        .pingInterval(0, TimeUnit.SECONDS).connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(0, TimeUnit.MILLISECONDS).build()
 }

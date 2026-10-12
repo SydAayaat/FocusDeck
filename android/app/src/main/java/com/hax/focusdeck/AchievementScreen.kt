@@ -113,7 +113,7 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     val layout=rememberDashboardLayout("achievements")
     var selected by rememberSaveable { mutableStateOf<String?>(null) }
     val editing=layout.editing
-    var archived by remember { mutableStateOf(false) }
+    var archived by rememberSaveable { mutableStateOf(false) }
     var layoutMenu by remember { mutableStateOf(false) }
     val mode = LocalAchievementMotion.current
     val pager = rememberPagerState(initialPage=AchievementEngine.categories.indexOf(initialCategory).coerceAtLeast(0), pageCount = { AchievementEngine.categories.size })
@@ -129,7 +129,7 @@ internal fun AchievementPages(store: AchievementStore, now: Long, zone: ZoneId, 
     else Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         EntryMotion { Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
             Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(5.dp)) { Text("Achievements",fontSize=30.sp,fontWeight=FontWeight.Bold);Text("Track your streaks, goals, and progress.",fontSize=12.sp,lineHeight=16.sp,color=AGrey) }
-            if(LocalDeckImmersive.current && LocalPrimaryNavigation.current==null) IconButton(close,Modifier.size(32.dp).semantics { contentDescription="Go to Home" }) { BundledCardIcon("house",Modifier.size(20.dp),ACyan) }
+            IconButton(close,Modifier.size(32.dp).semantics { contentDescription="Go to Home" }) { BundledCardIcon("house",Modifier.size(20.dp),ACyan) }
         } }
         if (error.isNotBlank()) Text(error, color = DeckColors.secondary, fontSize = 12.sp)
         EntryMotion(delay = 35) {

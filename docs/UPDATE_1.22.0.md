@@ -1,5 +1,7 @@
 # FocusDeck 1.22.0 · supplied three-year Developer Mode dataset
 
+This records Stage 1. The subsequent [Stage 2 navigation and QR changes](UPDATE_1.22.0_STAGE2.md) preserve this dataset and supersede its desktop-version/GitHub status.
+
 Android source is 1.22.0 / versionCode 26 on the existing local `codex/omss-native-ui` branch. This extends the existing uncommitted 1.21.0 implementation; desktop remains 1.20.0. The production phone installation remains unchanged. Only the already-isolated `.visualtest` package is deployed for this verification.
 
 ## Data and ownership

@@ -329,6 +329,16 @@ class ControlCenter:
                 if not status.get('connected') or state.get('session_id') != value.get('session_id') or state.get('block_index') != value.get('block_index'):
                     raise ValueError('The observed session changed. Refresh before acting.')
                 return self.request(dict(action=operation, expected_session_id=value['session_id'], expected_block_index=value['block_index']))
+            if action == 'pair-invite':
+                import io
+                import qrcode
+                result = self.request(dict(action='pair-invite', viewer=bool(value.get('viewer'))))
+                if not result.get('ok'): return result
+                image = qrcode.make(json.dumps(result['invitation'], separators=(',', ':')))
+                output = io.BytesIO(); image.save(output, format='PNG')
+                result['qr_image'] = 'data:image/png;base64,' + base64.b64encode(output.getvalue()).decode('ascii')
+                return result
+            if action == 'revoke-invite': return self.request(dict(action='revoke-invite', invitation_id=value.get('invitation_id')))
             if action == 'pairing': return self.request(dict(action='pairing', viewer=bool(value.get('viewer'))))
             if action == 'rename-device':
                 names = read_json(self.private / 'device-names.json', {}); names[value['id']] = str(value['name'])[:100]

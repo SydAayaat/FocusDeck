@@ -18,7 +18,9 @@ class UiQaActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        requestedOrientation=if(intent.getStringExtra("orientation")=="landscape") ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        if(savedInstanceState==null) intent.getStringExtra("orientation")?.let {
+            requestedOrientation=if(it=="landscape") ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
         val immersive=intent.getBooleanExtra("immersive",true)
         WindowCompat.getInsetsController(window,window.decorView).apply {
             isAppearanceLightStatusBars=false
@@ -31,7 +33,7 @@ class UiQaActivity : ComponentActivity() {
                 if((intent.getStringExtra("fixture") ?: "REFERENCE_3Y")=="REFERENCE_3Y") {
                     val density=LocalDensity.current
                     CompositionLocalProvider(LocalDensity provides Density(density.density,intent.getFloatExtra("fontScale",density.fontScale))) {
-                        SyntheticPreviewLoader({finish()},intent.getStringExtra("screen") ?: "home",intent.getStringExtra("scenario") ?: "idle")
+                        IsolatedPreviewHost(intent.getStringExtra("screen") ?: "home",intent.getStringExtra("scenario") ?: "idle",immersive,intent.getStringExtra("motion") ?: "OFF",{finish()})
                     }
                     return@DeckTheme
                 }
@@ -52,7 +54,6 @@ class UiQaActivity : ComponentActivity() {
                         {screen="home"},{screen="achievements"},{screen="day";period=HistoryPeriod.DAY},null)) {
                     Surface(Modifier.fillMaxSize(),color=DashboardBackground) {
                         Column(Modifier.windowInsetsPadding(dashboardViewportInsets()).padding(horizontal=if(screen.startsWith("home") || screen=="achievements") 12.dp else OmssGeometry.analyticsGutter.dp,vertical=4.dp)) {
-                            if(screen=="achievements" && immersive) ImmersiveTopNavigation()
                             if(screen.startsWith("home")) DashboardHomeHeader("Connected") {
                                 Box {
                                     TextButton({menu=true}) { Text("⋮",color=DeckColors.muted) }

@@ -148,19 +148,6 @@ import androidx.compose.animation.core.tween
         Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) { BundledCardIcon("clock",Modifier.size(23.dp),DeckColors.accent);Text("Duration deviation",fontSize=10.sp,color=DeckColors.muted);Text(estimate?.let { (if(it.delta>0) "+" else if(it.delta<0) "−" else "")+dashboardDuration(abs(it.delta)) } ?: "N/A",fontSize=17.sp,color=if((estimate?.delta ?: 0)>0) DeckColors.error else DeckColors.success) }
         Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) { BundledCardIcon("chart-no-axes-column",Modifier.size(23.dp),DeckColors.accent);Text("Est. vs. actual",fontSize=10.sp,color=DeckColors.muted);Text(estimate?.let { "${dashboardDuration(it.planned)} → ${dashboardDuration(it.actual)}" } ?: "N/A",fontSize=11.sp) }
     }
-    var calibration by remember { mutableStateOf(false) }
-    TextButton({calibration=!calibration},Modifier.height(28.dp),contentPadding=PaddingValues(0.dp)) { Text(if(calibration) "Hide project calibration" else "By project type  ›",fontSize=11.sp) }
-    if(calibration) {
-    HorizontalDivider(color=OmssColors.separator)
-    Text("By project type",fontSize=12.sp,fontWeight=FontWeight.Bold)
-    if(e.estimationGroups.isEmpty()) Text("No comparable timed DONE blocks",fontSize=12.sp,color=DeckColors.muted)
-    e.estimationGroups.forEach { (category,est)->
-        Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
-            Row(Modifier.fillMaxWidth()) { Text(category.replaceFirstChar { it.uppercase() },Modifier.weight(1f),fontSize=11.sp);Text(est.accuracy?.let { "${it.roundToInt()}%" } ?: "N/A",fontSize=11.sp);Spacer(Modifier.width(8.dp));Text((if(est.delta>0) "+" else if(est.delta<0) "−" else "")+dashboardDuration(abs(est.delta)),fontSize=11.sp,color=if(est.delta>0) DeckColors.error else DeckColors.success) }
-            FDTrack(est.accuracy?.toFloat()?.div(100),color=if(est.delta>0) DeckColors.accent else DeckColors.secondary)
-        }
-    }
-}
 }
 @Composable internal fun TelemetryInsights(e: DashboardAnalyticsEvidence,period: HistoryPeriod,presentation: TelemetryPresentation?=null) {
     val summary=buildAnnotatedString {

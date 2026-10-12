@@ -1,3 +1,7 @@
+# FocusDeck 1.22.0 · navigation repairs and local QR pairing
+
+Stage 2 restores Home settings/device controls, removes duplicate top navigation, preserves navigation state during rotation, and adds a current-period long press to the Analytics date control. Secure QR invitations complement manual JSON pairing. Android remains 1.22.0/code 26; desktop is now 1.21.0. See [Stage 2 changes and verification](docs/UPDATE_1.22.0_STAGE2.md) and [pairing workflow](docs/PAIRING_INVITATIONS.md).
+
 ## Android 1.22.0 — Read-only three-year Developer Mode
 
 Enable Developer Mode in Display settings to preview the supplied deterministic dataset across Home, Analytics, Achievements, Index, History, Timeline and Summary. Every preview uses a labeled simulated clock; **Use real data** restores the existing repository views. Synthetic records cannot enter production history, sync, rewards or genuine exports. The generator is retained as an optional utility and was not run. The existing isolated visualtest app is verified on the USB S24 Ultra; production installation remains unchanged. See [integration and verification](docs/UPDATE_1.22.0.md). Desktop remains 1.20.0.

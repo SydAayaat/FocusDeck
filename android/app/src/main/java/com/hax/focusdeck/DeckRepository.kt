@@ -300,11 +300,12 @@ class DeckRepository(private val app: Application) {
         mutex.withLock { requireWriter(); if (mutable.value.deletions.revision == revision) commit(mutable.value.copy(deletionDelivered = revision)) }
     }
 
-    suspend fun pair(pairing: Pairing) {
+    suspend fun pair(pairing: Pairing, expectedExisting: Pairing? = mutable.value.pairing) {
         pairing.validate()
         loaded.await()
         mutex.withLock {
             val old = mutable.value.pairing
+            require(old==expectedExisting) { "Pairing changed; review the current trusted desktop again" }
             val sameDesktop = old != null && old.desktopId == pairing.desktopId &&
                 old.role == pairing.role && old.token == pairing.token && old.certificateSha256.equals(pairing.certificateSha256, ignoreCase = true)
             require(sameDesktop || engine.state.phase !in listOf("active", "paused", "ready", "between", "quality", "reward", "session_reward")) { "Stop the session before changing desktops" }

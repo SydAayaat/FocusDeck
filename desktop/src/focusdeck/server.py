@@ -28,6 +28,8 @@ class DeckServer:
         self.saved = read_json(self.root / "daemon.json", {"device_id": None, "state": None, "pending": None})
         self.phone = None
         self.device = None
+        from .pairing_invitations import PairingInvitations
+        self.invitations = PairingInvitations()
         self.waiters = {}
         self.lock = asyncio.Lock()
         self.archive_lock = asyncio.Lock()
@@ -57,6 +59,9 @@ class DeckServer:
 
     def authenticate(self, connection, request):
         import hmac
+        if request.headers.get("Origin") is not None:
+            return connection.respond(403, "Browser origins are not supported\n")
+        if request.path == "/v1/pair": return None
         supplied = request.headers.get("Authorization", "")
         token = self.cfg.get("viewer_token") if request.path == "/v1/viewer" else self.cfg.get("token") if request.path == "/v1/device" else None
         if not token or not hmac.compare_digest(supplied, "Bearer " + token):
@@ -64,7 +69,27 @@ class DeckServer:
         if request.headers.get("Origin") is not None:
             return connection.respond(403, "Browser origins are not supported\n")
 
+    async def invitation_handler(self, ws):
+        from .pairing_invitations import InvitationError
+        try:
+            raw = await asyncio.wait_for(ws.recv(), 10)
+            if not isinstance(raw,str) or len(raw)>4096: raise ValueError("Invalid pairing request")
+            request = json.loads(raw)
+            async with self.lock:
+                pairing = self.invitations.redeem(request, self.cfg, self.saved['device_id'])
+            await ws.send(json.dumps(dict(type='pairing_grant',protocol_version=1,invitation_version=1,pairing=pairing)))
+        except InvitationError as error:
+            await ws.send(json.dumps(dict(type='pairing_error',error=str(error))))
+        except (ValueError, TypeError, asyncio.TimeoutError):
+            # Errors are fixed messages: never echo raw requests, credentials or parser diagnostics.
+            await ws.send(json.dumps(dict(type='pairing_error',error='Invalid, expired, used or incompatible invitation; create a new invitation')))
+        except ConnectionClosed:
+            pass
+        finally:
+            await ws.close()
+
     async def device_handler(self, ws):
+        if ws.request.path == "/v1/pair": return await self.invitation_handler(ws)
         if ws.request.path == "/v1/viewer":
             return await self.viewers.handle(ws)
         assigned = False
@@ -87,7 +112,7 @@ class DeckServer:
             if not isinstance(versions, list) or not versions or len(versions)>2 or any(type(v) is not int or v not in (1,2) for v in versions) or len(set(versions))!=len(versions):
                 raise ValueError("Invalid supported_session_versions")
             async with self.lock:
-                known = self.saved["device_id"]
+                known = self.saved["device_id"] or self.invitations.reserved_id()
                 if known and known != device_id:
                     raise ValueError("A different phone is paired; use focusdeck forget-device locally")
                 if self.phone is not None:
@@ -189,6 +214,13 @@ class DeckServer:
         if action == "devices":
             return {"ok": True, "devices": [dict(self.device, role="phone")] if self.device else [], "paired_id": self.saved["device_id"],
                     "viewers": [{"device_id": key, "name": c["name"], "role": "viewer"} for key,c in self.viewers.clients.items()]}
+        if action == "pair-invite":
+            async with self.lock:
+                invitation = self.invitations.create(self.cfg, bool(request.get('viewer', False)))
+            return dict(ok=True, invitation=invitation)
+        if action == "revoke-invite":
+            async with self.lock: self.invitations.revoke(request.get('invitation_id'))
+            return dict(ok=True)
         if action == "pairing":
             return {"ok": True, "pairing": pairing_info(self.cfg, bool(request.get("viewer", False)))}
         if action == "forget-device":

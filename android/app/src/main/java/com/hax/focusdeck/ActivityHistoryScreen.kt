@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable internal fun ActivityHistoryScreen(reports: List<Report>,store: AchievementStore,zone: ZoneId,today: LocalDate,dismiss: ()->Unit,openReport: (Report)->Unit,archive: ()->Unit,syntheticSource: SyntheticDataset? = null) {
     val compactSynthetic=LocalSyntheticPreview.current && androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp<500
+    val focusManager=androidx.compose.ui.platform.LocalFocusManager.current
     var query by rememberSaveable { mutableStateOf("") }
     var search by rememberSaveable { mutableStateOf(false) }
     var selectedNames by rememberSaveable { mutableStateOf(emptyList<String>()) }
@@ -41,7 +42,7 @@ import java.time.format.DateTimeFormatter
     var picking by remember { mutableStateOf(false) }
     var detail by remember { mutableStateOf<HistoryActivity?>(null) }
     val categories=selectedNames.mapNotNull { name -> ActivityCategory.entries.find { it.name==name } }.toSet()
-    var pageCount by remember(categories,query,fromText,toText,ascending) { mutableIntStateOf(1) }
+    var pageCount by rememberSaveable(categories,query,fromText,toText,ascending) { mutableIntStateOf(1) }
     val records by produceState<List<HistoryActivity>?>(null,reports,store,zone) { value=if(syntheticSource==null) withContext(Dispatchers.Default) { ActivityHistory.records(reports,store,zone) } else emptyList() }
     val filtered by produceState<List<HistoryActivity>?>(null,records,categories,query,fromText,toText,ascending,pageCount,syntheticSource) {
         value=if(syntheticSource!=null) withContext(Dispatchers.IO) {
@@ -58,7 +59,7 @@ import java.time.format.DateTimeFormatter
             IconButton({ascending=!ascending},Modifier.testTag("history-sort").semantics { contentDescription=if(ascending) "Sort newest first" else "Sort oldest first" }) { ActivityGlyph("arrow-up-down",Modifier.size(22.dp),DeckColors.accent) }
         }
         if(!compactSynthetic) Text(if(LocalSyntheticPreview.current) "Synthetic sessions, activity and changes." else "Your recorded sessions, activity and changes.",color=DeckColors.muted,fontSize=12.sp)
-        if(search) OutlinedTextField(query,{query=it},Modifier.fillMaxWidth().testTag("history-query"),singleLine=true,label={Text("Search recorded activity")})
+        if(search) OutlinedTextField(query,{query=it},Modifier.fillMaxWidth().testTag("history-query"),singleLine=true,keyboardOptions=androidx.compose.foundation.text.KeyboardOptions(imeAction=androidx.compose.ui.text.input.ImeAction.Search),keyboardActions=androidx.compose.foundation.text.KeyboardActions(onSearch={focusManager.clearFocus()}),label={Text("Search recorded activity")})
         val chipColors=FilterChipDefaults.filterChipColors(containerColor=DeckColors.surface,selectedContainerColor=DeckColors.surface,labelColor=DeckColors.muted,selectedLabelColor=DeckColors.accent)
         Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)) {
             FilterChip(categories.isEmpty(),{selectedNames=emptyList()},label={Text("All Activity",fontSize=11.sp)},colors=chipColors,border=BorderStroke(1.dp,if(categories.isEmpty()) DeckColors.accent else DeckColors.track))
@@ -73,7 +74,12 @@ import java.time.format.DateTimeFormatter
         }
         val rows=filtered
         val list=rememberLazyListState()
-        LaunchedEffect(pageCount,query,categories,fromText,toText,ascending) { list.scrollToItem(0) }
+        var previousFilter by rememberSaveable { mutableStateOf("$pageCount|$query|$categories|$fromText|$toText|$ascending") }
+        LaunchedEffect(pageCount,query,categories,fromText,toText,ascending) {
+            val filter="$pageCount|$query|$categories|$fromText|$toText|$ascending"
+            if(previousFilter!=filter) list.scrollToItem(0)
+            previousFilter=filter
+        }
         if(syntheticSource!=null) Row(Modifier.height(if(compactSynthetic) 36.dp else 48.dp),verticalAlignment=Alignment.CenterVertically) {
             TextButton({pageCount--},enabled=pageCount>1,modifier=Modifier.testTag("history-previous")) {Text("Previous")}
             Text("Page $pageCount",fontSize=11.sp)

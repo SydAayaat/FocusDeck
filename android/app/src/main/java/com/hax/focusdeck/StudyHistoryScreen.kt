@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -53,10 +54,10 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
     val reports by repo.history.collectAsStateWithLifecycle()
     val stored by repo.display.collectAsStateWithLifecycle()
     val historyNotice by repo.historyNotice.collectAsStateWithLifecycle()
-    var period by remember { mutableStateOf(initialPeriod) }
+    var period by rememberSaveable { mutableStateOf(initialPeriod) }
     val observedClock by repo.now.collectAsStateWithLifecycle()
     val zoneId by repo.displayZone.collectAsStateWithLifecycle()
-    var anchor by remember { mutableStateOf(Instant.ofEpochMilli(observedClock.wall).atZone(ZoneId.of(zoneId)).toLocalDate()) }
+    var anchor by rememberSaveable(stateSaver=LocalDateSaver) { mutableStateOf(Instant.ofEpochMilli(observedClock.wall).atZone(ZoneId.of(zoneId)).toLocalDate()) }
     val zone = ZoneId.of(zoneId)
     val viewer = stored.pairing?.viewer == true
     val today = Instant.ofEpochMilli(observedClock.wall).atZone(zone).toLocalDate()
@@ -67,17 +68,17 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
     val calendar by produceState<CalendarDataset?>(null,reports,stored.state) { value=withContext(Dispatchers.Default) { CalendarAnalytics.dataset(reports,stored.state) } }
     val summary = summaryState
     val window = remember(period, anchor) { StudyHistory.window(period, anchor) }
-    var pickingDate by remember { mutableStateOf(false) }
+    var pickingDate by rememberSaveable { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
     var exporting by remember { mutableStateOf(false) }
     var exportMenu by remember { mutableStateOf(false) }
     var csvPayload by remember { mutableStateOf("") }
     var deleteTarget by remember { mutableStateOf<Report?>(null) }
     var deleteAll by remember { mutableStateOf(false) }
-    var selectedReport by remember { mutableStateOf<Report?>(null) }
+    var selectedReportKey by rememberSaveable { mutableStateOf<String?>(null) }
+    val selectedReport=reports.find { it.key==selectedReportKey }
     LaunchedEffect(viewer) { if (viewer) { deleteAll = false; deleteTarget = null } }
     LaunchedEffect(reports) {
-        if (selectedReport?.let { selected -> reports.none { it.key == selected.key } } == true) selectedReport = null
         if (deleteTarget?.let { selected -> reports.none { it.key == selected.key } } == true) deleteTarget = null
     }
     val saveCsv = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/csv")) { uri ->
@@ -137,9 +138,9 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
                         (context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager).setPrimaryClip(android.content.ClipData.newPlainText("FocusDeck performance",text))
                         message="Factual performance report copied for GPT."
                     }
-                },openReport={selectedReport=it},copy=copy,delete=if(viewer) null else ({deleteTarget=it}),header={
+                },openReport={selectedReportKey=it.key},copy=copy,delete=if(viewer) null else ({deleteTarget=it}),header={
                     if (viewer) TabletViewerBanner(repo)
-                    AnalyticsHeader(period,anchor,{period=it},{anchor=it},connection,{pickingDate=true},{anchor=today},dismiss,home,achievements)
+                    AnalyticsHeader(period,anchor,{period=it},{anchor=it},connection,{pickingDate=true},{anchor=LocalDate.now()},dismiss,home,achievements)
                 },archiveActions={
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Box(Modifier.weight(1f)) {
@@ -198,7 +199,7 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
         text = { Text("Removes study records and regenerates automatic CSV logs on this phone, its chosen log folder, and the paired PC when synced. Independently exported copies are retained. The current active session continues.") },
         confirmButton = { TextButton(onClick = {
             val key = if (deleteAll) null else deleteTarget?.key
-            deleteAll = false; deleteTarget = null; selectedReport = null
+            deleteAll = false; deleteTarget = null; selectedReportKey = null
             scope.launch {
                 try { repo.deleteHistory(key); message = "Deletion saved. Automatic files update and PC sync follows." }
                 catch (e: Exception) { message = "Deletion could not save: ${e.message}" }
@@ -210,7 +211,7 @@ fun StudyHistoryDialog(repo: DeckRepository, dismiss: () -> Unit, copy: (Report)
         val picker=rememberDatePickerState(initialSelectedDateMillis=anchor.atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli())
         DatePickerDialog(onDismissRequest={pickingDate=false},confirmButton={TextButton({picker.selectedDateMillis?.let { anchor=Instant.ofEpochMilli(it).atZone(java.time.ZoneOffset.UTC).toLocalDate() };pickingDate=false}) { Text("SELECT") }},dismissButton={TextButton({pickingDate=false}) { Text("CANCEL") }}) { DatePicker(picker) }
     }
-    selectedReport?.let { report -> ReportDetailsDialog(report, { selectedReport = null }, { repo.history.value.find { it.key==report.key }?.let(copy) },currentReport={repo.history.value.find { it.key==report.key }}) }
+    selectedReport?.let { report -> ReportDetailsDialog(report, { selectedReportKey = null }, { repo.history.value.find { it.key==report.key }?.let(copy) },currentReport={repo.history.value.find { it.key==report.key }}) }
 }
 
 @Composable

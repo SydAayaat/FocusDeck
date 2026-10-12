@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FocusDeck ephemeral TLS pairing invitation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "invitation_version",
+    "protocol_version",
+    "invitation_id",
+    "nonce",
+    "host",
+    "port",
+    "desktop_id",
+    "certificate_sha256",
+    "role",
+    "expires_at_ms"
+  ],
+  "properties": {
+    "type": {
+      "const": "focusdeck_pairing_invitation"
+    },
+    "invitation_version": {
+      "const": 1
+    },
+    "protocol_version": {
+      "const": 1
+    },
+    "invitation_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "nonce": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{43}$"
+    },
+    "host": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9.:-]{1,253}$"
+    },
+    "port": {
+      "type": "integer",
+      "minimum": 1024,
+      "maximum": 65535
+    },
+    "desktop_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "certificate_sha256": {
+      "type": "string",
+      "pattern": "^[a-fA-F0-9]{64}$"
+    },
+    "role": {
+      "enum": [
+        "phone",
+        "viewer"
+      ]
+    },
+    "expires_at_ms": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

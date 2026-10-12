@@ -39,7 +39,8 @@ internal fun timelineHalfHours(data: CalendarDataset,date: LocalDate,zone: ZoneI
     val observed by repo.now.collectAsStateWithLifecycle()
     val zone by repo.displayZone.collectAsStateWithLifecycle()
     val data by produceState<CalendarDataset?>(null,reports,stored.state) { value=withContext(Dispatchers.Default) { timelineDataset(reports,stored.state) } }
-    data?.let { ExpandedTimelineDialog(it,reports,Instant.ofEpochMilli(observed.wall).atZone(ZoneId.of(zone)).toLocalDate(),dismiss,openReport) }
+    val date=rememberSaveable(saver=LocalDateSaver) { Instant.ofEpochMilli(observed.wall).atZone(ZoneId.of(zone)).toLocalDate() }
+    data?.let { ExpandedTimelineDialog(it,reports,date,dismiss,openReport) }
 }
 @Composable internal fun ExpandedTimelineDialog(data: CalendarDataset,reports: List<Report>,date: LocalDate,dismiss: ()->Unit,openReport: (Report)->Unit) {
     Dialog(dismiss,properties=DialogProperties(usePlatformDefaultWidth=false,decorFitsSystemWindows=false)) {

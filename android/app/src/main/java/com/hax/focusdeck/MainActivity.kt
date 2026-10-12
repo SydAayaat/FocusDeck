@@ -79,32 +79,41 @@ class MainActivity : ComponentActivity() {
         setContent {
             val stored by repo.display.collectAsStateWithLifecycle()
             DeckTheme(stored.theme, stored.motion, stored.immersive) {
+                DisposableEffect(stored.immersive) {
+                    WindowCompat.getInsetsController(window,window.decorView).apply {
+                        isAppearanceLightStatusBars=false;isAppearanceLightNavigationBars=false
+                        systemBarsBehavior=WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                        if(stored.immersive) hide(WindowInsetsCompat.Type.systemBars()) else show(WindowInsetsCompat.Type.systemBars())
+                    }
+                    onDispose {}
+                }
                 if(stored.developerMode) {
                     val previewScope=rememberCoroutineScope()
-                    SyntheticPreviewLoader(disable={previewScope.launch { repo.developerMode(false) }})
+                    ProductionPreviewHost(repo,stored,disable={previewScope.launch { repo.developerMode(false) }})
                     return@DeckTheme
                 }
                 val connection by repo.connection.collectAsStateWithLifecycle()
                 val tabletSnapshot by repo.tablet.snapshot.collectAsStateWithLifecycle()
                 val storageError by repo.error.collectAsStateWithLifecycle()
                 val scope = rememberCoroutineScope()
-                var pairDialog by remember { mutableStateOf(false) }
-                var settingsDialog by remember { mutableStateOf(false) }
-                var soundDialog by remember { mutableStateOf(false) }
-                var developerDialog by remember { mutableStateOf(false) }
-                var activityHistory by remember { mutableStateOf(false) }
-                var dailyTimeline by remember { mutableStateOf(false) }
+                var devicesDialog by rememberSaveable { mutableStateOf(false) }
+                var pairDialog by rememberSaveable { mutableStateOf(false) }
+                var settingsDialog by rememberSaveable { mutableStateOf(false) }
+                var soundDialog by rememberSaveable { mutableStateOf(false) }
+                var developerDialog by rememberSaveable { mutableStateOf(false) }
+                var activityHistory by rememberSaveable { mutableStateOf(false) }
+                var dailyTimeline by rememberSaveable { mutableStateOf(false) }
                 val timelineNavigation=remember { TimelineNavigationState() }
                 val observedDate by remember(repo) {
                     combine(repo.now,repo.displayZone) { stamp,zone -> Instant.ofEpochMilli(stamp.wall).atZone(ZoneId.of(zone)).toLocalDate() }.distinctUntilChanged()
                 }.collectAsStateWithLifecycle(initialValue=remember(repo) { Instant.ofEpochMilli(repo.now.value.wall).atZone(ZoneId.of(repo.displayZone.value)).toLocalDate() })
                 val archivedReports by repo.history.collectAsStateWithLifecycle()
-                var historyDialog by remember { mutableStateOf(false) }
-                var historyInitialPeriod by remember { mutableStateOf(HistoryPeriod.WEEK) }
-                var historyExpanded by remember { mutableStateOf(false) }
+                var historyDialog by rememberSaveable { mutableStateOf(false) }
+                var historyInitialPeriod by rememberSaveable { mutableStateOf(HistoryPeriod.WEEK) }
+                var historyExpanded by rememberSaveable { mutableStateOf(false) }
                 val homeLayout=rememberDashboardLayout("overview")
-                var reportDialog by remember { mutableStateOf<Report?>(null) }
-                LaunchedEffect(archivedReports) { if(reportDialog?.let { selected -> archivedReports.none { it.key==selected.key } }==true) reportDialog=null }
+                var reportKey by rememberSaveable { mutableStateOf<String?>(null) }
+                val reportDialog=archivedReports.find { it.key==reportKey }
                 var menu by remember { mutableStateOf(false) }
                 var menuRevision by remember { mutableStateOf(0L) }
                 var endRequest by remember { mutableStateOf<Triple<String, Long, String>?>(null) }
@@ -151,15 +160,9 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
-                DisposableEffect(stored.keepAwake, stored.immersive, active) {
+                DisposableEffect(stored.keepAwake, active) {
                     if (stored.keepAwake && active) window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     else window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    val controller = WindowCompat.getInsetsController(window, window.decorView)
-                    controller.isAppearanceLightStatusBars=false
-                    controller.isAppearanceLightNavigationBars=false
-                    controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-                    if (stored.immersive) controller.hide(WindowInsetsCompat.Type.systemBars())
-                    else controller.show(WindowInsetsCompat.Type.systemBars())
                     onDispose { window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON) }
                 }
                 val page = when {
@@ -178,7 +181,9 @@ class MainActivity : ComponentActivity() {
                                     DropdownMenuItem(text = { Text("Achievements") }, onClick = { menu=false;achievementsPage=true;homeSelected=false })
                                     if(stored.state.session!=null) DropdownMenuItem(text = { Text("Focus session") }, onClick = { menu=false;achievementsPage=false;homeSelected=false })
                                     DropdownMenuItem(text = { Text("Pair desktop") }, onClick = { menu = false; pairDialog = true })
+                                    DropdownMenuItem(text = { Text("Devices") }, onClick = { menu=false;devicesDialog=true })
                                     DropdownMenuItem(text = { Text("Sounds") }, onClick = { menu = false; soundDialog = true })
+                                    if(!viewer) DropdownMenuItem(text={Text("Developer Mode settings")},onClick={menu=false;settingsDialog=true})
                                     if(stored.developerMode && !viewer) DropdownMenuItem(text = { Text("Developer preview") }, onClick = { menu = false; developerDialog = true })
                                     DropdownMenuItem(text = { Text("Display settings") }, onClick = { menu = false; settingsDialog = true })
                                     if(!achievementsPage && (homeSelected || stored.state.session==null || stored.state.phase in listOf("idle","complete","stopped"))) DropdownMenuItem(text={Text("Edit Home layout")},onClick={menu=false;homeLayout.editing=true})
@@ -199,15 +204,14 @@ class MainActivity : ComponentActivity() {
                 val navigation=PrimaryNavigation(if(page in listOf("viewer","reward")) "focus" else page,
                     home={achievementsPage=false;homeSelected=true},achievements={achievementsPage=true;homeSelected=false},
                     analytics={historyDialog=true},focus=if(stored.state.session!=null || viewer) ({achievementsPage=false;homeSelected=false}) else null)
-                androidx.activity.compose.BackHandler(homeSelected && stored.state.session!=null && !achievementsPage && !historyDialog) { homeSelected=false }
+                DestinationBackHandler(page=="home") { achievementsPage=false;homeSelected=true }
                 CompositionLocalProvider(LocalPrimaryNavigation provides navigation,LocalTimelineNavigation provides timelineNavigation,
                     LocalDashboardDate provides observedDate) {
                 Surface(Modifier.fillMaxSize(), color = if(page in listOf("home","achievements")) DashboardBackground else Background) {
                     Column(Modifier.windowInsetsPadding(dashboardViewportInsets()).padding(horizontal = if(page in listOf("home","achievements")) 16.dp else 24.dp, vertical = if(stored.immersive) 4.dp else 12.dp)) {
-                        if(page=="achievements" && stored.immersive) ImmersiveTopNavigation()
                         if(page=="home") DashboardHomeHeader(connection,toolbarMenu)
                         else if(page!="achievements") Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
-                            if(stored.immersive) ImmersiveTopNavigation() else {
+                            if(!stored.immersive) {
                                 IconButton({historyDialog=true}) { UiGlyph("chart",Modifier.size(24.dp)) }
                                 IconButton({achievementsPage=!achievementsPage}) { UiGlyph("trophy",Modifier.size(24.dp)) }
                             }
@@ -226,7 +230,7 @@ class MainActivity : ComponentActivity() {
                                 "focus" -> FocusScreen(stored.state, repo, stored.dimDesk, pending, ::action)
                                 else -> CompositionLocalProvider(LocalDashboardLayout provides homeLayout, LocalAmbientEnabled provides (page == "home" && !historyDialog && !activityHistory && !dailyTimeline && !pairDialog && !settingsDialog && !soundDialog && !developerDialog && reportDialog == null && !menu)) {
                                     HomeScreen(repo, stored.pairing != null, connection,
-                                        history = { activityHistory = true }, pair = { pairDialog = true }, openReport = { reportDialog = it }, expandAnalytics = { dailyTimeline=true }, openSession={homeSelected=false},achievements={achievementsPage=true;homeSelected=false})
+                                        history = { activityHistory = true }, pair = { pairDialog = true }, openReport = { reportKey = it.key }, expandAnalytics = { dailyTimeline=true }, openSession={homeSelected=false},achievements={achievementsPage=true;homeSelected=false})
                                 }
                             }
                         }
@@ -246,13 +250,11 @@ class MainActivity : ComponentActivity() {
                         }) { Text(if (wholeSession) "End session" else "End block", color = endColor) } },
                         dismissButton = { TextButton(onClick = { endRequest = null }) { Text("Cancel") } })
                 }
-                if (pairDialog) PairDialog(stored.pairing, { pairDialog = false }) { pairing ->
-                    scope.launch {
-                        try {
-                            repo.pair(pairing); pairDialog = false
-                            startForegroundService(Intent(this@MainActivity, FocusService::class.java))
-                        } catch (e: Exception) { localError = e.message.orEmpty() }
-                    }
+                if(devicesDialog) DeviceManagementDialog(stored.pairing,connection,{devicesDialog=false},{devicesDialog=false;pairDialog=true},{startForegroundService(Intent(this@MainActivity,FocusService::class.java))},{stopService(Intent(this@MainActivity,FocusService::class.java))})
+                if (pairDialog) PairDialog(stored.pairing, { pairDialog = false },stored.deviceId,
+                    trustChangeAllowed=stored.state.phase !in listOf("active","paused","ready","between","quality","reward","session_reward")) { pairing, expected ->
+                    repo.pair(pairing,expected); pairDialog=false
+                    startForegroundService(Intent(this@MainActivity, FocusService::class.java))
                 }
                 if (settingsDialog) SettingsDialog(stored, connection, { settingsDialog = false },
                     save = { awake, immersive, sound, dim, motion, theme, rate -> scope.launch { repo.preferences(awake, immersive, sound, dim, motion, theme, rate) } },
@@ -261,10 +263,10 @@ class MainActivity : ComponentActivity() {
                     developer = { enabled -> scope.launch { repo.developerMode(enabled) } })
                 if(soundDialog) SoundSettingsDialog(stored,repo) { soundDialog=false }
                 if(developerDialog && stored.developerMode) DeveloperPreviewDialog { developerDialog=false }
-                if(activityHistory) ActivityHistoryDialog(repo,{activityHistory=false},{reportDialog=it},{activityHistory=false;historyDialog=true})
-                if(dailyTimeline) RepositoryTimelineDialog(repo,{dailyTimeline=false},{reportDialog=it})
-                if (historyDialog) StudyHistoryDialog(repo, { historyDialog = false;historyInitialPeriod=HistoryPeriod.WEEK;historyExpanded=false }, ::copySummary, historyInitialPeriod, initialExpanded=historyExpanded, home={historyDialog=false;historyExpanded=false;achievementsPage=false;homeSelected=true}, achievements={historyDialog=false;historyExpanded=false;achievementsPage=true;homeSelected=false}, focus=navigation.focus?.let { go -> { historyDialog=false;historyExpanded=false;go() } })
-                reportDialog?.let { report -> ReportDetailsDialog(report, { reportDialog = null }, { copySummary(report) },
+                if(activityHistory) ActivityHistoryDialog(repo,{activityHistory=false},{reportKey=it.key},{activityHistory=false;historyDialog=true})
+                if(dailyTimeline) RepositoryTimelineDialog(repo,{dailyTimeline=false},{reportKey=it.key})
+                if (historyDialog) StudyHistoryDialog(repo, { historyDialog = false;historyInitialPeriod=HistoryPeriod.WEEK;historyExpanded=false;achievementsPage=false;homeSelected=true }, ::copySummary, historyInitialPeriod, initialExpanded=historyExpanded, home={historyDialog=false;historyExpanded=false;achievementsPage=false;homeSelected=true}, achievements={historyDialog=false;historyExpanded=false;achievementsPage=true;homeSelected=false}, focus=navigation.focus?.let { go -> { historyDialog=false;historyExpanded=false;go() } })
+                reportDialog?.let { report -> ReportDetailsDialog(report, { reportKey = null }, { copySummary(report) },
                     delivered = report.key in stored.delivered, online = !viewer && connection == "Connected",
                     send = if (!viewer && stored.reports.any { it.key == report.key }) ({ scope.launch { repo.resendReport(report.key) }; Unit }) else null,currentReport={repo.history.value.find { it.key==report.key }}) }
                 } // Primary destination navigation is also inherited by app dialogs.
@@ -428,27 +430,8 @@ private fun timerText(remaining: Long, overtime: Boolean): String {
 }
 
 @Composable
-private fun PairDialog(existing: Pairing?, dismiss: () -> Unit, save: (Pairing) -> Unit) {
-    var input by remember { mutableStateOf(existing?.let { WireJson.encodeToJsonElement(it).toString() } ?: "") }
-    var error by remember { mutableStateOf("") }
-    DeckAlertDialog(onDismissRequest = dismiss, title = { Text("Pair desktop") }, text = {
-        Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Phone: run focusdeck pairing. Tablet (read-only): run focusdeck pairing --viewer. Paste the matching JSON here. Keep the token private.", color = Grey, fontSize = 13.sp)
-            OutlinedTextField(value = input, onValueChange = { if (it.length <= 4096) input = it }, label = { Text("Pairing JSON") }, minLines = 4, maxLines = 8)
-            if (error.isNotEmpty()) Text(error, color = Yellow, fontSize = 12.sp)
-        }
-    }, confirmButton = { TextButton(onClick = {
-        try {
-            val obj = WireJson.parseToJsonElement(input).jsonObject
-            val pairing = WireJson.decodeFromJsonElement<Pairing>(obj["pairing"] ?: obj)
-            pairing.validate(); save(pairing)
-        } catch (e: Exception) { error = e.message ?: "Invalid pairing JSON" }
-    }) { Text("PAIR") } }, dismissButton = { TextButton(dismiss) { Text("CANCEL") } })
-}
-
-@Composable
-private fun SettingsDialog(stored: StoredDeck, connection: String, dismiss: () -> Unit,
-    save: (Boolean, Boolean, Boolean, Boolean, String, String, Int) -> Unit, connect: () -> Unit, disconnect: () -> Unit, developer: (Boolean) -> Unit) {
+internal fun SettingsDialog(stored: StoredDeck, connection: String, dismiss: () -> Unit,
+    save: (Boolean, Boolean, Boolean, Boolean, String, String, Int) -> Unit, connect: () -> Unit, disconnect: () -> Unit, developer: (Boolean) -> Unit,connectionControls: Boolean=true) {
     var awake by remember { mutableStateOf(stored.keepAwake) }
     var immersive by remember { mutableStateOf(stored.immersive) }
     var sound by remember { mutableStateOf(stored.sound) }
@@ -485,8 +468,7 @@ private fun SettingsDialog(stored: StoredDeck, connection: String, dismiss: () -
             Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(dev, { dev = it }); Text("Developer mode") }
             Text("Shows the read-only three-year synthetic preview at its fixed simulated date. Use real data returns to your saved activity.", fontSize = 12.sp, color = Grey)
             Text(connection, fontSize = 12.sp, color = Grey)
-            TextButton(connect) { Text("CONNECT DESKTOP") }
-            TextButton(disconnect) { Text("DISCONNECT DESKTOP") }
+            if(connectionControls) {TextButton(connect) { Text("CONNECT DESKTOP") };TextButton(disconnect) { Text("DISCONNECT DESKTOP") }}
         }
     }, confirmButton = { TextButton(onClick = { save(awake, immersive, sound, dim, motion, theme, rate); developer(dev); dismiss() }) { Text("SAVE") } },
         dismissButton = { TextButton(dismiss) { Text("CANCEL") } })
